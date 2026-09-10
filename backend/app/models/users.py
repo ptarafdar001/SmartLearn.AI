@@ -65,6 +65,11 @@ class User(Base):
         uselist=False,
         cascade="all, delete-orphan",
     )
+    student_progress_records: Mapped[List["StudentProgress"]] = relationship(
+        "StudentProgress",
+        back_populates="user",
+        cascade="all, delete-orphan",
+    )
 
     def __repr__(self) -> str:
         return f"<User id={self.id} email={self.email!r} role={self.role!r} is_onboarded={self.is_onboarded}>"

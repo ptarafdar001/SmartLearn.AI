@@ -4,6 +4,13 @@ All models are imported here for clean discovery by Alembic and application serv
 """
 
 from app.db.base import Base
+from app.models.learning import (
+    Chapter,
+    LearningResource,
+    StudentProgress,
+    Subject,
+    Topic,
+)
 from app.models.onboarding import (
     LearningPreference,
     StudentProfile,
@@ -21,4 +28,9 @@ __all__ = [
     "LearningPreference",
     "StudyGoal",
     "StudySchedule",
+    "Subject",
+    "Chapter",
+    "Topic",
+    "LearningResource",
+    "StudentProgress",
 ]
