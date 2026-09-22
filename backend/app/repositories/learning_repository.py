@@ -3,10 +3,21 @@ Repository for learning entities and student progress data access.
 """
 
 from datetime import datetime, timezone
-from typing import Dict, List, Optional
+from typing import Any, Dict, List, Optional
 from sqlalchemy.orm import Session
 
-from app.models.learning import Chapter, LearningResource, StudentProgress, Subject, Topic
+from app.models.learning import (
+    Chapter,
+    LearningObjective,
+    LearningResource,
+    PracticeQuestion,
+    PreviousYearQuestion,
+    StudentProgress,
+    StudentQuestionAttempt,
+    Subject,
+    Topic,
+    TopicStudyNotes,
+)
 
 
 class LearningRepository:
@@ -190,3 +201,187 @@ class LearningRepository:
         db.commit()
         db.refresh(record)
         return record
+
+    # ── Learning Objectives ───────────────────────────────────────────────────
+    @staticmethod
+    def get_learning_objectives(
+        db: Session, topic_id: int, only_verified: bool = True
+    ) -> List[LearningObjective]:
+        """Fetch curriculum learning objectives for a topic."""
+        query = db.query(LearningObjective).filter(LearningObjective.topic_id == topic_id)
+        if only_verified:
+            query = query.filter(LearningObjective.is_verified == True)
+        return query.order_by(LearningObjective.code).all()
+
+    # ── Previous Year Questions (PYQs) ────────────────────────────────────────
+    @staticmethod
+    def get_pyqs_by_topic_id(
+        db: Session, topic_id: int, only_verified: bool = True
+    ) -> List[PreviousYearQuestion]:
+        """Fetch authentic previous-year exam questions for a topic."""
+        query = db.query(PreviousYearQuestion).filter(PreviousYearQuestion.topic_id == topic_id)
+        if only_verified:
+            query = query.filter(PreviousYearQuestion.is_verified == True)
+        return query.order_by(PreviousYearQuestion.exam_year.desc()).all()
+
+    @staticmethod
+    def get_pyqs_by_subject_id(
+        db: Session, subject_id: int, only_verified: bool = True
+    ) -> List[PreviousYearQuestion]:
+        """Fetch authentic previous-year exam questions for an entire subject."""
+        query = db.query(PreviousYearQuestion).filter(PreviousYearQuestion.subject_id == subject_id)
+        if only_verified:
+            query = query.filter(PreviousYearQuestion.is_verified == True)
+        return query.order_by(PreviousYearQuestion.exam_year.desc()).all()
+
+    @staticmethod
+    def get_pyq_by_id(db: Session, pyq_id: int) -> Optional[PreviousYearQuestion]:
+        """Fetch a single authentic PYQ by primary key."""
+        return db.query(PreviousYearQuestion).filter(PreviousYearQuestion.id == pyq_id).first()
+
+    # ── Practice Questions (AI-Generated & Curated) ───────────────────────────
+    @staticmethod
+    def get_practice_questions(
+        db: Session, topic_id: int, difficulty: Optional[str] = None
+    ) -> List[PracticeQuestion]:
+        """Fetch practice questions for a topic, optionally filtered by difficulty."""
+        query = db.query(PracticeQuestion).filter(PracticeQuestion.topic_id == topic_id)
+        if difficulty:
+            query = query.filter(PracticeQuestion.difficulty == difficulty)
+        return query.order_by(PracticeQuestion.id).all()
+
+    @staticmethod
+    def get_practice_question_by_id(
+        db: Session, question_id: int
+    ) -> Optional[PracticeQuestion]:
+        """Fetch a single practice question by primary key."""
+        return db.query(PracticeQuestion).filter(PracticeQuestion.id == question_id).first()
+
+    # ── Student Question Attempts ─────────────────────────────────────────────
+    @staticmethod
+    def record_question_attempt(
+        db: Session,
+        user_id: int,
+        question_type: str,
+        user_answer: str,
+        is_correct: Optional[bool] = None,
+        marks_obtained: Optional[float] = None,
+        feedback: Optional[str] = None,
+        pyq_id: Optional[int] = None,
+        practice_question_id: Optional[int] = None,
+    ) -> StudentQuestionAttempt:
+        """Persist a student attempt on a PYQ or practice question."""
+        now = datetime.now(timezone.utc)
+        attempt = StudentQuestionAttempt(
+            user_id=user_id,
+            question_type=question_type,
+            user_answer=user_answer,
+            is_correct=is_correct,
+            marks_obtained=marks_obtained,
+            feedback=feedback,
+            pyq_id=pyq_id,
+            practice_question_id=practice_question_id,
+            attempted_at=now,
+        )
+        db.add(attempt)
+        db.commit()
+        db.refresh(attempt)
+        return attempt
+
+    @staticmethod
+    def get_user_question_attempts(
+        db: Session, user_id: int, limit: int = 50
+    ) -> List[StudentQuestionAttempt]:
+        """Fetch recent attempts for a student."""
+        return (
+            db.query(StudentQuestionAttempt)
+            .filter(StudentQuestionAttempt.user_id == user_id)
+            .order_by(StudentQuestionAttempt.attempted_at.desc())
+            .limit(limit)
+            .all()
+        )
+
+    # ── Topic Study Notes ─────────────────────────────────────────────────────
+    @staticmethod
+    def get_topic_study_notes(
+        db: Session, topic_id: int, notes_type: str = "comprehensive"
+    ) -> Optional[TopicStudyNotes]:
+        """Fetch cached study notes for a topic."""
+        return (
+            db.query(TopicStudyNotes)
+            .filter(
+                TopicStudyNotes.topic_id == topic_id,
+                TopicStudyNotes.notes_type == notes_type,
+            )
+            .first()
+        )
+
+    @staticmethod
+    def upsert_topic_study_notes(
+        db: Session,
+        topic_id: int,
+        notes_type: str,
+        title: str,
+        overview: str,
+        explanation_markdown: str,
+        learning_objectives_json: Optional[Any] = None,
+        key_terms_json: Optional[Any] = None,
+        formulas_and_dates_json: Optional[Any] = None,
+        diagrams_json: Optional[Any] = None,
+        common_misconceptions_json: Optional[Any] = None,
+        exam_points_json: Optional[Any] = None,
+        practice_questions_json: Optional[Any] = None,
+        source_references_json: Optional[Any] = None,
+        is_verified: bool = True,
+    ) -> TopicStudyNotes:
+        """Create or update cached study notes for a topic."""
+        now = datetime.now(timezone.utc)
+        record = (
+            db.query(TopicStudyNotes)
+            .filter(
+                TopicStudyNotes.topic_id == topic_id,
+                TopicStudyNotes.notes_type == notes_type,
+            )
+            .first()
+        )
+        if record:
+            record.title = title
+            record.overview = overview
+            record.explanation_markdown = explanation_markdown
+            record.learning_objectives_json = learning_objectives_json
+            record.key_terms_json = key_terms_json
+            record.formulas_and_dates_json = formulas_and_dates_json
+            record.diagrams_json = diagrams_json
+            record.common_misconceptions_json = common_misconceptions_json
+            record.exam_points_json = exam_points_json
+            record.practice_questions_json = practice_questions_json
+            record.source_references_json = source_references_json
+            record.version += 1
+            record.is_verified = is_verified
+            record.updated_at = now
+        else:
+            record = TopicStudyNotes(
+                topic_id=topic_id,
+                notes_type=notes_type,
+                title=title,
+                overview=overview,
+                explanation_markdown=explanation_markdown,
+                learning_objectives_json=learning_objectives_json,
+                key_terms_json=key_terms_json,
+                formulas_and_dates_json=formulas_and_dates_json,
+                diagrams_json=diagrams_json,
+                common_misconceptions_json=common_misconceptions_json,
+                exam_points_json=exam_points_json,
+                practice_questions_json=practice_questions_json,
+                source_references_json=source_references_json,
+                version=1,
+                is_verified=is_verified,
+                created_at=now,
+                updated_at=now,
+            )
+            db.add(record)
+
+        db.commit()
+        db.refresh(record)
+        return record
+

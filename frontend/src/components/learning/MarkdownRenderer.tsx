@@ -4,6 +4,7 @@ import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import { Copy, Check } from 'lucide-react';
+import { MermaidDiagram } from './MermaidDiagram';
 
 interface MarkdownRendererProps {
   content: string;
@@ -33,6 +34,10 @@ const CodeBlock: React.FC<CodeBlockProps> = ({ inline, className, children, ...p
         {children}
       </code>
     );
+  }
+
+  if (language === 'mermaid') {
+    return <MermaidDiagram code={textContent} />;
   }
 
   return (

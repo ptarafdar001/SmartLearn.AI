@@ -21,11 +21,13 @@ from app.repositories.learning_repository import LearningRepository
 from app.repositories.onboarding_repository import OnboardingRepository
 from app.repositories.user_repository import UserRepository
 from app.schemas.tutor import (
+    GroundedSourceItem,
     TutorChatMessage,
     TutorChatRequest,
     TutorChatResponse,
     VoiceSessionResponse,
 )
+from app.services.rag_service import RAGRetrievalService
 
 logger = logging.getLogger("smartlearn.tutor")
 settings = get_settings()
@@ -47,44 +49,61 @@ class TutorService:
         """
         Generate a pedagogical, curriculum-grounded response for the authenticated student.
         """
-        # 1. Verify and retrieve student context
+        # 1. Retrieve authenticated student and learning context
         user = UserRepository.get_by_id(db, user_id)
         if not user:
             raise ValueError("Student user not found")
 
-        profile = OnboardingRepository.get_student_profile(db, user_id)
         learning_pref = OnboardingRepository.get_learning_preference(db, user_id)
 
-        # 2. Verify and retrieve topic & syllabus context
-        topic = LearningRepository.get_topic_by_id(db, request.topic_id)
-        if not topic:
-            raise ValueError(f"Topic with id {request.topic_id} not found")
-
-        chapter = LearningRepository.get_chapter_by_id(db, topic.chapter_id)
-        subject = (
-            LearningRepository.get_subject_by_id(db, chapter.subject_id)
-            if chapter
-            else None
+        # 2. Retrieve verified curriculum evidence bundle and evaluate academic scope
+        bundle = RAGRetrievalService.validate_and_retrieve_context(
+            db=db,
+            user_id=user_id,
+            topic_id=request.topic_id,
+            student_query=request.message,
         )
 
-        board_name = subject.board if subject else (profile.board if profile else "CBSE")
-        grade_name = subject.grade if subject else (profile.grade if profile else "Class 11")
-        stream_name = (
-            subject.academic_stream
-            if subject and subject.academic_stream
-            else (profile.academic_stream if profile else None)
+        board_name = bundle.subject.board
+        grade_name = bundle.subject.grade
+        stream_name = bundle.subject.academic_stream or (
+            bundle.profile.academic_stream if bundle.profile else None
         )
-        subject_name = subject.name if subject else "General Studies"
-        chapter_title = chapter.title if chapter else "Current Chapter"
-        chapter_num = chapter.chapter_number if chapter else 1
+        subject_name = bundle.subject.name
+        chapter_title = bundle.chapter.title
+        chapter_num = bundle.chapter.chapter_number
+        topic = bundle.topic
 
-        # 3. Retrieve verified learning resources for grounding
-        resources = LearningRepository.get_resources_by_topic_id(
-            db, topic.id, only_active=True
-        )
-        grounded_titles = [r.title for r in resources if r.is_verified]
+        grounded_sources = [
+            GroundedSourceItem(
+                title=r.title,
+                source_name=r.source_name,
+                source_url=r.source_url,
+                is_verified=r.is_verified,
+                resource_type=r.resource_type,
+            )
+            for r in bundle.verified_resources
+        ]
+        grounded_titles = [r.title for r in bundle.verified_resources]
+        objectives_list = [obj.description for obj in bundle.learning_objectives]
 
-        # 4. Construct System Instruction with curriculum grounding
+        # 3. Server-side curriculum scope enforcement
+        if bundle.is_out_of_scope and bundle.redirection_guidance:
+            return TutorChatResponse(
+                reply=bundle.redirection_guidance,
+                topic_id=topic.id,
+                topic_title=topic.title,
+                subject_name=subject_name,
+                board=board_name,
+                grade=grade_name,
+                grounded_resource_titles=grounded_titles,
+                grounded_sources=grounded_sources,
+                learning_objectives=objectives_list,
+                is_out_of_scope=True,
+                scope_redirection_guidance=bundle.redirection_guidance,
+            )
+
+        # 4. Construct System Instruction with verified curriculum grounding
         system_instruction = cls._build_system_instruction(
             student_name=user.full_name,
             board=board_name,
@@ -97,7 +116,8 @@ class TutorService:
             topic_number=topic.topic_number,
             topic_title=topic.title,
             topic_description=topic.description or "",
-            resources=resources,
+            resources=bundle.verified_resources,
+            evidence_bundle=bundle,
         )
 
         # 5. Check API key configuration
@@ -136,6 +156,14 @@ class TutorService:
             or "outside of our topic" in reply_text.lower()
         )
 
+        # Extract Mermaid diagram if present
+        diagram_code = None
+        if "```mermaid" in reply_text:
+            try:
+                diagram_code = reply_text.split("```mermaid")[1].split("```")[0].strip()
+            except Exception:
+                pass
+
         return TutorChatResponse(
             reply=reply_text,
             topic_id=topic.id,
@@ -144,7 +172,10 @@ class TutorService:
             board=board_name,
             grade=grade_name,
             grounded_resource_titles=grounded_titles,
+            grounded_sources=grounded_sources,
+            learning_objectives=objectives_list,
             is_out_of_scope=is_out_of_scope,
+            diagram_code=diagram_code,
         )
 
     @classmethod
@@ -162,9 +193,10 @@ class TutorService:
         topic_title: str,
         topic_description: str,
         resources: List[LearningResource],
+        evidence_bundle: Optional[Any] = None,
     ) -> str:
         """Construct a syllabus-grounded system prompt."""
-        # Compile verified resources context (notes and reading texts)
+        # Compile verified resources context
         resource_excerpts = []
         for r in resources:
             if r.text_content:
@@ -177,6 +209,22 @@ class TutorService:
             if resource_excerpts
             else "No explicit text resources pre-loaded for this topic. Base guidance on standard verified syllabus concepts."
         )
+
+        objectives_text = ""
+        if evidence_bundle and evidence_bundle.learning_objectives:
+            obj_lines = [
+                f"- [{obj.code}] {obj.description}"
+                for obj in evidence_bundle.learning_objectives
+            ]
+            objectives_text = "\n\nOFFICIAL SYLLABUS LEARNING OBJECTIVES:\n" + "\n".join(obj_lines)
+
+        pyq_text = ""
+        if evidence_bundle and evidence_bundle.authentic_pyqs:
+            pyq_lines = [
+                f"- [{q.board} {q.exam_year} {q.paper_code} {q.question_number} ({q.marks} Marks)]: {q.question_text}"
+                for q in evidence_bundle.authentic_pyqs[:3]
+            ]
+            pyq_text = "\n\nAUTHENTIC PREVIOUS-YEAR EXAMINATION PATTERNS:\n" + "\n".join(pyq_lines)
 
         stream_info = f", Stream: {stream}" if stream else ""
 
@@ -191,13 +239,15 @@ class TutorService:
             f"- Subject: {subject_name}\n"
             f"- Chapter {chapter_number}: {chapter_title}\n"
             f"- Topic {topic_number}: {topic_title}\n"
-            f"- Topic Description: {topic_description}\n\n"
+            f"- Topic Description: {topic_description}\n"
+            f"{objectives_text}\n"
+            f"{pyq_text}\n\n"
             f"VERIFIED CURRICULUM GROUNDING MATERIAL:\n"
             f"{resources_text}\n\n"
             f"CORE TUTORING PRINCIPLES:\n"
             f"1. Curriculum Grounding: Keep explanations strictly aligned with {board} {grade} level expectations.\n"
             f"2. Student-Centric Pedagogical Style: Explain clearly with relatable analogies, break multi-part concepts into bullet points, and adapt to the student's {preferred_style} style.\n"
-            f"3. Visual Doubt Solving: If the student provides an image (e.g. textbook page, exercise diagram, or handwritten doubt), carefully identify what is shown, pinpoint their error or confusion, and provide step-by-step guidance.\n"
+            f"3. Visual Doubt Solving & Diagrams: If the student provides an image, identify key elements and guide them. When explaining processes, cause-and-effect, or timelines, you may include a safe ```mermaid flowchart TD``` code block to visualize the concept.\n"
             f"4. Socratic Guidance & Practice: When helping with exercises or questions, give helpful hints and conceptual steps rather than solving it passively.\n"
             f"5. Scope & Boundary Management: If the student asks about something clearly irrelevant or beyond the {board} {grade} syllabus, politely clarify: 'This concept is outside the syllabus for {board} {grade} {subject_name}, but let's connect it back to {topic_title}...' and guide them back.\n"
             f"6. Accuracy: Never hallucinate curriculum requirements or claim fake syllabus regulations.\n"

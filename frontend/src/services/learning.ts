@@ -71,3 +71,66 @@ export async function fetchDashboardOverview(): Promise<DashboardOverview> {
     requiresAuth: true,
   });
 }
+
+export async function fetchTopicObjectives(topicId: number) {
+  return apiClient<any[]>(`/learning/topics/${topicId}/objectives`, {
+    method: 'GET',
+    requiresAuth: true,
+  });
+}
+
+export async function fetchTopicPYQs(topicId: number) {
+  return apiClient<any[]>(`/learning/topics/${topicId}/pyqs`, {
+    method: 'GET',
+    requiresAuth: true,
+  });
+}
+
+export async function fetchSubjectPYQs(subjectId: number) {
+  return apiClient<any[]>(`/learning/subjects/${subjectId}/pyqs`, {
+    method: 'GET',
+    requiresAuth: true,
+  });
+}
+
+export async function fetchPracticeQuestions(topicId: number, difficulty?: string) {
+  const query = difficulty ? `?difficulty=${encodeURIComponent(difficulty)}` : '';
+  return apiClient<any[]>(`/learning/topics/${topicId}/practice-questions${query}`, {
+    method: 'GET',
+    requiresAuth: true,
+  });
+}
+
+export async function generatePracticeQuestions(topicId: number, difficulty?: string) {
+  const query = difficulty ? `?difficulty=${encodeURIComponent(difficulty)}` : '';
+  return apiClient<any[]>(`/learning/topics/${topicId}/practice-questions/generate${query}`, {
+    method: 'POST',
+    requiresAuth: true,
+  });
+}
+
+export async function submitPracticeAttempt(questionId: number, userAnswer: string) {
+  return apiClient<any>(`/learning/practice-questions/${questionId}/attempt`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ user_answer: userAnswer }),
+    requiresAuth: true,
+  });
+}
+
+export async function fetchTopicStudyNotes(topicId: number, notesType: string = 'comprehensive') {
+  return apiClient<any>(`/learning/topics/${topicId}/notes?type=${encodeURIComponent(notesType)}`, {
+    method: 'GET',
+    requiresAuth: true,
+  });
+}
+
+export async function regenerateTopicStudyNotes(topicId: number, notesType: string = 'comprehensive') {
+  return apiClient<any>(`/learning/topics/${topicId}/notes/generate`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ notes_type: notesType }),
+    requiresAuth: true,
+  });
+}
+

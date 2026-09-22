@@ -27,6 +27,15 @@ class TutorChatRequest(BaseModel):
     )
 
 
+class GroundedSourceItem(BaseModel):
+    """Verified curriculum source citation."""
+    title: str
+    source_name: Optional[str] = None
+    source_url: Optional[str] = None
+    is_verified: bool = True
+    resource_type: Optional[str] = None
+
+
 class TutorChatResponse(BaseModel):
     """Response returned by the AI Tutor service."""
     reply: str
@@ -36,7 +45,11 @@ class TutorChatResponse(BaseModel):
     board: str
     grade: str
     grounded_resource_titles: List[str] = []
+    grounded_sources: List[GroundedSourceItem] = []
+    learning_objectives: List[str] = []
     is_out_of_scope: bool = False
+    scope_redirection_guidance: Optional[str] = None
+    diagram_code: Optional[str] = None
 
     model_config = ConfigDict(from_attributes=True)
 

@@ -175,3 +175,87 @@ export interface RecommendationsResponse {
   recommendations: RecommendationItem[];
   total_count: number;
 }
+
+export interface LearningObjective {
+  id: number;
+  topic_id: number;
+  code: string;
+  description: string;
+  taxonomy_level: string;
+  is_core: boolean;
+  is_verified: boolean;
+}
+
+export interface PreviousYearQuestion {
+  id: number;
+  subject_id: number;
+  topic_id: number;
+  board: string;
+  grade: string;
+  exam_year: number;
+  paper_code: string;
+  question_number: string;
+  question_text: string;
+  marks: number;
+  marking_scheme?: string | null;
+  source_name: string;
+  source_url?: string | null;
+  is_verified: boolean;
+  verified_at?: string | null;
+}
+
+export interface PracticeOption {
+  id: string;
+  text: string;
+}
+
+export interface PracticeQuestion {
+  id: number;
+  topic_id: number;
+  learning_objective_id?: number | null;
+  question_text: string;
+  question_type: string;
+  options?: PracticeOption[] | null;
+  correct_answer: string;
+  explanation: string;
+  difficulty: string;
+  marks: number;
+  is_ai_generated: boolean;
+  generation_provenance?: any;
+  created_at: string;
+}
+
+export interface PracticeAttemptResponse {
+  id: number;
+  question_id: number;
+  question_type: string;
+  user_answer: string;
+  is_correct: boolean;
+  marks_obtained: number;
+  max_marks: number;
+  feedback: string;
+  explanation: string;
+  attempted_at: string;
+}
+
+export interface TopicStudyNotes {
+  id: number;
+  topic_id: number;
+  notes_type: string;
+  title: string;
+  overview: string;
+  learning_objectives_json?: string[] | null;
+  explanation_markdown: string;
+  key_terms_json?: { term: string; definition: string }[] | null;
+  formulas_and_dates_json?: { date?: string; event?: string; formula?: string }[] | null;
+  diagrams_json?: { title: string; diagram_type: string; code: string; description: string }[] | null;
+  common_misconceptions_json?: { misconception: string; correction: string }[] | null;
+  exam_points_json?: string[] | null;
+  practice_questions_json?: { question: string; answer: string }[] | null;
+  source_references_json?: { title: string; url?: string; verified: boolean }[] | null;
+  version: number;
+  is_verified: boolean;
+  created_at: string;
+  updated_at: string;
+}
+

@@ -14,10 +14,11 @@ import {
   AlertCircle,
   ArrowRight,
 } from 'lucide-react';
-import { fetchTopicDetail, saveTopicProgress } from '../../services/learning';
+import { fetchTopicDetail, fetchTopicStudyNotes, saveTopicProgress } from '../../services/learning';
 import { TutorDrawer } from '../../components/learning/TutorDrawer';
 import { AppLayout } from '../../components/layout/AppLayout';
-import type { LearningResource, ProgressStatus, TopicDetail } from '../../types/learning';
+import { MarkdownRenderer } from '../../components/learning/MarkdownRenderer';
+import type { LearningResource, ProgressStatus, TopicDetail, TopicStudyNotes } from '../../types/learning';
 import '../../styles/learning.css';
 
 interface QuizQuestion {
@@ -77,6 +78,7 @@ export const TopicStudyPage: React.FC = () => {
   // Local progress state
   const [currentStatus, setCurrentStatus] = useState<ProgressStatus>('not_started');
   const [currentPct, setCurrentPct] = useState<number>(0);
+  const [dynamicNotes, setDynamicNotes] = useState<TopicStudyNotes | null>(null);
 
   // Self-assessment interactive quiz state
   const [selectedAnswers, setSelectedAnswers] = useState<Record<number, number>>({});
@@ -110,6 +112,16 @@ export const TopicStudyPage: React.FC = () => {
               setActiveTab(data.resources[0].resource_type);
             }
           }
+        }
+
+        // Attempt loading dynamic 10-part study notes
+        try {
+          const notesData = await fetchTopicStudyNotes(Number(topicId));
+          if (isMounted) {
+            setDynamicNotes(notesData);
+          }
+        } catch {
+          // silent fallback
         }
       } catch (err: any) {
         if (isMounted) {
@@ -411,26 +423,78 @@ export const TopicStudyPage: React.FC = () => {
               {/* TAB 2: STUDY NOTES & RICH ENGAGING VISUALS */}
               {activeTab === 'notes' && (
                 <div className="study-notes-enhanced">
-                  {/* Verified provenance header */}
-                  {activeResources.map((res) => (
-                    <div key={res.id} style={{ marginBottom: '20px' }}>
-                      <div className="resource-provenance">
-                        <span className="provenance-tag">Provider: {res.provider || 'SmartLearn'}</span>
-                        {res.is_verified && (
-                          <span className="verified-badge">
-                            <Check size={12} />
-                            <span>Official Verified CISCE Curriculum Notes</span>
-                          </span>
-                        )}
+                  {dynamicNotes ? (
+                    <div className="dynamic-study-notes-wrapper">
+                      <div className="flex items-center justify-between p-3.5 bg-indigo-50/70 rounded-xl border border-indigo-100 mb-5">
+                        <div className="flex items-center gap-2 text-indigo-950 font-semibold text-xs">
+                          <CheckCircle2 size={16} className="text-emerald-600" />
+                          <span>10-Part Curriculum Study Notes (Verified CISCE Syllabus)</span>
+                        </div>
+                        <span className="text-[11px] text-slate-500 font-mono">v{dynamicNotes.version}.0 Verified</span>
                       </div>
-                      <h2 className="resource-title">{res.title}</h2>
-                      {res.text_content && (
-                        <div className="notes-highlight-banner">
-                          <p>{res.text_content}</p>
+
+                      {dynamicNotes.learning_objectives_json && (
+                        <div className="mb-5 p-3.5 rounded-xl border border-slate-200 bg-slate-50/60">
+                          <h4 className="text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-2">
+                            Syllabus Learning Objectives
+                          </h4>
+                          <div className="grid gap-1.5">
+                            {dynamicNotes.learning_objectives_json.map((obj, i) => (
+                              <div key={i} className="flex items-start gap-2 text-xs text-slate-700">
+                                <span className="shrink-0 w-1.5 h-1.5 rounded-full bg-indigo-600 mt-1.5" />
+                                <span>{obj}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      <div className="prose prose-slate max-w-none text-slate-800 text-sm leading-relaxed">
+                        <MarkdownRenderer content={dynamicNotes.explanation_markdown} />
+                      </div>
+
+                      {dynamicNotes.source_references_json && (
+                        <div className="mt-8 pt-4 border-t border-slate-200 text-xs text-slate-500 flex flex-wrap items-center gap-3">
+                          <span className="font-semibold text-slate-700">Grounded in Verified Sources:</span>
+                          {dynamicNotes.source_references_json.map((s, idx) => (
+                            <a
+                              key={idx}
+                              href={s.url || '#'}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="flex items-center gap-1 text-indigo-600 hover:underline"
+                            >
+                              <span>{s.title}</span>
+                              {s.url && <ExternalLink size={11} />}
+                            </a>
+                          ))}
                         </div>
                       )}
                     </div>
-                  ))}
+                  ) : (
+                    <>
+                      {/* Verified provenance header */}
+                      {activeResources.map((res) => (
+                        <div key={res.id} style={{ marginBottom: '20px' }}>
+                          <div className="resource-provenance">
+                            <span className="provenance-tag">Provider: {res.provider || 'SmartLearn'}</span>
+                            {res.is_verified && (
+                              <span className="verified-badge">
+                                <Check size={12} />
+                                <span>Official Verified CISCE Curriculum Notes</span>
+                              </span>
+                            )}
+                          </div>
+                          <h2 className="resource-title">{res.title}</h2>
+                          {res.text_content && (
+                            <div className="notes-highlight-banner">
+                              <p>{res.text_content}</p>
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </>
+                  )}
 
                   {/* Structured Pedagogical Concept Cards */}
                   <div className="concept-cards-grid">

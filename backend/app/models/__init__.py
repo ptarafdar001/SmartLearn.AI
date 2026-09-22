@@ -6,10 +6,15 @@ All models are imported here for clean discovery by Alembic and application serv
 from app.db.base import Base
 from app.models.learning import (
     Chapter,
+    LearningObjective,
     LearningResource,
+    PracticeQuestion,
+    PreviousYearQuestion,
     StudentProgress,
+    StudentQuestionAttempt,
     Subject,
     Topic,
+    TopicStudyNotes,
 )
 from app.models.onboarding import (
     LearningPreference,
@@ -33,4 +38,9 @@ __all__ = [
     "Topic",
     "LearningResource",
     "StudentProgress",
+    "LearningObjective",
+    "PreviousYearQuestion",
+    "PracticeQuestion",
+    "StudentQuestionAttempt",
+    "TopicStudyNotes",
 ]
