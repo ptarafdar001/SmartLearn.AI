@@ -85,6 +85,11 @@ class SubjectSummaryResponse(BaseModel):
     topic_count: Optional[int] = None
     completed_topics: int
     progress_percentage: Optional[float] = None
+    curriculum_status: Optional[str] = "in_preparation"
+    source_authority: Optional[str] = None
+    source_url: Optional[str] = None
+    syllabus_version: Optional[str] = None
+    status_message: Optional[str] = None
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -103,6 +108,11 @@ class SubjectDetailResponse(BaseModel):
     total_topics: int
     completed_topics: int
     progress_percentage: float
+    curriculum_status: Optional[str] = "in_preparation"
+    source_authority: Optional[str] = None
+    source_url: Optional[str] = None
+    syllabus_version: Optional[str] = None
+    status_message: Optional[str] = None
     chapters: List[ChapterSummaryResponse] = []
 
     model_config = ConfigDict(from_attributes=True)

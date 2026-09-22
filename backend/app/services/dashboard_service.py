@@ -96,7 +96,9 @@ class DashboardService:
                     db, board=board, grade=grade, academic_stream=stream
                 )
                 for cand in candidate_subjects:
-                    if cand.name.lower() == s.subject_name.lower():
+                    c_name = cand.name.lower()
+                    s_name = s.subject_name.lower()
+                    if c_name == s_name or s_name in c_name or c_name in s_name:
                         canonical = cand
                         break
 
@@ -126,6 +128,8 @@ class DashboardService:
                     id=s.id,
                     subject_name=s.subject_name,
                     progress_percentage=progress_pct,
+                    canonical_subject_id=canonical.id if canonical else None,
+                    curriculum_status=canonical.curriculum_status if canonical else "in_preparation",
                 )
             )
         return results

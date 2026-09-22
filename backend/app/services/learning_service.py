@@ -5,9 +5,11 @@ Domain business logic service for the SmartLearn.AI Learning Foundation.
 from datetime import datetime, timezone
 import logging
 from typing import List, Optional
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from app.models.learning import Chapter, Subject, Topic
+from app.models.onboarding import SubjectSelection
 from app.repositories.learning_repository import LearningRepository
 from app.repositories.onboarding_repository import OnboardingRepository
 from app.schemas.learning import (
@@ -51,15 +53,29 @@ class LearningService:
 
         # Filter to subjects the student enrolled in during onboarding (or all matching if no filter)
         if selected_names:
-            matched_subjects = [
-                s for s in candidate_subjects if s.name.strip().lower() in selected_names
-            ]
-            # Fallback if names differ slightly (e.g. "History" vs "History Elective")
-            if not matched_subjects:
-                matched_subjects = [
-                    s for s in candidate_subjects
-                    if any(sel in s.name.strip().lower() for sel in selected_names)
-                ]
+            matched_subjects = []
+            for sel in selected_names:
+                # 1. Exact match against candidate subject name
+                exact = next(
+                    (s for s in candidate_subjects if s.name.strip().lower() == sel),
+                    None,
+                )
+                if exact and exact not in matched_subjects:
+                    matched_subjects.append(exact)
+                    continue
+
+                # 2. Normalized fallback only if no exact match found
+                fallback = next(
+                    (
+                        s
+                        for s in candidate_subjects
+                        if sel in s.name.strip().lower() or s.name.strip().lower() in sel
+                    ),
+                    None,
+                )
+                if fallback and fallback not in matched_subjects:
+                    matched_subjects.append(fallback)
+
             subjects = matched_subjects if matched_subjects else candidate_subjects
         else:
             subjects = candidate_subjects
@@ -104,6 +120,10 @@ class LearningService:
                     topic_count=total_topics,
                     completed_topics=completed_topics,
                     progress_percentage=overall_pct,
+                    curriculum_status=s.curriculum_status or "in_preparation",
+                    source_authority=s.source_authority,
+                    source_url=s.source_url,
+                    syllabus_version=s.syllabus_version,
                 )
             )
 
@@ -128,6 +148,8 @@ class LearningService:
                         topic_count=0,
                         completed_topics=0,
                         progress_percentage=None,
+                        curriculum_status="in_preparation",
+                        status_message=f"Enrollment recorded for {sel.subject_name}. Subject syllabus is being prepared.",
                     )
                 )
 
@@ -138,9 +160,60 @@ class LearningService:
         """Retrieve complete subject details with chapter accordions and student progress status."""
         subject = LearningRepository.get_subject_by_id(db, subject_id)
         if not subject:
+            # Fallback in case subject_id was passed as an enrolled selection id
+            sel = (
+                db.query(SubjectSelection)
+                .filter(SubjectSelection.id == subject_id, SubjectSelection.user_id == user_id)
+                .first()
+            )
+            if sel:
+                profile = OnboardingRepository.get_student_profile(db, user_id)
+                if profile:
+                    candidate_subjects = LearningRepository.get_subjects_by_board_grade(
+                        db,
+                        board=profile.board,
+                        grade=profile.grade,
+                        academic_stream=profile.academic_stream,
+                    )
+                    sel_clean = sel.subject_name.strip().lower()
+                    for cand in candidate_subjects:
+                        cand_clean = cand.name.strip().lower()
+                        if cand_clean == sel_clean or cand_clean in sel_clean or sel_clean in cand_clean:
+                            subject = cand
+                            break
+
+        if not subject:
             raise ValueError("Subject not found or inactive")
 
         chapters = LearningRepository.get_chapters_by_subject_id(db, subject.id)
+
+        # If subject has no chapters yet, return an explicit, honest in-preparation response
+        if not chapters:
+            status_msg = (
+                f"Curriculum framework registered for {subject.board} {subject.grade} {subject.name}. "
+                f"Syllabus structures and learning modules are actively being curated from {subject.source_authority or 'authoritative educational'} sources."
+            )
+            return SubjectDetailResponse(
+                id=subject.id,
+                code=subject.code,
+                name=subject.name,
+                board=subject.board,
+                grade=subject.grade,
+                academic_stream=subject.academic_stream,
+                category=subject.category,
+                description=subject.description,
+                total_chapters=0,
+                total_topics=0,
+                completed_topics=0,
+                progress_percentage=0.0,
+                curriculum_status=subject.curriculum_status or "in_preparation",
+                source_authority=subject.source_authority,
+                source_url=subject.source_url,
+                syllabus_version=subject.syllabus_version,
+                status_message=status_msg,
+                chapters=[],
+            )
+
         all_topics: List[Topic] = []
         for ch in chapters:
             all_topics.extend(LearningRepository.get_topics_by_chapter_id(db, ch.id))
@@ -220,6 +293,11 @@ class LearningService:
             total_topics=total_subject_topics,
             completed_topics=total_completed,
             progress_percentage=overall_pct,
+            curriculum_status=subject.curriculum_status or "curriculum_verified",
+            source_authority=subject.source_authority,
+            source_url=subject.source_url,
+            syllabus_version=subject.syllabus_version,
+            status_message=None,
             chapters=chapter_responses,
         )
 

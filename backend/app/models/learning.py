@@ -49,6 +49,17 @@ class Subject(Base):
     description: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     display_order: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+    # ── Curriculum Readiness & Source Provenance ──────────────────────────────
+    # Status levels: 'catalogued', 'curriculum_verified', 'content_available', 'in_preparation'
+    curriculum_status: Mapped[str] = mapped_column(
+        String(50), default="in_preparation", server_default="in_preparation", nullable=False
+    )
+    source_authority: Mapped[Optional[str]] = mapped_column(String(150), nullable=True)
+    source_url: Mapped[Optional[str]] = mapped_column(String(500), nullable=True)
+    syllabus_version: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
+    last_verified_at: Mapped[Optional[datetime]] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
     )

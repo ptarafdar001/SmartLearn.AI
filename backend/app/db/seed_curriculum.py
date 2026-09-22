@@ -16,7 +16,14 @@ from typing import Any, Dict, List
 from sqlalchemy.orm import Session
 
 from app.db.session import SessionLocal
-from app.models.learning import Chapter, LearningResource, Subject, Topic
+from app.models.learning import Chapter, LearningObjective, LearningResource, Subject, Topic
+from app.db.curriculum_catalog_data import (
+    CANONICAL_SUBJECTS_CATALOG,
+    CBSE_10_SCIENCE_SYLLABUS,
+    CBSE_10_MATH_SYLLABUS,
+    CBSE_12_PHYSICS_SYLLABUS,
+    ICSE_10_HCG_SYLLABUS,
+)
 
 logger = logging.getLogger("smartlearn.seed")
 
@@ -626,7 +633,7 @@ ISC_HISTORY_FIXTURE: Dict[str, Any] = {
 }
 
 
-def seed_curriculum(db: Session) -> Subject:
+def seed_isc_history_slice(db: Session) -> Subject:
     """
     Idempotently seed the official CISCE ISC Class XI History curriculum slice into PostgreSQL.
     Preserves exact official CISCE chapter numbers (1, 2, 3, 4, 7) and titles for Exam Year 2027.
@@ -647,6 +654,11 @@ def seed_curriculum(db: Session) -> Subject:
             description=ISC_HISTORY_FIXTURE["description"],
             display_order=ISC_HISTORY_FIXTURE["display_order"],
             is_active=True,
+            curriculum_status="content_available",
+            source_authority="CISCE",
+            source_url="https://www.cisce.org/regulations-and-syllabuses-isc/",
+            syllabus_version="Examination Year 2027",
+            last_verified_at=datetime.now(timezone.utc),
         )
         db.add(subject)
         db.flush()
@@ -656,6 +668,11 @@ def seed_curriculum(db: Session) -> Subject:
         subject.grade = ISC_HISTORY_FIXTURE["grade"]
         subject.academic_stream = ISC_HISTORY_FIXTURE["academic_stream"]
         subject.description = ISC_HISTORY_FIXTURE["description"]
+        subject.curriculum_status = "content_available"
+        subject.source_authority = "CISCE"
+        subject.source_url = "https://www.cisce.org/regulations-and-syllabuses-isc/"
+        subject.syllabus_version = "Examination Year 2027"
+        subject.last_verified_at = datetime.now(timezone.utc)
         db.flush()
 
     fixture_chapter_nums = [c["chapter_number"] for c in ISC_HISTORY_FIXTURE["chapters"]]
@@ -793,9 +810,272 @@ def seed_curriculum(db: Session) -> Subject:
     for sc in stale_chapters:
         db.delete(sc)
 
-    db.commit()
-    logger.info("Official CISCE ISC Class XI History curriculum seeded successfully.")
+    db.flush()
+    logger.info("Official CISCE ISC Class XI History curriculum slice seeded successfully.")
     return subject
+
+
+def seed_canonical_catalog(db: Session) -> int:
+    """Upsert all canonical subjects across all boards, classes, and streams."""
+    logger.info("Upserting canonical multi-board subjects catalog...")
+    upserted_count = 0
+    for s_data in CANONICAL_SUBJECTS_CATALOG:
+        code = s_data["code"]
+        existing = db.query(Subject).filter(Subject.code == code).first()
+        if not existing:
+            subj = Subject(
+                code=code,
+                name=s_data["name"],
+                board=s_data["board"],
+                grade=s_data["grade"],
+                academic_stream=s_data.get("academic_stream"),
+                category=s_data.get("category", "core"),
+                description=s_data.get("description"),
+                display_order=s_data.get("display_order", 0),
+                is_active=True,
+                curriculum_status=s_data.get("curriculum_status", "in_preparation"),
+                source_authority=s_data.get("source_authority"),
+                source_url=s_data.get("source_url"),
+                syllabus_version=s_data.get("syllabus_version"),
+            )
+            db.add(subj)
+            upserted_count += 1
+        else:
+            existing.name = s_data["name"]
+            existing.board = s_data["board"]
+            existing.grade = s_data["grade"]
+            existing.academic_stream = s_data.get("academic_stream")
+            existing.category = s_data.get("category", existing.category)
+            existing.description = s_data.get("description", existing.description)
+            existing.display_order = s_data.get("display_order", existing.display_order)
+            existing.source_authority = s_data.get("source_authority", existing.source_authority)
+            existing.source_url = s_data.get("source_url", existing.source_url)
+            existing.syllabus_version = s_data.get("syllabus_version", existing.syllabus_version)
+            if existing.curriculum_status not in ("content_available", "curriculum_verified"):
+                existing.curriculum_status = s_data.get("curriculum_status", existing.curriculum_status)
+    db.flush()
+    logger.info(f"Canonical catalog upsert complete ({len(CANONICAL_SUBJECTS_CATALOG)} entries handled).")
+    return upserted_count
+
+
+def seed_exemplar_syllabi(db: Session) -> None:
+    """
+    Seed authoritative syllabus structures for verified exemplar subjects:
+    - CBSE Class 10 Science (13 NCERT chapters, topics, verified learning objectives & textbook notes)
+    - CBSE Class 10 Mathematics Standard (14 NCERT chapters, topics)
+    - CBSE Class 12 Physics (14 NCERT chapters)
+    - ICSE Class 10 History, Civics and Geography (12 CISCE chapters)
+    """
+    logger.info("Seeding authoritative exemplar syllabi...")
+    exemplars = [
+        CBSE_10_SCIENCE_SYLLABUS,
+        CBSE_10_MATH_SYLLABUS,
+        CBSE_12_PHYSICS_SYLLABUS,
+        ICSE_10_HCG_SYLLABUS,
+    ]
+    for ex in exemplars:
+        subject = db.query(Subject).filter(Subject.code == ex["code"]).first()
+        if not subject:
+            subject = (
+                db.query(Subject)
+                .filter(
+                    Subject.board == ex["board"],
+                    Subject.grade == ex["grade"],
+                    Subject.name == ex["name"],
+                )
+                .first()
+            )
+        if not subject:
+            logger.warning(f"Exemplar subject record not found for code={ex.get('code')}")
+            continue
+
+        subject.curriculum_status = "curriculum_verified"
+        subject.last_verified_at = datetime.now(timezone.utc)
+        db.flush()
+
+        fixture_chapter_nums = [c["chapter_number"] for c in ex["chapters"]]
+        for ch_data in ex["chapters"]:
+            chapter = (
+                db.query(Chapter)
+                .filter(
+                    Chapter.subject_id == subject.id,
+                    Chapter.chapter_number == ch_data["chapter_number"],
+                )
+                .first()
+            )
+            if not chapter:
+                chapter = Chapter(
+                    subject_id=subject.id,
+                    chapter_number=ch_data["chapter_number"],
+                    title=ch_data["title"],
+                    description=ch_data.get("description"),
+                )
+                db.add(chapter)
+                db.flush()
+            else:
+                chapter.title = ch_data["title"]
+                chapter.description = ch_data.get("description")
+                db.flush()
+
+            # Upsert topics if present
+            topics_data = ch_data.get("topics", [])
+            for top_data in topics_data:
+                topic = (
+                    db.query(Topic)
+                    .filter(
+                        Topic.chapter_id == chapter.id,
+                        Topic.topic_number == top_data["topic_number"],
+                    )
+                    .first()
+                )
+                if not topic:
+                    topic = Topic(
+                        chapter_id=chapter.id,
+                        topic_number=top_data["topic_number"],
+                        title=top_data["title"],
+                        description=top_data.get("description"),
+                        estimated_minutes=top_data.get("estimated_minutes", 20),
+                    )
+                    db.add(topic)
+                    db.flush()
+                else:
+                    topic.title = top_data["title"]
+                    topic.description = top_data.get("description")
+                    topic.estimated_minutes = top_data.get("estimated_minutes", 20)
+                    db.flush()
+
+            if topics_data:
+                fix_top_nums = [t["topic_number"] for t in topics_data]
+                old_topics = (
+                    db.query(Topic)
+                    .filter(
+                        Topic.chapter_id == chapter.id,
+                        ~Topic.topic_number.in_(fix_top_nums),
+                    )
+                    .all()
+                )
+                for ot in old_topics:
+                    db.delete(ot)
+                db.flush()
+
+        stale_chapters = (
+            db.query(Chapter)
+            .filter(
+                Chapter.subject_id == subject.id,
+                ~Chapter.chapter_number.in_(fixture_chapter_nums),
+            )
+            .all()
+        )
+        for sc in stale_chapters:
+            db.delete(sc)
+        db.flush()
+
+    # Seed verified textbook notes and learning objectives for CBSE 10 Science Chapter 1
+    cbse_sci = (
+        db.query(Subject)
+        .filter(Subject.board == "CBSE", Subject.grade == "Class 10", Subject.name == "Science")
+        .first()
+    )
+    if cbse_sci:
+        ch1 = (
+            db.query(Chapter)
+            .filter(Chapter.subject_id == cbse_sci.id, Chapter.chapter_number == 1)
+            .first()
+        )
+        if ch1:
+            t1 = db.query(Topic).filter(Topic.chapter_id == ch1.id, Topic.topic_number == 1).first()
+            if t1:
+                res = (
+                    db.query(LearningResource)
+                    .filter(
+                        LearningResource.topic_id == t1.id,
+                        LearningResource.order_index == 1,
+                    )
+                    .first()
+                )
+                if not res:
+                    res = LearningResource(
+                        topic_id=t1.id,
+                        title="NCERT Textbook Overview: Chemical Reactions & Equations",
+                        resource_type="notes",
+                        provider="ncert",
+                        source_name="NCERT Class X Science Textbook (Chapter 1)",
+                        source_url="https://ncert.nic.in/textbook.php?jesc1=1-13",
+                        text_content=(
+                            "# Chemical Reactions and Equations\n\n"
+                            "## 1. What is a Chemical Reaction?\n"
+                            "Whenever a chemical change occurs, we say that a chemical reaction has taken place. "
+                            "It is accompanied by changes such as change in state, change in colour, evolution of a gas, "
+                            "or change in temperature.\n\n"
+                            "## 2. Balanced Chemical Equations\n"
+                            "The law of conservation of mass states that mass can neither be created nor destroyed in a chemical reaction. "
+                            "That is, the total mass of the elements present in the products of a chemical reaction has to be equal to "
+                            "the total mass of the elements present in the reactants.\n\n"
+                            "**Example**: $3\\text{Fe} + 4\\text{H}_2\\text{O} \\rightarrow \\text{Fe}_3\\text{O}_4 + 4\\text{H}_2$\n"
+                        ),
+                        order_index=1,
+                        is_active=True,
+                        is_verified=True,
+                        verified_at=datetime.now(timezone.utc),
+                    )
+                    db.add(res)
+
+                lo1 = (
+                    db.query(LearningObjective)
+                    .filter(
+                        LearningObjective.topic_id == t1.id,
+                        LearningObjective.code == "CBSE10-SCI-CH01-LO01",
+                    )
+                    .first()
+                )
+                if not lo1:
+                    lo1 = LearningObjective(
+                        topic_id=t1.id,
+                        code="CBSE10-SCI-CH01-LO01",
+                        description="Write word equations and skeletal chemical equations for observable chemical changes.",
+                        taxonomy_level="understand",
+                        is_core=True,
+                        is_verified=True,
+                    )
+                    db.add(lo1)
+
+                lo2 = (
+                    db.query(LearningObjective)
+                    .filter(
+                        LearningObjective.topic_id == t1.id,
+                        LearningObjective.code == "CBSE10-SCI-CH01-LO02",
+                    )
+                    .first()
+                )
+                if not lo2:
+                    lo2 = LearningObjective(
+                        topic_id=t1.id,
+                        code="CBSE10-SCI-CH01-LO02",
+                        description="Balance chemical equations using stoichiometric coefficients consistent with conservation of mass.",
+                        taxonomy_level="apply",
+                        is_core=True,
+                        is_verified=True,
+                    )
+                    db.add(lo2)
+
+                cbse_sci.curriculum_status = "content_available"
+                db.flush()
+
+
+def seed_curriculum(db: Session) -> Subject:
+    """
+    Comprehensive idempotent multi-curriculum seed runner.
+    1. Upserts canonical subjects across all advertised boards/grades/streams.
+    2. Seeds official CISCE ISC Class XI History slice (preserves ID 43).
+    3. Seeds authoritative exemplar syllabus structures (CBSE 10 Science, CBSE 10 Math, CBSE 12 Physics, ICSE 10 HCG).
+    """
+    logger.info("Executing comprehensive multi-curriculum seeding...")
+    seed_canonical_catalog(db)
+    isc_subject = seed_isc_history_slice(db)
+    seed_exemplar_syllabi(db)
+    db.commit()
+    logger.info("Multi-curriculum database seeding completed successfully.")
+    return isc_subject
 
 
 seed_isc_history_curriculum = seed_curriculum

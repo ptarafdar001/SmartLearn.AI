@@ -6,7 +6,9 @@ class EnrolledSubjectSummary(BaseModel):
     """Subject enrolled by the student."""
     id: int
     subject_name: str
-    progress_percentage: Optional[float] = None  # None until syllabus progress module is implemented
+    progress_percentage: Optional[float] = None
+    canonical_subject_id: Optional[int] = None
+    curriculum_status: Optional[str] = None
 
     model_config = ConfigDict(from_attributes=True)
 
