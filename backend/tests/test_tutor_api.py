@@ -442,3 +442,119 @@ def test_voice_websocket_lifecycle_and_interruption(client: TestClient, db_sessi
                 assert "1853 railway between Bombay and Thane" in speaking_event["text"]
                 assert speaking_event["is_out_of_scope"] is False
 
+
+# ── 10. Model Prefix Normalization & Clean URL ────────────────────────────────
+def test_tutor_chat_model_prefix_normalization(client: TestClient, db_session: Session):
+    """Verify models/ prefix in AI_TUTOR_MODEL is stripped to avoid double path prefix."""
+    student = create_test_student(
+        client, db_session, "model_norm@example.com", "Norm Student"
+    )
+    topic = db_session.query(Topic).first()
+
+    mock_gemini_resp = {
+        "candidates": [{"content": {"parts": [{"text": "Model normalization works."}]}}]
+    }
+    mock_client_instance = MagicMock()
+    mock_client_instance.__enter__.return_value = mock_client_instance
+    mock_client_instance.post.return_value = MagicMock(
+        status_code=200,
+        json=lambda: mock_gemini_resp,
+    )
+
+    with patch.object(settings, "GEMINI_API_KEY", "mock-test-key"):
+        with patch.object(settings, "AI_TUTOR_MODEL", "models/gemini-3.5-flash"):
+            with patch("app.services.tutor_service.httpx.Client", return_value=mock_client_instance):
+                resp = client.post(
+                    "/api/v1/tutor/chat",
+                    json={"topic_id": topic.id, "message": "Test normalization"},
+                    headers=student["headers"],
+                )
+
+                assert resp.status_code == 200
+                assert resp.json()["reply"] == "Model normalization works."
+                called_url = mock_client_instance.post.call_args[0][0]
+                assert "models/models/" not in called_url
+                assert "models/gemini-3.5-flash:generateContent" in called_url
+
+
+# ── 11. Upstream Model Unavailable (404) ──────────────────────────────────────
+def test_tutor_chat_upstream_model_not_found_404(client: TestClient, db_session: Session):
+    """Verify 404 from upstream Gemini translates into 502 with clear diagnostic message."""
+    student = create_test_student(
+        client, db_session, "model_404@example.com", "Model 404 Student"
+    )
+    topic = db_session.query(Topic).first()
+
+    mock_client_instance = MagicMock()
+    mock_client_instance.__enter__.return_value = mock_client_instance
+    mock_client_instance.post.return_value = MagicMock(
+        status_code=404,
+        text='{"error": {"code": 404, "message": "models/gemini-deprecated is not found"}}',
+    )
+
+    with patch.object(settings, "GEMINI_API_KEY", "mock-test-key"):
+        with patch("app.services.tutor_service.httpx.Client", return_value=mock_client_instance):
+            resp = client.post(
+                "/api/v1/tutor/chat",
+                json={"topic_id": topic.id, "message": "Test 404 model"},
+                headers=student["headers"],
+            )
+
+            assert resp.status_code == 502
+            assert "unavailable or not supported" in resp.json()["detail"].lower()
+
+
+# ── 12. Upstream High Demand (503) ───────────────────────────────────────────
+def test_tutor_chat_upstream_high_demand_503(client: TestClient, db_session: Session):
+    """Verify 503 from upstream Gemini translates into friendly retry message."""
+    student = create_test_student(
+        client, db_session, "model_503@example.com", "Model 503 Student"
+    )
+    topic = db_session.query(Topic).first()
+
+    mock_client_instance = MagicMock()
+    mock_client_instance.__enter__.return_value = mock_client_instance
+    mock_client_instance.post.return_value = MagicMock(
+        status_code=503,
+        text='{"error": {"code": 503, "message": "This model is currently experiencing high demand"}}',
+    )
+
+    with patch.object(settings, "GEMINI_API_KEY", "mock-test-key"):
+        with patch("app.services.tutor_service.httpx.Client", return_value=mock_client_instance):
+            resp = client.post(
+                "/api/v1/tutor/chat",
+                json={"topic_id": topic.id, "message": "Test 503 model"},
+                headers=student["headers"],
+            )
+
+            assert resp.status_code == 503
+            assert "high demand" in resp.json()["detail"].lower()
+
+
+# ── 13. Upstream Invalid Key (API_KEY_INVALID) ───────────────────────────────
+def test_tutor_chat_invalid_api_key_503(client: TestClient, db_session: Session):
+    """Verify invalid API key error returns clean 503 instruction."""
+    student = create_test_student(
+        client, db_session, "model_invalid_key@example.com", "Invalid Key Student"
+    )
+    topic = db_session.query(Topic).first()
+
+    mock_client_instance = MagicMock()
+    mock_client_instance.__enter__.return_value = mock_client_instance
+    mock_client_instance.post.return_value = MagicMock(
+        status_code=400,
+        text='{"error": {"code": 400, "message": "API_KEY_INVALID", "status": "INVALID_ARGUMENT"}}',
+    )
+
+    with patch.object(settings, "GEMINI_API_KEY", "invalid-key-here"):
+        with patch("app.services.tutor_service.httpx.Client", return_value=mock_client_instance):
+            resp = client.post(
+                "/api/v1/tutor/chat",
+                json={"topic_id": topic.id, "message": "Test invalid key"},
+                headers=student["headers"],
+            )
+
+            assert resp.status_code == 503
+            assert "authentication failed" in resp.json()["detail"].lower()
+
+

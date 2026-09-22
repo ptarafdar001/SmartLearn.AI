@@ -286,7 +286,8 @@ class TutorService:
         client: Optional[httpx.Client] = None,
     ) -> str:
         """Send synchronous HTTP request to Google Gemini API."""
-        url = f"{GEMINI_API_BASE}/{model}:generateContent?key={api_key}"
+        clean_model = model.removeprefix("models/")
+        url = f"{GEMINI_API_BASE}/{clean_model}:generateContent?key={api_key}"
         headers = {"Content-Type": "application/json"}
 
         timeout = float(settings.AI_TUTOR_TIMEOUT_SECONDS)
@@ -307,11 +308,22 @@ class TutorService:
 
             if response.status_code != 200:
                 err_body = response.text
-                logger.error(f"Gemini API returned error {response.status_code}: {err_body}")
+                sanitized_err = re.sub(r"key=[a-zA-Z0-9_\-]+", "key=[REDACTED]", err_body)
+                logger.error(f"Gemini API returned error {response.status_code}: {sanitized_err}")
                 if "API_KEY_INVALID" in err_body or "PERMISSION_DENIED" in err_body:
                     raise HTTPException(
                         status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
                         detail="AI Tutor authentication failed. Please verify GEMINI_API_KEY.",
+                    )
+                if response.status_code == 404:
+                    raise HTTPException(
+                        status_code=status.HTTP_502_BAD_GATEWAY,
+                        detail=f"The configured AI Tutor model '{clean_model}' is unavailable or not supported. Please verify AI_TUTOR_MODEL configuration.",
+                    )
+                if response.status_code == 503:
+                    raise HTTPException(
+                        status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                        detail="AI Tutor provider is temporarily experiencing high demand. Please try again in a few moments.",
                     )
                 raise HTTPException(
                     status_code=status.HTTP_502_BAD_GATEWAY,
@@ -336,13 +348,13 @@ class TutorService:
             return parts[0].get("text", "").strip()
 
         except httpx.TimeoutException:
-            logger.error("Gemini API request timed out")
+            logger.error(f"Gemini API request timed out for model {clean_model}")
             raise HTTPException(
                 status_code=status.HTTP_504_GATEWAY_TIMEOUT,
                 detail="AI Tutor request timed out. Please try again.",
             )
         except httpx.RequestError as exc:
-            logger.error(f"Network error contacting Gemini API: {exc}")
+            logger.error(f"Network error contacting Gemini API: {type(exc).__name__}")
             raise HTTPException(
                 status_code=status.HTTP_502_BAD_GATEWAY,
                 detail="Unable to reach AI Tutor provider. Please check network connectivity.",

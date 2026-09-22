@@ -50,7 +50,7 @@ class Settings(BaseSettings):
 
     # ── AI Tutor Configuration ────────────────────────────────────────────────
     GEMINI_API_KEY: Optional[str] = None
-    AI_TUTOR_MODEL: str = "gemini-1.5-flash"
+    AI_TUTOR_MODEL: str = "gemini-3.5-flash"
     AI_TUTOR_TIMEOUT_SECONDS: int = 30
 
     # ── PostgreSQL Database ───────────────────────────────────────────────────
