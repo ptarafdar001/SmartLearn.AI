@@ -29,6 +29,7 @@ from app.schemas.tutor import (
     VoiceSessionResponse,
 )
 from app.services.rag_service import RAGRetrievalService
+from app.services.llm.failover_service import LLMFailoverService
 
 logger = logging.getLogger("smartlearn.tutor")
 settings = get_settings()
@@ -121,34 +122,25 @@ class TutorService:
             evidence_bundle=bundle,
         )
 
-        # 5. Check API key configuration
-        api_key = settings.GEMINI_API_KEY
-        if not api_key:
-            raise HTTPException(
-                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-                detail="AI Tutor service is not configured. GEMINI_API_KEY is required in the backend environment.",
-            )
+        # 5. Convert conversation turns to standard message dicts for failover service
+        messages: List[Dict[str, str]] = [
+            {
+                "role": "assistant" if turn.role in ["tutor", "model"] else "user",
+                "content": turn.content,
+            }
+            for turn in request.conversation_history
+        ]
+        messages.append({"role": "user", "content": request.message})
 
-        # 6. Parse and validate optional image
-        image_part: Optional[Dict[str, Any]] = None
-        if request.image_base64:
-            image_part = cls._parse_image_payload(request.image_base64)
-
-        # 7. Construct Gemini multimodal request payload
-        gemini_payload = cls._build_gemini_payload(
+        # 6. Execute inference through quota-aware multi-provider failover
+        llm_result = LLMFailoverService.execute_with_failover(
+            messages=messages,
             system_instruction=system_instruction,
-            conversation_history=request.conversation_history,
-            current_message=request.message,
-            image_part=image_part,
-        )
-
-        # 8. Call Gemini REST API
-        reply_text = cls._call_gemini_api(
-            api_key=api_key,
-            model=settings.AI_TUTOR_MODEL,
-            payload=gemini_payload,
+            image_base64=request.image_base64,
+            timeout_seconds=float(settings.AI_TUTOR_TIMEOUT_SECONDS),
             client=client,
         )
+        reply_text = llm_result.reply_text
 
         # Detect potential out-of-scope flag based on standardized redirection phrasing
         is_out_of_scope = (
@@ -592,26 +584,23 @@ class TutorService:
             resources=resources,
         )
 
-        api_key = settings.GEMINI_API_KEY
-        if not api_key:
-            raise HTTPException(
-                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-                detail="AI Tutor voice service is not configured. GEMINI_API_KEY is required.",
-            )
+        messages: List[Dict[str, str]] = [
+            {
+                "role": "assistant" if turn.role in ["tutor", "model"] else "user",
+                "content": turn.content,
+            }
+            for turn in conversation_history
+        ]
+        messages.append({"role": "user", "content": speech_text})
 
-        gemini_payload = cls._build_gemini_payload(
+        llm_result = LLMFailoverService.execute_with_failover(
+            messages=messages,
             system_instruction=system_instruction,
-            conversation_history=conversation_history,
-            current_message=speech_text,
-            image_part=None,
-        )
-
-        reply_text = cls._call_gemini_api(
-            api_key=api_key,
-            model=settings.AI_TUTOR_MODEL,
-            payload=gemini_payload,
+            image_base64=None,
+            timeout_seconds=float(settings.AI_TUTOR_TIMEOUT_SECONDS),
             client=client,
         )
+        reply_text = llm_result.reply_text
 
         is_out_of_scope = (
             "outside the syllabus" in reply_text.lower()

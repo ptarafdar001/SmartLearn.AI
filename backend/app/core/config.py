@@ -48,10 +48,30 @@ class Settings(BaseSettings):
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 1440  # 24 hours
 
-    # ── AI Tutor Configuration ────────────────────────────────────────────────
+    # ── AI Tutor Configuration & Multi-Provider Failover ──────────────────────
     GEMINI_API_KEY: Optional[str] = None
     AI_TUTOR_MODEL: str = "gemini-3.6-flash"
     AI_TUTOR_TIMEOUT_SECONDS: int = 30
+
+    # Fallback Provider: Groq
+    GROQ_API_KEY: Optional[str] = None
+    GROQ_MODEL: str = "llama-3.3-70b-versatile"
+    GROQ_VISION_MODEL: str = "llama-3.2-11b-vision-preview"
+
+    # Fallback Provider: OpenRouter
+    OPENROUTER_API_KEY: Optional[str] = None
+    OPENROUTER_MODEL: str = "openrouter/free"
+
+    # Fallback Provider: Cerebras
+    CEREBRAS_API_KEY: Optional[str] = None
+    CEREBRAS_MODEL: str = "llama-3.3-70b"
+
+    # Fallback Provider: Mistral
+    MISTRAL_API_KEY: Optional[str] = None
+    MISTRAL_MODEL: str = "mistral-small-latest"
+
+    # Provider Resolution Order (comma-separated priority list)
+    AI_TUTOR_PROVIDER_ORDER: str = "gemini,groq,openrouter,cerebras,mistral"
 
     # ── PostgreSQL Database ───────────────────────────────────────────────────
     POSTGRES_SERVER: str = "localhost"
