@@ -1,11 +1,63 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
+import {
+  ChevronRight,
+  Clock,
+  Video,
+  FileText,
+  BookOpen,
+  HelpCircle,
+  Check,
+  CheckCircle2,
+  ExternalLink,
+  Bot,
+  AlertCircle,
+  LogOut,
+  ArrowRight,
+} from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { BrandLogo } from '../../components/common/BrandLogo';
 import { fetchTopicDetail, saveTopicProgress } from '../../services/learning';
 import { TutorDrawer } from '../../components/learning/TutorDrawer';
 import type { LearningResource, ProgressStatus, TopicDetail } from '../../types/learning';
 import '../../styles/learning.css';
+
+interface QuizQuestion {
+  id: number;
+  question: string;
+  options: string[];
+  correctIndex: number;
+  explanation: string;
+}
+
+const SELF_CHECK_QUIZ: QuizQuestion[] = [
+  {
+    id: 1,
+    question: 'In which year did the first commercial passenger railway run in colonial India, connecting Bombay to Thane?',
+    options: ['1848', '1853', '1857', '1861'],
+    correctIndex: 1,
+    explanation: 'The first train in India ran between Bombay (Bori Bunder) and Thane on 16 April 1853, covering approximately 21 miles (34 km).',
+  },
+  {
+    id: 2,
+    question: 'Under the colonial Guarantee System, what annual rate of return did the British Indian government promise private British railway companies?',
+    options: ['2.5% return', '5% guaranteed return from Indian revenues', '10% profit-sharing', 'Zero guaranteed return'],
+    correctIndex: 1,
+    explanation: 'The British administration guaranteed a minimum 5% annual return on invested capital to private British railway firms, paid directly from Indian tax revenues regardless of operational profit.',
+  },
+  {
+    id: 3,
+    question: 'What was the primary imperial motivation underlying the layout and route selection of the colonial railway network?',
+    options: [
+      'Promoting regional Indian manufacturing and small cottage industries',
+      'Connecting interior cotton/wheat hubs to ports and facilitating rapid troop movements',
+      'Providing free passenger transport for rural agricultural laborers',
+      'Developing indigenous metallurgical and locomotive workshops',
+    ],
+    correctIndex: 1,
+    explanation: 'Railways were designed strategically to dispatch troops rapidly during internal unrest and extract agrarian raw materials from the hinterland to coastal ports for export to Britain.',
+  },
+];
 
 export const TopicStudyPage: React.FC = () => {
   const { topicId } = useParams<{ topicId: string }>();
@@ -18,7 +70,7 @@ export const TopicStudyPage: React.FC = () => {
   const [saving, setSaving] = useState<boolean>(false);
   const [isTutorOpen, setIsTutorOpen] = useState<boolean>(false);
 
-  // Active resource tab ('text' | 'notes' | 'video')
+  // Active resource tab ('video' | 'notes' | 'text' | 'practice')
   const [activeTab, setActiveTab] = useState<string>('video');
 
   // Study timer (seconds spent in this session)
@@ -28,6 +80,10 @@ export const TopicStudyPage: React.FC = () => {
   // Local progress state
   const [currentStatus, setCurrentStatus] = useState<ProgressStatus>('not_started');
   const [currentPct, setCurrentPct] = useState<number>(0);
+
+  // Self-assessment interactive quiz state
+  const [selectedAnswers, setSelectedAnswers] = useState<Record<number, number>>({});
+  const [submittedAnswers, setSubmittedAnswers] = useState<Record<number, boolean>>({});
 
   useEffect(() => {
     let isMounted = true;
@@ -117,6 +173,14 @@ export const TopicStudyPage: React.FC = () => {
     }
   };
 
+  const handleSelectOption = (questionId: number, optionIdx: number) => {
+    setSelectedAnswers((prev) => ({ ...prev, [questionId]: optionIdx }));
+  };
+
+  const handleCheckAnswer = (questionId: number) => {
+    setSubmittedAnswers((prev) => ({ ...prev, [questionId]: true }));
+  };
+
   const studentName = user?.full_name || 'Student';
 
   // Group resources by type
@@ -130,17 +194,18 @@ export const TopicStudyPage: React.FC = () => {
         <div className="learn-nav-container">
           <Link to="/dashboard" className="learn-nav-brand" aria-label="SmartLearn Home">
             <BrandLogo size="sm" />
-            <span style={{ fontWeight: 700, fontSize: '18px', color: '#0f172a' }}>
-              SmartLearn.AI
-            </span>
+            <span className="learn-brand-text">SmartLearn.AI</span>
           </Link>
+
           <div className="learn-nav-actions">
             <div className="learn-user-pill">
               <div className="learn-user-avatar">{studentName.charAt(0).toUpperCase()}</div>
-              <span>{studentName}</span>
+              <span className="learn-user-name">{studentName}</span>
             </div>
-            <button type="button" className="learn-signout-btn" onClick={logout}>
-              Sign Out
+
+            <button type="button" className="learn-signout-btn" onClick={logout} aria-label="Sign out">
+              <LogOut size={14} />
+              <span>Sign Out</span>
             </button>
           </div>
         </div>
@@ -153,7 +218,7 @@ export const TopicStudyPage: React.FC = () => {
           <Link to="/dashboard" className="learn-breadcrumb-link">
             Dashboard
           </Link>
-          <span className="learn-breadcrumb-sep">/</span>
+          <ChevronRight size={14} className="learn-breadcrumb-sep" />
           {topic && (
             <>
               <Link
@@ -162,9 +227,9 @@ export const TopicStudyPage: React.FC = () => {
               >
                 {topic.subject_name}
               </Link>
-              <span className="learn-breadcrumb-sep">/</span>
+              <ChevronRight size={14} className="learn-breadcrumb-sep" />
               <span className="learn-breadcrumb-link">{topic.chapter_title}</span>
-              <span className="learn-breadcrumb-sep">/</span>
+              <ChevronRight size={14} className="learn-breadcrumb-sep" />
             </>
           )}
           <span className="learn-breadcrumb-current">{topic?.title || 'Topic'}</span>
@@ -172,7 +237,7 @@ export const TopicStudyPage: React.FC = () => {
 
         {error && (
           <div className="learn-error-box" role="alert">
-            <span aria-hidden="true">⚠️</span>
+            <AlertCircle size={18} className="text-amber-600" />
             <div>
               <strong>Error:</strong> {error}
             </div>
@@ -180,12 +245,8 @@ export const TopicStudyPage: React.FC = () => {
         )}
 
         {saveSuccess && (
-          <div
-            className="learn-error-box"
-            role="status"
-            style={{ background: '#ecfdf5', borderColor: '#a7f3d0', color: '#065f46' }}
-          >
-            <span aria-hidden="true">✅</span>
+          <div className="learn-success-box" role="status">
+            <CheckCircle2 size={18} className="text-emerald-600" />
             <div>{saveSuccess}</div>
           </div>
         )}
@@ -199,7 +260,7 @@ export const TopicStudyPage: React.FC = () => {
           <>
             {/* Header Card */}
             <div className="study-header">
-              <div style={{ display: 'flex', gap: '8px', marginBottom: '8px' }}>
+              <div className="study-badges-row">
                 <span className="subject-badge">{topic.subject_name}</span>
                 <span className="subject-badge">
                   Chapter {topic.chapter_number}: {topic.chapter_title}
@@ -211,32 +272,35 @@ export const TopicStudyPage: React.FC = () => {
               {topic.description && <p className="study-desc">{topic.description}</p>}
 
               <div className="study-meta-row">
-                <div style={{ display: 'flex', alignItems: 'center', gap: '16px', fontSize: '13px', color: '#64748b' }}>
-                  <span>⏱️ Est. Study Time: {topic.estimated_minutes} mins</span>
-                  <span>•</span>
-                  <span>⏳ Time in Session: {Math.floor(sessionSeconds / 60)}m {sessionSeconds % 60}s</span>
+                <div className="study-meta-left">
+                  <span className="study-timer-badge">
+                    <Clock size={14} />
+                    <span>Est. Study Time: {topic.estimated_minutes} mins</span>
+                  </span>
+                  <span className="study-meta-sep">•</span>
+                  <span className="study-session-badge">
+                    <Clock size={14} />
+                    <span>
+                      Session: {Math.floor(sessionSeconds / 60)}m {sessionSeconds % 60}s
+                    </span>
+                  </span>
                 </div>
 
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <div className="study-meta-right">
                   <button
                     type="button"
                     className="study-tutor-btn"
                     onClick={() => setIsTutorOpen(true)}
                     aria-label="Open AI Tutor to ask doubts"
                   >
-                    🤖 Ask AI Tutor
+                    <Bot size={16} />
+                    <span>Ask AI Tutor</span>
                   </button>
-                  <span style={{ fontSize: '13px', fontWeight: 600, color: '#475569' }}>
+
+                  <span className="study-status-indicator">
                     Status:{' '}
                     <span
-                      style={{
-                        color:
-                          currentStatus === 'completed'
-                            ? '#10b981'
-                            : currentStatus === 'in_progress'
-                              ? '#4f46e5'
-                              : '#64748b',
-                      }}
+                      className={`status-text-${currentStatus}`}
                     >
                       {currentStatus === 'completed'
                         ? 'Completed (100%)'
@@ -249,7 +313,7 @@ export const TopicStudyPage: React.FC = () => {
               </div>
             </div>
 
-            {/* Multi-Modal Modality Selection Bar */}
+            {/* Modality Selection Bar */}
             <div className="modalities-bar" role="tablist" aria-label="Learning modalities">
               <button
                 type="button"
@@ -258,7 +322,8 @@ export const TopicStudyPage: React.FC = () => {
                 className={`modality-tab ${activeTab === 'video' ? 'active' : ''}`}
                 onClick={() => setActiveTab('video')}
               >
-                <span>🎥</span> Video Lesson
+                <Video size={16} />
+                <span>Video Lesson</span>
               </button>
 
               <button
@@ -268,7 +333,8 @@ export const TopicStudyPage: React.FC = () => {
                 className={`modality-tab ${activeTab === 'notes' ? 'active' : ''}`}
                 onClick={() => setActiveTab('notes')}
               >
-                <span>📝</span> Study Notes &amp; Summary
+                <FileText size={16} />
+                <span>Study Notes &amp; Summary</span>
               </button>
 
               <button
@@ -278,89 +344,336 @@ export const TopicStudyPage: React.FC = () => {
                 className={`modality-tab ${activeTab === 'text' ? 'active' : ''}`}
                 onClick={() => setActiveTab('text')}
               >
-                <span>📖</span> Reading Material
+                <BookOpen size={16} />
+                <span>Reading Material</span>
+              </button>
+
+              <button
+                type="button"
+                role="tab"
+                aria-selected={activeTab === 'practice'}
+                className={`modality-tab ${activeTab === 'practice' ? 'active' : ''}`}
+                onClick={() => setActiveTab('practice')}
+              >
+                <HelpCircle size={16} />
+                <span>Practice &amp; Quick Quiz</span>
               </button>
             </div>
 
             {/* Resource Display Area */}
             <div className="resource-viewer" role="tabpanel" aria-labelledby={`tab-${activeTab}`}>
-              {activeResources.length === 0 ? (
-                <div className="learn-empty-state">
-                  <p>No {activeTab} resources available for this topic yet.</p>
-                </div>
-              ) : (
-                activeResources.map((res) => (
-                  <div key={res.id} style={{ marginBottom: '28px' }}>
-                    <div className="resource-provenance">
-                      <span className="provenance-tag">
-                        Provider: {res.provider || 'SmartLearn'}
-                      </span>
-                      {res.source_name && (
-                        <span>
-                          Source: <strong>{res.source_name}</strong>
-                        </span>
-                      )}
-                      {res.is_verified && (
-                        <span className="verified-badge">
-                          ✓ Official Verified Curriculum Resource
-                        </span>
+              {/* TAB 1: VIDEO LESSON */}
+              {activeTab === 'video' && (
+                <>
+                  {activeResources.length === 0 ? (
+                    <div className="learn-empty-state">
+                      <p>No video lessons available for this topic yet.</p>
+                    </div>
+                  ) : (
+                    activeResources.map((res) => (
+                      <div key={res.id} className="resource-item-block">
+                        <div className="resource-provenance">
+                          <span className="provenance-tag">Provider: {res.provider || 'SmartLearn'}</span>
+                          {res.source_name && (
+                            <span>
+                              Source: <strong>{res.source_name}</strong>
+                            </span>
+                          )}
+                          {res.is_verified && (
+                            <span className="verified-badge">
+                              <Check size={12} />
+                              <span>Official Verified Curriculum Resource</span>
+                            </span>
+                          )}
+                        </div>
+
+                        <h2 className="resource-title">{res.title}</h2>
+
+                        {/* YouTube Player with Safe Fallback */}
+                        {res.content_url && (
+                          <div className="video-wrapper">
+                            <div className="video-container">
+                              <iframe
+                                src={res.content_url}
+                                title={res.title}
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                allowFullScreen
+                                sandbox="allow-scripts allow-same-origin allow-presentation"
+                              />
+                            </div>
+                            <div className="youtube-fallback-banner">
+                              <div className="youtube-fallback-info">
+                                <span className="youtube-fallback-badge">YouTube</span>
+                                <span>Playback issues or embedding restricted?</span>
+                              </div>
+                              <a
+                                href={
+                                  res.source_url ||
+                                  (res.external_id
+                                    ? `https://www.youtube.com/watch?v=${res.external_id}`
+                                    : res.content_url)
+                                }
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="youtube-direct-link"
+                                aria-label={`Watch ${res.title} directly on YouTube`}
+                              >
+                                <span>Watch directly on YouTube</span>
+                                <ExternalLink size={13} />
+                              </a>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    ))
+                  )}
+                </>
+              )}
+
+              {/* TAB 2: STUDY NOTES & RICH ENGAGING VISUALS */}
+              {activeTab === 'notes' && (
+                <div className="study-notes-enhanced">
+                  {/* Verified provenance header */}
+                  {activeResources.map((res) => (
+                    <div key={res.id} style={{ marginBottom: '20px' }}>
+                      <div className="resource-provenance">
+                        <span className="provenance-tag">Provider: {res.provider || 'SmartLearn'}</span>
+                        {res.is_verified && (
+                          <span className="verified-badge">
+                            <Check size={12} />
+                            <span>Official Verified CISCE Curriculum Notes</span>
+                          </span>
+                        )}
+                      </div>
+                      <h2 className="resource-title">{res.title}</h2>
+                      {res.text_content && (
+                        <div className="notes-highlight-banner">
+                          <p>{res.text_content}</p>
+                        </div>
                       )}
                     </div>
+                  ))}
 
-                    <h2 style={{ fontSize: '18px', fontWeight: 700, margin: '0 0 16px' }}>
-                      {res.title}
-                    </h2>
+                  {/* Structured Pedagogical Concept Cards */}
+                  <div className="concept-cards-grid">
+                    <div className="concept-card">
+                      <div className="concept-card-badge">Key Concept 1</div>
+                      <h3 className="concept-card-title">Lord Dalhousie's Railway Minutes (1853)</h3>
+                      <p className="concept-card-text">
+                        Governor-General Lord Dalhousie advocated a comprehensive trunk-line railway scheme to link major British administrative presidencies (Calcutta, Bombay, Madras, and Delhi).
+                      </p>
+                    </div>
 
-                    {/* Video Player with YouTube Fallback */}
-                    {res.resource_type === 'video' && res.content_url && (
-                      <div className="video-wrapper">
-                        <div className="video-container">
-                          <iframe
-                            src={res.content_url}
-                            title={res.title}
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                            allowFullScreen
-                            sandbox="allow-scripts allow-same-origin allow-presentation"
-                          />
-                        </div>
-                        <div className="youtube-fallback-banner">
-                          <div className="youtube-fallback-info">
-                            <span className="youtube-fallback-badge">YouTube</span>
-                            <span>Playback issues or embedding restricted?</span>
-                          </div>
-                          <a
-                            href={
-                              res.source_url ||
-                              (res.external_id
-                                ? `https://www.youtube.com/watch?v=${res.external_id}`
-                                : res.content_url)
-                            }
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="youtube-direct-link"
-                            aria-label={`Watch ${res.title} directly on YouTube`}
-                          >
-                            Watch directly on YouTube ↗
-                          </a>
-                        </div>
-                      </div>
-                    )}
+                    <div className="concept-card">
+                      <div className="concept-card-badge">Key Concept 2</div>
+                      <h3 className="concept-card-title">The 5% Guarantee System</h3>
+                      <p className="concept-card-text">
+                        To attract British private capital without risk, the government pledged free land on 99-year leases and a guaranteed 5% annual dividend on investment, funded through Indian peasant revenues.
+                      </p>
+                    </div>
 
-                    {/* Text / Notes Content */}
-                    {res.text_content && (
-                      <div className="text-content-box">
-                        <div
-                          style={{
-                            whiteSpace: 'pre-line',
-                            fontFamily: 'Inter, system-ui, sans-serif',
-                          }}
-                        >
-                          {res.text_content}
-                        </div>
-                      </div>
-                    )}
+                    <div className="concept-card">
+                      <div className="concept-card-badge">Key Concept 3</div>
+                      <h3 className="concept-card-title">Dual Imperial Objectives</h3>
+                      <p className="concept-card-text">
+                        Military deployment (swift mobilization of garrison troops) and commercial exploitation (siphoning agrarian raw materials like raw cotton and wheat directly to ports for shipment to British factories).
+                      </p>
+                    </div>
+
+                    <div className="concept-card">
+                      <div className="concept-card-badge">Key Concept 4</div>
+                      <h3 className="concept-card-title">Drain of Wealth &amp; De-industrialisation</h3>
+                      <p className="concept-card-text">
+                        Import tariffs favored machine-made British textiles entering India, while indigenous handloom weavers lost markets, leading to severe rural indebtedness and the drain of capital.
+                      </p>
+                    </div>
                   </div>
-                ))
+
+                  {/* Interactive Visual Progression Diagram */}
+                  <div className="notes-diagram-box">
+                    <div className="diagram-header">
+                      <h3 className="diagram-title">Historical &amp; Economic Flow: Colonial Railway Network</h3>
+                      <span className="diagram-subtitle">4-stage imperial mechanism</span>
+                    </div>
+
+                    <div className="diagram-steps-grid">
+                      <div className="diagram-step-card">
+                        <div className="step-number">01</div>
+                        <h4 className="step-title">1853 Inception</h4>
+                        <p className="step-desc">
+                          First 21-mile route from Bombay to Thane; Dalhousie's proposal for national trunk lines.
+                        </p>
+                      </div>
+
+                      <div className="diagram-step-arrow">
+                        <ArrowRight size={20} className="text-indigo-400" />
+                      </div>
+
+                      <div className="diagram-step-card">
+                        <div className="step-number">02</div>
+                        <h4 className="step-title">Capital Influx</h4>
+                        <p className="step-desc">
+                          British joint-stock firms invest with zero risk under the guaranteed 5% dividend system.
+                        </p>
+                      </div>
+
+                      <div className="diagram-step-arrow">
+                        <ArrowRight size={20} className="text-indigo-400" />
+                      </div>
+
+                      <div className="diagram-step-card">
+                        <div className="step-number">03</div>
+                        <h4 className="step-title">Port Feeder Lines</h4>
+                        <p className="step-desc">
+                          Tracks designed to funnel agricultural crops from rural districts straight to maritime ports.
+                        </p>
+                      </div>
+
+                      <div className="diagram-step-arrow">
+                        <ArrowRight size={20} className="text-indigo-400" />
+                      </div>
+
+                      <div className="diagram-step-card">
+                        <div className="step-number">04</div>
+                        <h4 className="step-title">Drain of Wealth</h4>
+                        <p className="step-desc">
+                          Guaranteed deficits debited from colonial treasury; domestic cottage artisans lose viability.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* High-Yield Exam Pointers Callout */}
+                  <div className="exam-pointers-callout">
+                    <h3 className="exam-pointers-title">High-Yield Exam Takeaways:</h3>
+                    <ul className="exam-pointers-list">
+                      <li><strong>16 April 1853:</strong> First train run from Bombay to Thane under Great Indian Peninsula Railway (GIPR).</li>
+                      <li><strong>The Guarantee System:</strong> 5% return guaranteed from Indian taxes, removing investor incentive for economy or efficiency.</li>
+                      <li><strong>Telegraph Network:</strong> Installed simultaneously by Lord Dalhousie along railway alignments to ensure immediate administrative control.</li>
+                    </ul>
+                  </div>
+                </div>
+              )}
+
+              {/* TAB 3: READING MATERIAL */}
+              {activeTab === 'text' && (
+                <div className="reading-material-container">
+                  {activeResources.length === 0 ? (
+                    <div className="learn-empty-state">
+                      <p>No text resources available for this topic yet.</p>
+                    </div>
+                  ) : (
+                    activeResources.map((res) => (
+                      <div key={res.id} className="resource-item-block">
+                        <div className="resource-provenance">
+                          <span className="provenance-tag">Provider: {res.provider || 'SmartLearn'}</span>
+                          {res.is_verified && (
+                            <span className="verified-badge">
+                              <Check size={12} />
+                              <span>Official Verified Textbook Material</span>
+                            </span>
+                          )}
+                        </div>
+                        <h2 className="resource-title">{res.title}</h2>
+                        {res.text_content && (
+                          <div className="text-content-box">
+                            <div className="text-article-body">{res.text_content}</div>
+                          </div>
+                        )}
+                      </div>
+                    ))
+                  )}
+                </div>
+              )}
+
+              {/* TAB 4: PRACTICE & QUICK QUIZ */}
+              {activeTab === 'practice' && (
+                <div className="practice-quiz-container">
+                  <div className="practice-header">
+                    <div>
+                      <h2 className="practice-title">Interactive Knowledge Check</h2>
+                      <p className="practice-subtitle">
+                        Test your mastery of official CISCE Class 11 History concepts for this topic.
+                      </p>
+                    </div>
+                    <span className="practice-count-badge">{SELF_CHECK_QUIZ.length} Practice Questions</span>
+                  </div>
+
+                  <div className="quiz-questions-list">
+                    {SELF_CHECK_QUIZ.map((q, qIndex) => {
+                      const selected = selectedAnswers[q.id];
+                      const isSubmitted = submittedAnswers[q.id];
+                      const isCorrect = selected === q.correctIndex;
+
+                      return (
+                        <div key={q.id} className="quiz-question-card">
+                          <div className="quiz-q-num">Question {qIndex + 1} of {SELF_CHECK_QUIZ.length}</div>
+                          <h3 className="quiz-q-text">{q.question}</h3>
+
+                          <div className="quiz-options-group">
+                            {q.options.map((opt, optIdx) => {
+                              const isOptionSelected = selected === optIdx;
+                              let optionClass = 'quiz-opt-btn';
+
+                              if (isSubmitted) {
+                                if (optIdx === q.correctIndex) {
+                                  optionClass += ' correct-opt';
+                                } else if (isOptionSelected) {
+                                  optionClass += ' wrong-opt';
+                                }
+                              } else if (isOptionSelected) {
+                                optionClass += ' selected-opt';
+                              }
+
+                              return (
+                                <button
+                                  key={optIdx}
+                                  type="button"
+                                  className={optionClass}
+                                  onClick={() => handleSelectOption(q.id, optIdx)}
+                                  disabled={isSubmitted}
+                                >
+                                  <span className="opt-letter">
+                                    {String.fromCharCode(65 + optIdx)}
+                                  </span>
+                                  <span className="opt-text">{opt}</span>
+                                </button>
+                              );
+                            })}
+                          </div>
+
+                          {!isSubmitted ? (
+                            <button
+                              type="button"
+                              className="quiz-check-btn"
+                              onClick={() => handleCheckAnswer(q.id)}
+                              disabled={selected === undefined}
+                            >
+                              Check Answer
+                            </button>
+                          ) : (
+                            <div className={`quiz-feedback-box ${isCorrect ? 'feedback-correct' : 'feedback-incorrect'}`}>
+                              <div className="feedback-status-row">
+                                {isCorrect ? (
+                                  <>
+                                    <CheckCircle2 size={16} className="text-emerald-600" />
+                                    <span className="feedback-status-text">Correct! Great understanding.</span>
+                                  </>
+                                ) : (
+                                  <>
+                                    <AlertCircle size={16} className="text-amber-600" />
+                                    <span className="feedback-status-text">Incorrect. Review the syllabus rationale below:</span>
+                                  </>
+                                )}
+                              </div>
+                              <p className="feedback-explanation">{q.explanation}</p>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
               )}
             </div>
 
@@ -368,15 +681,8 @@ export const TopicStudyPage: React.FC = () => {
             <section className="progress-action-bar" aria-label="Topic progress controls">
               <div className="progress-status-indicator">
                 <span>Progress:</span>
-                <span
-                  style={{
-                    color: currentStatus === 'completed' ? '#10b981' : '#4f46e5',
-                    fontWeight: 700,
-                  }}
-                >
-                  {currentPct}%
-                </span>
-                <span>({currentStatus.replace('_', ' ')})</span>
+                <span className="progress-indicator-pct">{currentPct}%</span>
+                <span className="progress-indicator-status">({currentStatus.replace('_', ' ')})</span>
               </div>
 
               <div className="progress-buttons">
@@ -417,20 +723,20 @@ export const TopicStudyPage: React.FC = () => {
 
                 <Link
                   to="/dashboard"
-                  className="continue-action-btn"
-                  style={{ background: '#334155' }}
+                  className="continue-action-btn progress-dashboard-btn"
                   aria-label="Return to Dashboard to see updated metrics"
                 >
-                  Dashboard →
+                  <span>Dashboard →</span>
                 </Link>
               </div>
             </section>
           </>
         ) : (
           <div className="learn-empty-state">
+            <BookOpen size={32} className="empty-state-icon" />
             <p>Topic not found.</p>
             <Link to="/dashboard" className="continue-action-btn" style={{ marginTop: '16px' }}>
-              Return to Dashboard
+              <span>Return to Dashboard</span>
             </Link>
           </div>
         )}
@@ -444,7 +750,9 @@ export const TopicStudyPage: React.FC = () => {
           onClick={() => setIsTutorOpen(true)}
           aria-label="Open AI Tutor to ask doubts"
         >
-          <span className="floating-tutor-icon" aria-hidden="true">🤖</span>
+          <span className="floating-tutor-icon" aria-hidden="true">
+            <Bot size={20} />
+          </span>
           <span>Ask AI Tutor</span>
         </button>
       )}

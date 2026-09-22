@@ -201,7 +201,8 @@ class TutorService:
             f"4. Socratic Guidance & Practice: When helping with exercises or questions, give helpful hints and conceptual steps rather than solving it passively.\n"
             f"5. Scope & Boundary Management: If the student asks about something clearly irrelevant or beyond the {board} {grade} syllabus, politely clarify: 'This concept is outside the syllabus for {board} {grade} {subject_name}, but let's connect it back to {topic_title}...' and guide them back.\n"
             f"6. Accuracy: Never hallucinate curriculum requirements or claim fake syllabus regulations.\n"
-            f"7. Tone: Friendly, patient, academic, and encouraging."
+            f"7. Tone: Friendly, patient, academic, and encouraging.\n"
+            f"8. Presentation Quality: Present answers with professional, ChatGPT-quality Markdown. Use clear headings (###), bullet points, markdown tables for comparisons or data, LaTeX math formatting ($inline$ or $$block$$) for any formulas or equations, and callouts (> **Key Takeaway:**) for high-yield exam points. Do not use emojis in explanations."
         )
 
     @classmethod

@@ -1,6 +1,23 @@
 import React, { useEffect, useRef, useState } from 'react';
+import {
+  Bot,
+  Send,
+  Image as ImageIcon,
+  X,
+  MessageSquare,
+  Mic,
+  MicOff,
+  Square,
+  PhoneOff,
+  RotateCcw,
+  AlertCircle,
+  Sparkles,
+  Volume2,
+  Headphones,
+} from 'lucide-react';
 import { askAITutor, createVoiceSession } from '../../services/tutor';
 import type { TutorChatMessage, VoiceSessionResponse, VoiceState } from '../../types/tutor';
+import { MarkdownRenderer } from './MarkdownRenderer';
 
 interface TutorDrawerProps {
   isOpen: boolean;
@@ -20,10 +37,10 @@ interface VoiceTranscriptItem {
 }
 
 const STARTER_PROMPTS = [
-  'Explain this concept in simple terms 💡',
-  'Give me a real-world example from the syllabus 🌍',
-  'Quiz me with a practice question ❓',
-  'Summarize the high-yield exam takeaways 📌',
+  'Explain this concept in simple terms',
+  'Give me a real-world example from the syllabus',
+  'Quiz me with a practice question',
+  'Summarize the high-yield exam takeaways',
 ];
 
 export const TutorDrawer: React.FC<TutorDrawerProps> = ({
@@ -43,7 +60,7 @@ export const TutorDrawer: React.FC<TutorDrawerProps> = ({
     {
       id: 'welcome',
       role: 'tutor',
-      content: `Hello! I'm your Curriculum AI Tutor for **${subjectName}**.\n\nWe're currently exploring **Chapter ${chapterNumber}: ${chapterTitle}** → **${topicTitle}**.\n\nAsk me any doubt, request simple explanations, or upload a photo of your textbook problem or diagram!`,
+      content: `Hello! I am your Curriculum AI Tutor for **${subjectName}**.\n\nWe are currently studying **Chapter ${chapterNumber}: ${chapterTitle}** → **${topicTitle}**.\n\nAsk any question, request step-by-step breakdowns, or upload a textbook photo/diagram for guided doubt-solving.`,
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     },
   ]);
@@ -95,7 +112,6 @@ export const TutorDrawer: React.FC<TutorDrawerProps> = ({
       stopVoiceSession();
     };
   }, [isOpen]);
-
 
   // Handle escape key
   useEffect(() => {
@@ -150,47 +166,43 @@ export const TutorDrawer: React.FC<TutorDrawerProps> = ({
     const studentMsg: TutorChatMessage = {
       id: `student-${Date.now()}`,
       role: 'student',
-      content: query || (currentImg ? 'Uploaded diagram/exercise for doubt solving' : ''),
+      content: query || 'Analyze attached doubt diagram',
+      imageUrl: currentImg || undefined,
       timestamp,
-      imageUrl: currentImg,
     };
 
-    setMessages((prev) => [...prev, studentMsg]);
+    const nextHistory = [...messages, studentMsg];
+    setMessages(nextHistory);
     setInputMessage('');
-    setSelectedImage(null);
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
-    }
+    removeSelectedImage();
     setIsLoading(true);
 
     try {
-      const historyPayload = messages
+      const historyPayload = nextHistory
         .filter((m) => m.id !== 'welcome')
-        .slice(-10)
+        .slice(-6)
         .map((m) => ({
-          role: m.role as 'student' | 'tutor',
+          role: m.role,
           content: m.content,
         }));
 
-      const resp = await askAITutor({
+      const res = await askAITutor({
         topic_id: topicId,
-        message: query || 'Analyze this textbook image and guide me through solving it.',
+        message: query || 'Please analyze this diagram or problem from the syllabus.',
+        image_base64: currentImg || undefined,
         conversation_history: historyPayload,
-        image_base64: currentImg,
       });
 
-      const tutorReply: TutorChatMessage = {
+      const tutorMsg: TutorChatMessage = {
         id: `tutor-${Date.now()}`,
         role: 'tutor',
-        content: resp.reply,
+        content: res.reply,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       };
 
-      setMessages((prev) => [...prev, tutorReply]);
+      setMessages((prev) => [...prev, tutorMsg]);
     } catch (err: any) {
-      const errMsg =
-        err.message ||
-        'Unable to contact the AI Tutor. Please check your connection or server configuration.';
+      const errMsg = err.message || 'Failed to get tutor response. Please try again.';
       setChatError(errMsg);
     } finally {
       setIsLoading(false);
@@ -204,75 +216,38 @@ export const TutorDrawer: React.FC<TutorDrawerProps> = ({
     }
   };
 
-  // ── Voice Session Logic ────────────────────────────────────────────────────
-  const resolveWsUrl = (wsEndpoint: string, token: string): string => {
-    const base = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api/v1';
-    const wsBase = base.replace(/^http(s)?:/, (match: string) => (match === 'https:' ? 'wss:' : 'ws:'));
-    const cleanBase = wsBase.replace(/\/api\/v1\/?$/, '');
-    const cleanEndpoint = wsEndpoint.startsWith('/') ? wsEndpoint : `/${wsEndpoint}`;
-    return `${cleanBase}${cleanEndpoint}?token=${encodeURIComponent(token)}`;
-  };
-
+  // ── Voice Session Lifecycle ────────────────────────────────────────────────
   const startVoiceSession = async () => {
     setVoiceError(null);
     setVoiceState('connecting');
+    setInterimSpeech('');
 
-    // 1. Microphone check & acquisition
-    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-      setVoiceError('Audio capture is not supported in this browser environment. You can use Text Chat!');
-      setVoiceState('error');
-      return;
-    }
-
-    let stream: MediaStream;
     try {
-      stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      // 1. Request Ephemeral Voice Session Token from backend
+      const sessionData = await createVoiceSession(topicId);
+      activeSessionRef.current = sessionData;
+
+      // 2. Request user microphone permission
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       streamRef.current = stream;
-    } catch (micErr: any) {
-      if (micErr.name === 'NotAllowedError' || micErr.name === 'PermissionDeniedError') {
-        setVoiceError('Microphone permission was denied. Please allow microphone access in your browser settings to talk with your AI Tutor.');
-      } else if (micErr.name === 'NotFoundError' || micErr.name === 'DevicesNotFoundError') {
-        setVoiceError('No microphone found on your device. Please plug in a mic or switch to Text Chat.');
-      } else {
-        setVoiceError(`Could not access microphone: ${micErr.message || micErr.name}`);
+
+      // 3. Setup Web Audio API Analyser for live frequency spectrum
+      setupAudioVisualizer(stream);
+
+      // 4. Initialize WebSocket connection to backend voice gateway
+      const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+      const wsHost = window.location.host;
+      let endpoint = sessionData.ws_endpoint;
+
+      if (!endpoint.startsWith('ws://') && !endpoint.startsWith('wss://')) {
+        if (!endpoint.startsWith('http')) {
+          endpoint = `${wsProtocol}//${wsHost}${endpoint.startsWith('/') ? '' : '/'}${endpoint}`;
+        } else {
+          endpoint = endpoint.replace(/^http/, 'ws');
+        }
       }
-      setVoiceState('error');
-      return;
-    }
 
-    // 2. Setup Audio Visualizer (Web Audio API)
-    try {
-      const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
-      if (AudioCtx) {
-        const audioCtx = new AudioCtx();
-        audioContextRef.current = audioCtx;
-        const analyser = audioCtx.createAnalyser();
-        analyser.fftSize = 64;
-        analyserRef.current = analyser;
-
-        const source = audioCtx.createMediaStreamSource(stream);
-        source.connect(analyser);
-        startVisualizerLoop();
-      }
-    } catch (e) {
-      console.warn('Web Audio visualizer setup error:', e);
-    }
-
-    // 3. Create backend voice session (ephemeral JWT token)
-    let session: VoiceSessionResponse;
-    try {
-      session = await createVoiceSession(topicId);
-      activeSessionRef.current = session;
-    } catch (err: any) {
-      setVoiceError(err.message || 'Failed to initialize voice session token from server.');
-      setVoiceState('error');
-      stopMediaStream();
-      return;
-    }
-
-    // 4. Connect WebSocket
-    try {
-      const wsUrl = resolveWsUrl(session.ws_endpoint, session.session_token);
+      const wsUrl = `${endpoint}?token=${encodeURIComponent(sessionData.session_token)}`;
       const ws = new WebSocket(wsUrl);
       wsRef.current = ws;
 
@@ -285,27 +260,27 @@ export const TutorDrawer: React.FC<TutorDrawerProps> = ({
         try {
           const data = JSON.parse(event.data);
           handleWebSocketMessage(data);
-        } catch (e) {
-          console.warn('Failed to parse WebSocket message:', event.data);
+        } catch {
+          // ignore parsing error
         }
       };
 
-      ws.onerror = (evt) => {
-        console.error('Tutor voice WebSocket error:', evt);
-        setVoiceError('Voice connection error. Please reconnect or switch to text chat.');
+      ws.onerror = () => {
+        setVoiceError('Voice connection error. Please verify your network and microphone.');
         setVoiceState('error');
       };
 
-      ws.onclose = (evt) => {
+      ws.onclose = () => {
         if (voiceStateRef.current !== 'idle') {
-          if (!evt.wasClean) {
-            setVoiceError('Voice session disconnected unexpectedly.');
-            setVoiceState('error');
-          }
+          setVoiceState('idle');
         }
       };
-    } catch (wsErr: any) {
-      setVoiceError(`Failed to establish voice connection: ${wsErr.message}`);
+    } catch (err: any) {
+      const msg =
+        err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError'
+          ? 'Microphone permission was denied. Please allow microphone access in your browser.'
+          : err.message || 'Failed to initialize voice session.';
+      setVoiceError(msg);
       setVoiceState('error');
       stopMediaStream();
     }
@@ -317,23 +292,19 @@ export const TutorDrawer: React.FC<TutorDrawerProps> = ({
         setVoiceState('listening');
         break;
 
-      case 'thinking':
-        setVoiceState('thinking');
-        break;
-
       case 'speaking':
-      case 'response_text':
+      case 'tutor_speech':
         setVoiceState('speaking');
-        if (data.text) {
-          const tutorTurn: VoiceTranscriptItem = {
-            id: `v-tutor-${Date.now()}`,
+        setVoiceTranscripts((prev) => [
+          ...prev,
+          {
+            id: `vtutor-${Date.now()}`,
             role: 'tutor',
             text: data.text,
             timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-          };
-          setVoiceTranscripts((prev) => [...prev, tutorTurn]);
-          speakAloud(data.text);
-        }
+          },
+        ]);
+        playTextToSpeech(data.text);
         break;
 
       case 'interrupted':
@@ -344,7 +315,7 @@ export const TutorDrawer: React.FC<TutorDrawerProps> = ({
         break;
 
       case 'error':
-        setVoiceError(data.message || 'An error occurred during voice communication.');
+        setVoiceError(data.message || 'Voice error occurred.');
         setVoiceState('error');
         break;
 
@@ -353,57 +324,16 @@ export const TutorDrawer: React.FC<TutorDrawerProps> = ({
     }
   };
 
-  const speakAloud = (text: string) => {
-    const UtteranceClass =
-      (window as any).SpeechSynthesisUtterance ||
-      (typeof SpeechSynthesisUtterance !== 'undefined' ? SpeechSynthesisUtterance : null);
-
-    if (typeof window === 'undefined' || !window.speechSynthesis || !UtteranceClass) {
-      return;
-    }
-
-
-
-    try {
-      window.speechSynthesis.cancel(); // cancel any previous utterance
-      const cleanText = text.replace(/[*_#`]/g, '');
-      const utterance = new UtteranceClass(cleanText);
-      utterance.rate = 1.0;
-      utterance.pitch = 1.0;
-
-
-      utterance.onend = () => {
-        if (voiceStateRef.current === 'speaking') {
-          setVoiceState('listening');
-        }
-      };
-
-      utterance.onerror = (event: any) => {
-        if (event.error !== 'canceled' && event.error !== 'interrupted') {
-          console.warn('Speech synthesis utterance error:', event.error);
-        }
-        if (voiceStateRef.current === 'speaking') {
-          setVoiceState('listening');
-        }
-      };
-
-
-      window.speechSynthesis.speak(utterance);
-    } catch (e) {
-      console.warn('Speech synthesis speak failure:', e);
-    }
-  };
-
-
   const initSpeechRecognition = () => {
-    const SpeechRec = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-    if (!SpeechRec) {
-      console.info('Web SpeechRecognition not supported in this browser.');
+    const SpeechRecognition =
+      (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+
+    if (!SpeechRecognition) {
       return;
     }
 
     try {
-      const recognition = new SpeechRec();
+      const recognition = new SpeechRecognition();
       recognition.continuous = true;
       recognition.interimResults = true;
       recognition.lang = 'en-US';
@@ -413,106 +343,145 @@ export const TutorDrawer: React.FC<TutorDrawerProps> = ({
         let final = '';
 
         for (let i = event.resultIndex; i < event.results.length; ++i) {
-          const res = event.results[i];
-          if (res.isFinal) {
-            final += res[0].transcript;
+          if (event.results[i].isFinal) {
+            final += event.results[i][0].transcript;
           } else {
-            interim += res[0].transcript;
+            interim += event.results[i][0].transcript;
           }
-        }
-
-        // Barge-in check: if tutor is speaking, user speaking interrupts it!
-        if ((interim || final) && voiceStateRef.current === 'speaking') {
-          interruptTutor();
         }
 
         if (interim) {
           setInterimSpeech(interim);
-          if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
-            wsRef.current.send(
-              JSON.stringify({
-                type: 'speech_interim',
-                text: interim,
-                session_id: activeSessionRef.current?.session_id,
-              })
-            );
+          if (voiceStateRef.current === 'speaking') {
+            interruptTutor();
           }
         }
 
-        if (final && final.trim()) {
-          const trimmed = final.trim();
+        if (final.trim()) {
           setInterimSpeech('');
-          const studentTurn: VoiceTranscriptItem = {
-            id: `v-student-${Date.now()}`,
-            role: 'student',
-            text: trimmed,
-            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-          };
-          setVoiceTranscripts((prev) => [...prev, studentTurn]);
-          setVoiceState('thinking');
+          const timestamp = new Date().toLocaleTimeString([], {
+            hour: '2-digit',
+            minute: '2-digit',
+          });
+
+          setVoiceTranscripts((prev) => [
+            ...prev,
+            {
+              id: `vstudent-${Date.now()}`,
+              role: 'student',
+              text: final.trim(),
+              timestamp,
+            },
+          ]);
 
           if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
+            setVoiceState('thinking');
             wsRef.current.send(
               JSON.stringify({
                 type: 'speech_final',
-                text: trimmed,
-                session_id: activeSessionRef.current?.session_id,
+                text: final.trim(),
               })
             );
           }
         }
       };
 
-      recognition.onerror = (event: any) => {
-        if (event.error !== 'no-speech') {
-          console.warn('SpeechRecognition error:', event.error);
+      recognition.onerror = (e: any) => {
+        if (e.error !== 'no-speech') {
+          // non-critical error
         }
       };
 
       recognition.onend = () => {
-        // Restart recognition if session is still active and listening
-        if (voiceStateRef.current !== 'idle' && voiceStateRef.current !== 'error' && recognitionRef.current) {
+        if (voiceStateRef.current === 'listening' && !isMuted) {
           try {
             recognition.start();
-          } catch {
-            // Already started or restarting
-          }
+          } catch {}
         }
       };
 
       recognition.start();
       recognitionRef.current = recognition;
-    } catch (e) {
-      console.warn('Speech recognition initiation error:', e);
+    } catch {
+      // Speech recognition fallback
     }
   };
 
-  const startVisualizerLoop = () => {
+  const playTextToSpeech = (text: string) => {
+    if (!('speechSynthesis' in window)) {
+      setVoiceState('listening');
+      return;
+    }
+
+    window.speechSynthesis.cancel();
+    const cleanText = text.replace(/[*_#`~[\]]/g, '').trim();
+    const utterance = new SpeechSynthesisUtterance(cleanText);
+    utterance.rate = 1.0;
+    utterance.pitch = 1.0;
+
+    utterance.onend = () => {
+      if (voiceStateRef.current === 'speaking') {
+        setVoiceState('listening');
+      }
+    };
+
+    utterance.onerror = () => {
+      setVoiceState('listening');
+    };
+
+    window.speechSynthesis.speak(utterance);
+  };
+
+  const setupAudioVisualizer = (stream: MediaStream) => {
+    try {
+      const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
+      const audioCtx = new AudioCtx();
+      audioContextRef.current = audioCtx;
+
+      const analyser = audioCtx.createAnalyser();
+      analyser.fftSize = 64;
+      analyserRef.current = analyser;
+
+      const source = audioCtx.createMediaStreamSource(stream);
+      source.connect(analyser);
+
+      drawVisualizerLoop();
+    } catch {
+      // canvas visualizer fallback
+    }
+  };
+
+  const drawVisualizerLoop = () => {
+    const canvas = canvasRef.current;
+    const analyser = analyserRef.current;
+    if (!canvas || !analyser) {
+      animFrameRef.current = requestAnimationFrame(drawVisualizerLoop);
+      return;
+    }
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const bufferLength = analyser.frequencyBinCount;
+    const dataArray = new Uint8Array(bufferLength);
+
     const draw = () => {
-      const canvas = canvasRef.current;
-      const analyser = analyserRef.current;
-      if (canvas && analyser) {
-        const ctx = canvas.getContext('2d');
-        if (ctx) {
-          const bufferLength = analyser.frequencyBinCount;
-          const dataArray = new Uint8Array(bufferLength);
-          analyser.getByteFrequencyData(dataArray);
+      if (analyserRef.current && canvasRef.current) {
+        analyserRef.current.getByteFrequencyData(dataArray);
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-          ctx.clearRect(0, 0, canvas.width, canvas.height);
+        const barWidth = (canvas.width / bufferLength) * 2.2;
+        let x = 0;
 
-          const barWidth = (canvas.width / bufferLength) * 2.2;
-          let x = 0;
+        for (let i = 0; i < bufferLength; i++) {
+          const barHeight = (dataArray[i] / 255) * (canvas.height - 4);
+          const gradient = ctx.createLinearGradient(0, canvas.height, 0, 0);
+          gradient.addColorStop(0, '#4f46e5');
+          gradient.addColorStop(1, '#818cf8');
 
-          for (let i = 0; i < bufferLength; i++) {
-            const barHeight = (dataArray[i] / 255) * (canvas.height - 4);
-            const gradient = ctx.createLinearGradient(0, canvas.height, 0, 0);
-            gradient.addColorStop(0, '#4f46e5');
-            gradient.addColorStop(1, '#818cf8');
-
-            ctx.fillStyle = isMuted ? '#94a3b8' : gradient;
-            ctx.fillRect(x, canvas.height - barHeight - 2, barWidth - 1, barHeight + 2);
-            x += barWidth;
-          }
+          ctx.fillStyle = isMuted ? '#94a3b8' : gradient;
+          ctx.fillRect(x, canvas.height - barHeight - 2, barWidth - 1, barHeight + 2);
+          x += barWidth;
         }
       }
       animFrameRef.current = requestAnimationFrame(draw);
@@ -609,7 +578,9 @@ export const TutorDrawer: React.FC<TutorDrawerProps> = ({
         {/* Drawer Header */}
         <div className="tutor-header">
           <div className="tutor-header-title">
-            <div className="tutor-avatar" aria-hidden="true">🤖</div>
+            <div className="tutor-avatar" aria-hidden="true">
+              <Bot size={18} />
+            </div>
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <h2 style={{ fontSize: '16px', fontWeight: 700, margin: 0, color: '#0f172a' }}>
@@ -628,7 +599,7 @@ export const TutorDrawer: React.FC<TutorDrawerProps> = ({
             onClick={onClose}
             aria-label="Close AI Tutor"
           >
-            ✕
+            <X size={18} />
           </button>
         </div>
 
@@ -641,7 +612,8 @@ export const TutorDrawer: React.FC<TutorDrawerProps> = ({
             className={`tutor-mode-tab ${activeTab === 'chat' ? 'active' : ''}`}
             onClick={() => setActiveTab('chat')}
           >
-            💬 Chat Doubt-Solving
+            <MessageSquare size={15} />
+            <span>Chat Doubt-Solving</span>
           </button>
           <button
             type="button"
@@ -655,7 +627,8 @@ export const TutorDrawer: React.FC<TutorDrawerProps> = ({
               }
             }}
           >
-            🎙️ Live Voice Tutor
+            <Mic size={15} />
+            <span>Live Voice Tutor</span>
           </button>
         </div>
 
@@ -665,15 +638,15 @@ export const TutorDrawer: React.FC<TutorDrawerProps> = ({
             {/* Error Alert Banner */}
             {chatError && (
               <div className="tutor-error-banner" role="alert">
-                <span>⚠️</span>
+                <AlertCircle size={16} className="text-amber-600" />
                 <div style={{ flex: 1 }}>{chatError}</div>
                 <button
                   type="button"
-                  style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '13px' }}
+                  style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center' }}
                   onClick={() => setChatError(null)}
                   aria-label="Dismiss error"
                 >
-                  ✕
+                  <X size={14} />
                 </button>
               </div>
             )}
@@ -686,7 +659,9 @@ export const TutorDrawer: React.FC<TutorDrawerProps> = ({
                   className={`tutor-bubble-row ${msg.role === 'student' ? 'student-row' : 'tutor-row'}`}
                 >
                   {msg.role === 'tutor' && (
-                    <div className="tutor-bubble-avatar" aria-hidden="true">🤖</div>
+                    <div className="tutor-bubble-avatar" aria-hidden="true">
+                      <Bot size={16} />
+                    </div>
                   )}
 
                   <div className={`tutor-bubble ${msg.role === 'student' ? 'student-bubble' : 'tutor-bubble-content'}`}>
@@ -695,7 +670,11 @@ export const TutorDrawer: React.FC<TutorDrawerProps> = ({
                         <img src={msg.imageUrl} alt="Student attached doubt" className="tutor-msg-image" />
                       </div>
                     )}
-                    <div style={{ whiteSpace: 'pre-line' }}>{msg.content}</div>
+                    {msg.role === 'tutor' ? (
+                      <MarkdownRenderer content={msg.content} />
+                    ) : (
+                      <div className="tutor-student-text">{msg.content}</div>
+                    )}
                     <div className="tutor-msg-time">{msg.timestamp}</div>
                   </div>
                 </div>
@@ -703,7 +682,9 @@ export const TutorDrawer: React.FC<TutorDrawerProps> = ({
 
               {isLoading && (
                 <div className="tutor-bubble-row tutor-row">
-                  <div className="tutor-bubble-avatar" aria-hidden="true">🤖</div>
+                  <div className="tutor-bubble-avatar" aria-hidden="true">
+                    <Bot size={16} />
+                  </div>
                   <div className="tutor-bubble tutor-bubble-content loading-bubble">
                     <div className="tutor-typing-indicator" aria-label="Tutor is thinking">
                       <span />
@@ -751,7 +732,7 @@ export const TutorDrawer: React.FC<TutorDrawerProps> = ({
                     title="Remove image"
                     aria-label="Remove attached image"
                   >
-                    ✕
+                    <X size={12} />
                   </button>
                 </div>
               )}
@@ -771,7 +752,7 @@ export const TutorDrawer: React.FC<TutorDrawerProps> = ({
                   title="Upload textbook photo or diagram doubt"
                   aria-label="Upload photo or diagram doubt"
                 >
-                  📷
+                  <ImageIcon size={18} />
                 </label>
 
                 <textarea
@@ -792,7 +773,7 @@ export const TutorDrawer: React.FC<TutorDrawerProps> = ({
                   disabled={(!inputMessage.trim() && !selectedImage) || isLoading}
                   aria-label="Send message to AI Tutor"
                 >
-                  ➤
+                  <Send size={16} />
                 </button>
               </div>
             </div>
@@ -805,15 +786,15 @@ export const TutorDrawer: React.FC<TutorDrawerProps> = ({
             {/* Voice Error Banner */}
             {voiceError && (
               <div className="tutor-error-banner" role="alert" style={{ margin: '12px 16px' }}>
-                <span>⚠️</span>
+                <AlertCircle size={16} className="text-amber-600" />
                 <div style={{ flex: 1 }}>{voiceError}</div>
                 <button
                   type="button"
-                  style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '13px' }}
+                  style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center' }}
                   onClick={() => setVoiceError(null)}
                   aria-label="Dismiss error"
                 >
-                  ✕
+                  <X size={14} />
                 </button>
               </div>
             )}
@@ -823,12 +804,12 @@ export const TutorDrawer: React.FC<TutorDrawerProps> = ({
               <div className="tutor-voice-orb-container">
                 {voiceState === 'listening' && <div className="tutor-voice-pulse-ring" />}
                 <div className={`tutor-voice-orb ${voiceState}`}>
-                  {voiceState === 'connecting' && '⏳'}
-                  {voiceState === 'listening' && (isMuted ? '🔇' : '🎙️')}
-                  {voiceState === 'thinking' && '🧠'}
-                  {voiceState === 'speaking' && '🔊'}
-                  {voiceState === 'idle' && '🎧'}
-                  {voiceState === 'error' && '⚠️'}
+                  {voiceState === 'connecting' && <RotateCcw className="spin-icon" size={26} />}
+                  {voiceState === 'listening' && (isMuted ? <MicOff size={26} /> : <Mic size={26} />)}
+                  {voiceState === 'thinking' && <Sparkles size={26} />}
+                  {voiceState === 'speaking' && <Volume2 size={26} />}
+                  {voiceState === 'idle' && <Headphones size={26} />}
+                  {voiceState === 'error' && <AlertCircle size={26} />}
                 </div>
               </div>
 
@@ -879,7 +860,9 @@ export const TutorDrawer: React.FC<TutorDrawerProps> = ({
                   className={`tutor-bubble-row ${t.role === 'student' ? 'student-row' : 'tutor-row'}`}
                 >
                   {t.role === 'tutor' && (
-                    <div className="tutor-bubble-avatar" aria-hidden="true">🤖</div>
+                    <div className="tutor-bubble-avatar" aria-hidden="true">
+                      <Bot size={16} />
+                    </div>
                   )}
                   <div className={`tutor-bubble ${t.role === 'student' ? 'student-bubble' : 'tutor-bubble-content'}`}>
                     <div>{t.text}</div>
@@ -909,7 +892,8 @@ export const TutorDrawer: React.FC<TutorDrawerProps> = ({
                   onClick={startVoiceSession}
                   aria-label="Start Voice Conversation"
                 >
-                  🎙️ Start Voice Conversation
+                  <Mic size={16} />
+                  <span>Start Voice Conversation</span>
                 </button>
               ) : (
                 <>
@@ -921,7 +905,7 @@ export const TutorDrawer: React.FC<TutorDrawerProps> = ({
                     title={isMuted ? 'Unmute microphone' : 'Mute microphone'}
                     aria-label={isMuted ? 'Unmute microphone' : 'Mute microphone'}
                   >
-                    {isMuted ? '🔇' : '🎙️'}
+                    {isMuted ? <MicOff size={18} /> : <Mic size={18} />}
                   </button>
 
                   {/* Interrupt / Stop Tutor Speaking Button */}
@@ -933,7 +917,8 @@ export const TutorDrawer: React.FC<TutorDrawerProps> = ({
                       title="Stop speaking (interrupt)"
                       aria-label="Stop tutor speaking"
                     >
-                      ⏹️ Stop Voice
+                      <Square size={14} fill="currentColor" />
+                      <span>Stop Voice</span>
                     </button>
                   )}
 
@@ -945,7 +930,8 @@ export const TutorDrawer: React.FC<TutorDrawerProps> = ({
                     title="End voice session"
                     aria-label="End voice session"
                   >
-                    🛑 End Call
+                    <PhoneOff size={15} />
+                    <span>End Call</span>
                   </button>
 
                   {/* Reconnect Button if error */}
@@ -956,7 +942,8 @@ export const TutorDrawer: React.FC<TutorDrawerProps> = ({
                       onClick={startVoiceSession}
                       aria-label="Retry Voice Session"
                     >
-                      🔄 Retry
+                      <RotateCcw size={15} />
+                      <span>Retry</span>
                     </button>
                   )}
                 </>

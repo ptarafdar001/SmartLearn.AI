@@ -1,5 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
+import {
+  ChevronRight,
+  ChevronDown,
+  ChevronUp,
+  BookOpen,
+  Clock,
+  LogOut,
+  AlertCircle,
+  ArrowLeft,
+  CheckCircle2,
+} from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { BrandLogo } from '../../components/common/BrandLogo';
 import { fetchSubjectDetail } from '../../services/learning';
@@ -66,17 +77,18 @@ export const SubjectDetailPage: React.FC = () => {
         <div className="learn-nav-container">
           <Link to="/dashboard" className="learn-nav-brand" aria-label="Back to Dashboard">
             <BrandLogo size="sm" />
-            <span style={{ fontWeight: 700, fontSize: '18px', color: '#0f172a' }}>
-              SmartLearn.AI
-            </span>
+            <span className="learn-brand-text">SmartLearn.AI</span>
           </Link>
+
           <div className="learn-nav-actions">
             <div className="learn-user-pill">
               <div className="learn-user-avatar">{studentName.charAt(0).toUpperCase()}</div>
-              <span>{studentName}</span>
+              <span className="learn-user-name">{studentName}</span>
             </div>
-            <button type="button" className="learn-signout-btn" onClick={logout}>
-              Sign Out
+
+            <button type="button" className="learn-signout-btn" onClick={logout} aria-label="Sign out">
+              <LogOut size={14} />
+              <span>Sign Out</span>
             </button>
           </div>
         </div>
@@ -89,13 +101,13 @@ export const SubjectDetailPage: React.FC = () => {
           <Link to="/dashboard" className="learn-breadcrumb-link">
             Dashboard
           </Link>
-          <span className="learn-breadcrumb-sep">/</span>
+          <ChevronRight size={14} className="learn-breadcrumb-sep" />
           <span className="learn-breadcrumb-current">{subject?.name || 'Subject'}</span>
         </nav>
 
         {error && (
           <div className="learn-error-box" role="alert">
-            <span aria-hidden="true">⚠️</span>
+            <AlertCircle size={18} className="text-amber-600" />
             <div>
               <strong>Error Loading Subject:</strong> {error}
             </div>
@@ -109,27 +121,29 @@ export const SubjectDetailPage: React.FC = () => {
           </div>
         ) : subject ? (
           <>
-            {/* Subject Hero */}
+            {/* Subject Hero Header */}
             <div className="subject-hero">
               <div className="subject-hero-info">
-                <div style={{ display: 'flex', gap: '8px', marginBottom: '8px' }}>
+                <div className="subject-badges-row">
                   <span className="subject-badge">{subject.board}</span>
                   <span className="subject-badge">{subject.grade}</span>
                   {subject.academic_stream && (
                     <span className="subject-badge">{subject.academic_stream}</span>
                   )}
                 </div>
+
                 <h1 className="subject-hero-title">{subject.name}</h1>
                 <p className="subject-hero-desc">
                   {subject.description || 'Comprehensive syllabus aligned with official board guidelines.'}
                 </p>
               </div>
 
-              <div style={{ minWidth: '220px' }}>
+              <div className="subject-hero-progress-box">
                 <div className="progress-header">
                   <span>Syllabus Completion</span>
-                  <span>{subject.progress_percentage}%</span>
+                  <span className="progress-pct-val">{subject.progress_percentage}%</span>
                 </div>
+
                 <div
                   className="progress-bar-bg"
                   role="progressbar"
@@ -143,8 +157,10 @@ export const SubjectDetailPage: React.FC = () => {
                     style={{ width: `${subject.progress_percentage}%` }}
                   />
                 </div>
-                <div style={{ marginTop: '8px', fontSize: '13px', color: '#64748b' }}>
-                  {subject.completed_topics} of {subject.total_topics} topics completed
+
+                <div className="subject-progress-topics-count">
+                  <CheckCircle2 size={13} className="text-indigo-600" />
+                  <span>{subject.completed_topics} of {subject.total_topics} topics completed</span>
                 </div>
               </div>
             </div>
@@ -153,7 +169,8 @@ export const SubjectDetailPage: React.FC = () => {
             <section aria-labelledby="syllabus-title">
               <div className="learn-section-header">
                 <h2 id="syllabus-title" className="learn-section-title">
-                  Chapters &amp; Topics
+                  <BookOpen size={18} className="section-title-icon" />
+                  <span>Chapters &amp; Topics</span>
                 </h2>
               </div>
 
@@ -174,14 +191,7 @@ export const SubjectDetailPage: React.FC = () => {
                           <div>
                             <h3 className="chapter-title">{chapter.title}</h3>
                             {chapter.description && (
-                              <p
-                                style={{
-                                  fontSize: '13px',
-                                  color: '#64748b',
-                                  margin: '2px 0 0',
-                                  fontWeight: 400,
-                                }}
-                              >
+                              <p className="chapter-desc-text">
                                 {chapter.description}
                               </p>
                             )}
@@ -192,9 +202,9 @@ export const SubjectDetailPage: React.FC = () => {
                           <span>
                             {chapter.completed_topics}/{chapter.total_topics} Topics
                           </span>
-                          <span>{chapter.progress_percentage}%</span>
-                          <span aria-hidden="true" style={{ fontSize: '12px' }}>
-                            {isExpanded ? '▲' : '▼'}
+                          <span className="chapter-pct-pill">{chapter.progress_percentage}%</span>
+                          <span aria-hidden="true" className="chapter-chevron-icon">
+                            {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
                           </span>
                         </div>
                       </button>
@@ -231,7 +241,10 @@ export const SubjectDetailPage: React.FC = () => {
                                       {topic.topic_number}. {topic.title}
                                     </h4>
                                     <div className="topic-meta">
-                                      <span>Est. {topic.estimated_minutes} mins</span>
+                                      <span className="topic-meta-time">
+                                        <Clock size={12} />
+                                        <span>Est. {topic.estimated_minutes} mins</span>
+                                      </span>
                                       {topic.progress?.progress_percentage !== undefined && (
                                         <span> • {topic.progress.progress_percentage}% completed</span>
                                       )}
@@ -239,13 +252,7 @@ export const SubjectDetailPage: React.FC = () => {
                                   </div>
                                 </div>
 
-                                <span
-                                  style={{
-                                    fontSize: '13px',
-                                    color: '#4f46e5',
-                                    fontWeight: 600,
-                                  }}
-                                >
+                                <span className="topic-action-link">
                                   {status === 'completed' ? 'Review →' : 'Study →'}
                                 </span>
                               </Link>
@@ -261,9 +268,11 @@ export const SubjectDetailPage: React.FC = () => {
           </>
         ) : (
           <div className="learn-empty-state">
+            <BookOpen size={32} className="empty-state-icon" />
             <p>Subject not found.</p>
             <Link to="/dashboard" className="continue-action-btn" style={{ marginTop: '16px' }}>
-              Return to Dashboard
+              <ArrowLeft size={14} />
+              <span>Return to Dashboard</span>
             </Link>
           </div>
         )}
