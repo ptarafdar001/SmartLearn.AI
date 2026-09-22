@@ -3,6 +3,7 @@ import { Link, useParams } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { BrandLogo } from '../../components/common/BrandLogo';
 import { fetchTopicDetail, saveTopicProgress } from '../../services/learning';
+import { TutorDrawer } from '../../components/learning/TutorDrawer';
 import type { LearningResource, ProgressStatus, TopicDetail } from '../../types/learning';
 import '../../styles/learning.css';
 
@@ -15,6 +16,7 @@ export const TopicStudyPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [saveSuccess, setSaveSuccess] = useState<string | null>(null);
   const [saving, setSaving] = useState<boolean>(false);
+  const [isTutorOpen, setIsTutorOpen] = useState<boolean>(false);
 
   // Active resource tab ('text' | 'notes' | 'video')
   const [activeTab, setActiveTab] = useState<string>('video');
@@ -215,7 +217,15 @@ export const TopicStudyPage: React.FC = () => {
                   <span>⏳ Time in Session: {Math.floor(sessionSeconds / 60)}m {sessionSeconds % 60}s</span>
                 </div>
 
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <button
+                    type="button"
+                    className="study-tutor-btn"
+                    onClick={() => setIsTutorOpen(true)}
+                    aria-label="Open AI Tutor to ask doubts"
+                  >
+                    🤖 Ask AI Tutor
+                  </button>
                   <span style={{ fontSize: '13px', fontWeight: 600, color: '#475569' }}>
                     Status:{' '}
                     <span
@@ -301,16 +311,38 @@ export const TopicStudyPage: React.FC = () => {
                       {res.title}
                     </h2>
 
-                    {/* Video Player */}
+                    {/* Video Player with YouTube Fallback */}
                     {res.resource_type === 'video' && res.content_url && (
-                      <div className="video-container">
-                        <iframe
-                          src={res.content_url}
-                          title={res.title}
-                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                          allowFullScreen
-                          sandbox="allow-scripts allow-same-origin allow-presentation"
-                        />
+                      <div className="video-wrapper">
+                        <div className="video-container">
+                          <iframe
+                            src={res.content_url}
+                            title={res.title}
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowFullScreen
+                            sandbox="allow-scripts allow-same-origin allow-presentation"
+                          />
+                        </div>
+                        <div className="youtube-fallback-banner">
+                          <div className="youtube-fallback-info">
+                            <span className="youtube-fallback-badge">YouTube</span>
+                            <span>Playback issues or embedding restricted?</span>
+                          </div>
+                          <a
+                            href={
+                              res.source_url ||
+                              (res.external_id
+                                ? `https://www.youtube.com/watch?v=${res.external_id}`
+                                : res.content_url)
+                            }
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="youtube-direct-link"
+                            aria-label={`Watch ${res.title} directly on YouTube`}
+                          >
+                            Watch directly on YouTube ↗
+                          </a>
+                        </div>
                       </div>
                     )}
 
@@ -403,6 +435,32 @@ export const TopicStudyPage: React.FC = () => {
           </div>
         )}
       </main>
+
+      {/* Floating AI Tutor Trigger Button */}
+      {topic && (
+        <button
+          type="button"
+          className="floating-tutor-btn"
+          onClick={() => setIsTutorOpen(true)}
+          aria-label="Open AI Tutor to ask doubts"
+        >
+          <span className="floating-tutor-icon" aria-hidden="true">🤖</span>
+          <span>Ask AI Tutor</span>
+        </button>
+      )}
+
+      {/* AI Tutor Slide-over Drawer */}
+      {topic && (
+        <TutorDrawer
+          isOpen={isTutorOpen}
+          onClose={() => setIsTutorOpen(false)}
+          topicId={topic.id}
+          topicTitle={topic.title}
+          subjectName={topic.subject_name}
+          chapterTitle={topic.chapter_title}
+          chapterNumber={topic.chapter_number}
+        />
+      )}
     </div>
   );
 };

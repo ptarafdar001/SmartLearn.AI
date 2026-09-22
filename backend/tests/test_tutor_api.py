@@ -1,0 +1,339 @@
+"""
+Tests for Curriculum-Aware AI Tutor API:
+- POST /api/v1/tutor/chat
+- Authentication, validation, curriculum grounding, multimodal image doubt-solving,
+  quota/error handling, and cross-user context isolation.
+"""
+
+import base64
+from unittest.mock import MagicMock, patch
+import httpx
+import pytest
+from fastapi.testclient import TestClient
+from sqlalchemy.orm import Session
+
+from app.core.config import get_settings
+from app.db.seed_curriculum import seed_isc_history_curriculum
+from app.db.session import SessionLocal
+from app.main import app
+from app.models.learning import Topic
+from app.repositories.user_repository import UserRepository
+from app.schemas.onboarding import (
+    Step1BoardClass,
+    Step2StreamSubjects,
+    Step3PreferencesGoals,
+    Step4Schedule,
+)
+from app.services.onboarding_service import OnboardingService
+
+settings = get_settings()
+
+
+@pytest.fixture(scope="module")
+def client():
+    return TestClient(app)
+
+
+@pytest.fixture
+def db_session():
+    session = SessionLocal()
+    try:
+        seed_isc_history_curriculum(session)
+        yield session
+    finally:
+        session.rollback()
+        session.close()
+
+
+def create_test_student(
+    client: TestClient,
+    db: Session,
+    email: str,
+    full_name: str,
+    board: str = "ISC",
+    grade: str = "Class 11",
+    stream: str = "Humanities",
+):
+    existing = UserRepository.get_by_email(db, email)
+    if existing:
+        UserRepository.delete(db, existing.id)
+
+    r_reg = client.post(
+        "/api/v1/auth/register",
+        json={
+            "email": email,
+            "password": "SecurePassword123!",
+            "full_name": full_name,
+            "terms_accepted": True,
+        },
+    )
+    user_id = r_reg.json()["id"]
+
+    r_login = client.post(
+        "/api/v1/auth/login",
+        json={"email": email, "password": "SecurePassword123!"},
+    )
+    token = r_login.json()["access_token"]
+    headers = {"Authorization": f"Bearer {token}"}
+
+    OnboardingService.save_step1_board_class(
+        db, user_id, Step1BoardClass(board=board, grade=grade, academic_stream=stream)
+    )
+    OnboardingService.save_step2_stream_subjects(
+        db, user_id, Step2StreamSubjects(subjects=["History"])
+    )
+    OnboardingService.save_step3_preferences_goals(
+        db,
+        user_id,
+        Step3PreferencesGoals(
+            preferred_style="Visual",
+            goals=["Score 90% in ISC History"],
+            target_score="90%",
+            target_exam="ISC Class 11",
+        ),
+    )
+    OnboardingService.save_step4_schedule(
+        db,
+        user_id,
+        Step4Schedule(
+            daily_target_hours=2.0,
+            preferred_slot="evening",
+            available_days=["Monday", "Tuesday"],
+        ),
+    )
+
+    return {"user_id": user_id, "token": token, "headers": headers}
+
+
+# ── 1. Authentication Protection ──────────────────────────────────────────────
+def test_tutor_chat_requires_authentication(client: TestClient):
+    """Verify unauthenticated request is rejected with 401."""
+    resp = client.post("/api/v1/tutor/chat", json={"topic_id": 1, "message": "Help me"})
+    assert resp.status_code == 401
+
+
+# ── 2. Missing API Key Returns 503 Service Unavailable ────────────────────────
+def test_tutor_chat_missing_api_key(client: TestClient, db_session: Session):
+    """Verify friendly 503 error when GEMINI_API_KEY is not configured."""
+    student = create_test_student(
+        client, db_session, "tutor_key_test@example.com", "Key Test Student"
+    )
+    topic = db_session.query(Topic).first()
+    assert topic is not None
+
+    with patch.object(settings, "GEMINI_API_KEY", None):
+        resp = client.post(
+            "/api/v1/tutor/chat",
+            json={"topic_id": topic.id, "message": "Explain the railway guarantee system"},
+            headers=student["headers"],
+        )
+        assert resp.status_code == 503
+        assert "GEMINI_API_KEY is required" in resp.json()["detail"]
+
+
+# ── 3. Grounded Text Tutoring with Mocked Gemini API ──────────────────────────
+def test_tutor_chat_successful_grounded_text(client: TestClient, db_session: Session):
+    """Verify tutor generates grounded response with student and syllabus context."""
+    student = create_test_student(
+        client, db_session, "tutor_success@example.com", "Rohan Mehta", board="ISC", grade="Class 11"
+    )
+    topic = db_session.query(Topic).first()
+
+    mock_gemini_resp = {
+        "candidates": [
+            {
+                "content": {
+                    "parts": [
+                        {
+                            "text": (
+                                "Hello Rohan! The Railway Guarantee System guaranteed British investors "
+                                "a 4.5% to 5% return directly from Indian taxes, which encouraged wasteful expenditure."
+                            )
+                        }
+                    ]
+                }
+            }
+        ]
+    }
+
+    mock_client_instance = MagicMock()
+    mock_client_instance.__enter__.return_value = mock_client_instance
+    mock_client_instance.post.return_value = MagicMock(
+        status_code=200,
+        json=lambda: mock_gemini_resp,
+    )
+
+    with patch.object(settings, "GEMINI_API_KEY", "mock-test-key"):
+        with patch("app.services.tutor_service.httpx.Client", return_value=mock_client_instance):
+            resp = client.post(
+                "/api/v1/tutor/chat",
+                json={
+                    "topic_id": topic.id,
+                    "message": "Can you explain the railway guarantee system simply?",
+                    "conversation_history": [],
+                },
+                headers=student["headers"],
+            )
+
+            assert resp.status_code == 200
+            data = resp.json()
+            assert "Railway Guarantee System" in data["reply"]
+            assert data["topic_id"] == topic.id
+            assert data["topic_title"] == topic.title
+            assert data["board"] == "ISC"
+            assert data["grade"] == "Class 11"
+            assert len(data["grounded_resource_titles"]) >= 1
+            assert data["is_out_of_scope"] is False
+
+            # Verify Gemini payload received system instruction with curriculum context
+            called_payload = mock_client_instance.post.call_args[1]["json"]
+            sys_text = called_payload["system_instruction"]["parts"][0]["text"]
+            assert "ISC" in sys_text
+            assert "Class 11" in sys_text
+            assert "Rohan Mehta" in sys_text
+            assert topic.title in sys_text
+
+
+# ── 4. Multimodal Image Doubt Solving ─────────────────────────────────────────
+def test_tutor_chat_multimodal_image_doubt(client: TestClient, db_session: Session):
+    """Verify image base64 is accepted and formatted as inline_data for Gemini."""
+    student = create_test_student(
+        client, db_session, "tutor_image@example.com", "Priya Das"
+    )
+    topic = db_session.query(Topic).first()
+
+    # Create dummy 1x1 png image base64
+    fake_png_bytes = b"\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x01\x00\x00\x00\x01\x08\x06\x00\x00\x00\x1f\x15c4\x00\x00\x00\nIDATx\x9cc\x00\x01\x00\x00\x05\x00\x01\r\n-\xb4\x00\x00\x00\x00IEND\xaeB`\x82"
+    fake_b64 = f"data:image/png;base64,{base64.b64encode(fake_png_bytes).decode('utf-8')}"
+
+    mock_gemini_resp = {
+        "candidates": [
+            {
+                "content": {
+                    "parts": [
+                        {
+                            "text": "Looking at the diagram of the 1853 railway route, notice how it linked Bombay with Thane."
+                        }
+                    ]
+                }
+            }
+        ]
+    }
+
+    mock_client_instance = MagicMock()
+    mock_client_instance.__enter__.return_value = mock_client_instance
+    mock_client_instance.post.return_value = MagicMock(
+        status_code=200,
+        json=lambda: mock_gemini_resp,
+    )
+
+    with patch.object(settings, "GEMINI_API_KEY", "mock-test-key"):
+        with patch("app.services.tutor_service.httpx.Client", return_value=mock_client_instance):
+            resp = client.post(
+                "/api/v1/tutor/chat",
+                json={
+                    "topic_id": topic.id,
+                    "message": "What is shown in this map from my textbook?",
+                    "image_base64": fake_b64,
+                },
+                headers=student["headers"],
+            )
+
+            assert resp.status_code == 200
+            assert "1853 railway route" in resp.json()["reply"]
+
+            # Inspect that inline_data part was constructed
+            called_payload = mock_client_instance.post.call_args[1]["json"]
+            user_parts = called_payload["contents"][0]["parts"]
+            image_part = next((p for p in user_parts if "inline_data" in p), None)
+            assert image_part is not None
+            assert image_part["inline_data"]["mime_type"] == "image/png"
+
+
+# ── 5. Quota Exceeded (429) Handling ──────────────────────────────────────────
+def test_tutor_chat_quota_handling(client: TestClient, db_session: Session):
+    """Verify 429 quota error from upstream Gemini is transformed into clean HTTP 429."""
+    student = create_test_student(
+        client, db_session, "tutor_quota@example.com", "Quota Student"
+    )
+    topic = db_session.query(Topic).first()
+
+    mock_client_instance = MagicMock()
+    mock_client_instance.__enter__.return_value = mock_client_instance
+    mock_client_instance.post.return_value = MagicMock(
+        status_code=429,
+        text="Quota exceeded",
+    )
+
+    with patch.object(settings, "GEMINI_API_KEY", "mock-test-key"):
+        with patch("app.services.tutor_service.httpx.Client", return_value=mock_client_instance):
+            resp = client.post(
+                "/api/v1/tutor/chat",
+                json={"topic_id": topic.id, "message": "Give me practice questions"},
+                headers=student["headers"],
+            )
+
+            assert resp.status_code == 429
+            assert "quota or rate limit exceeded" in resp.json()["detail"].lower()
+
+
+# ── 6. Out-of-Scope Redirection Handling ──────────────────────────────────────
+def test_tutor_chat_out_of_scope_handling(client: TestClient, db_session: Session):
+    """Verify out-of-scope response flags is_out_of_scope=True."""
+    student = create_test_student(
+        client, db_session, "tutor_scope@example.com", "Scope Student"
+    )
+    topic = db_session.query(Topic).first()
+
+    mock_gemini_resp = {
+        "candidates": [
+            {
+                "content": {
+                    "parts": [
+                        {
+                            "text": (
+                                "This concept is outside the syllabus for ISC Class 11 History, "
+                                "as quantum mechanics is not covered in this topic. Let's return to the Colonial Economy."
+                            )
+                        }
+                    ]
+                }
+            }
+        ]
+    }
+
+    mock_client_instance = MagicMock()
+    mock_client_instance.__enter__.return_value = mock_client_instance
+    mock_client_instance.post.return_value = MagicMock(
+        status_code=200,
+        json=lambda: mock_gemini_resp,
+    )
+
+    with patch.object(settings, "GEMINI_API_KEY", "mock-test-key"):
+        with patch("app.services.tutor_service.httpx.Client", return_value=mock_client_instance):
+            resp = client.post(
+                "/api/v1/tutor/chat",
+                json={"topic_id": topic.id, "message": "Can you explain quantum physics?"},
+                headers=student["headers"],
+            )
+
+            assert resp.status_code == 200
+            assert resp.json()["is_out_of_scope"] is True
+
+
+# ── 7. Non-existent Topic 404 ─────────────────────────────────────────────────
+def test_tutor_chat_topic_not_found(client: TestClient, db_session: Session):
+
+    """Verify 404 when topic_id does not exist."""
+    student = create_test_student(
+        client, db_session, "tutor_404@example.com", "Missing Topic Student"
+    )
+
+    with patch.object(settings, "GEMINI_API_KEY", "mock-test-key"):
+        resp = client.post(
+            "/api/v1/tutor/chat",
+            json={"topic_id": 999999, "message": "Hello"},
+            headers=student["headers"],
+        )
+        assert resp.status_code == 404
+        assert "not found" in resp.json()["detail"].lower()
