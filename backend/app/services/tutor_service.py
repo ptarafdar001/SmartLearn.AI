@@ -7,6 +7,7 @@ import base64
 from datetime import timedelta
 import logging
 import re
+import time
 from typing import Any, Dict, List, Optional, Tuple
 import uuid
 import httpx
@@ -322,7 +323,7 @@ class TutorService:
             },
             "generationConfig": {
                 "temperature": 0.7,
-                "maxOutputTokens": 1200,
+                "maxOutputTokens": 2048,
                 "topP": 0.95,
             },
         }
@@ -343,11 +344,27 @@ class TutorService:
         timeout = float(settings.AI_TUTOR_TIMEOUT_SECONDS)
 
         try:
-            if client:
-                response = client.post(url, json=payload, headers=headers, timeout=timeout)
-            else:
-                with httpx.Client(timeout=timeout) as http_client:
-                    response = http_client.post(url, json=payload, headers=headers)
+            max_attempts = 2
+            response = None
+            for attempt in range(1, max_attempts + 1):
+                if client:
+                    response = client.post(url, json=payload, headers=headers, timeout=timeout)
+                else:
+                    with httpx.Client(timeout=timeout) as http_client:
+                        response = http_client.post(url, json=payload, headers=headers)
+
+                # Retry once if provider indicates temporary demand spike (503)
+                if response.status_code == 503 and attempt < max_attempts:
+                    logger.warning(f"Gemini API returned 503 (high demand); retrying in 1.5s (attempt {attempt}/{max_attempts})...")
+                    time.sleep(1.5)
+                    continue
+                break
+
+            if response is None:
+                raise HTTPException(
+                    status_code=status.HTTP_502_BAD_GATEWAY,
+                    detail="Failed to obtain response from AI Tutor service.",
+                )
 
             if response.status_code == 429:
                 logger.warning("Gemini API rate limit exceeded (429)")
@@ -389,13 +406,14 @@ class TutorService:
                 )
 
             parts = candidates[0].get("content", {}).get("parts", [])
-            if not parts:
+            text_parts = [p.get("text", "") for p in parts if isinstance(p, dict) and "text" in p]
+            if not text_parts or not "".join(text_parts).strip():
                 raise HTTPException(
                     status_code=status.HTTP_502_BAD_GATEWAY,
                     detail="Empty response returned from AI Tutor.",
                 )
 
-            return parts[0].get("text", "").strip()
+            return "\n\n".join(text_parts).strip()
 
         except httpx.TimeoutException:
             logger.error(f"Gemini API request timed out for model {clean_model}")

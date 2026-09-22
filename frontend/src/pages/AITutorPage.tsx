@@ -1,14 +1,17 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useSearchParams, Link } from 'react-router-dom';
 import {
   Bot,
   Send,
   Image as ImageIcon,
   X,
   AlertCircle,
+  Mic,
 } from 'lucide-react';
 import { AppLayout } from '../components/layout/AppLayout';
 import { MarkdownRenderer } from '../components/learning/MarkdownRenderer';
 import { askAITutor } from '../services/tutor';
+import { fetchEnrolledSubjects, fetchSubjectDetail } from '../services/learning';
 import type { TutorChatMessage } from '../types/tutor';
 
 const STARTER_PROMPTS = [
@@ -18,7 +21,22 @@ const STARTER_PROMPTS = [
   'Generate 3 high-yield practice questions for my upcoming exam',
 ];
 
+interface TopicOption {
+  id: number;
+  title: string;
+  chapterTitle: string;
+  subjectName: string;
+}
+
 export const AITutorPage: React.FC = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const initialTopicParam = searchParams.get('topicId');
+
+  const [topics, setTopics] = useState<TopicOption[]>([]);
+  const [activeTopicId, setActiveTopicId] = useState<number>(
+    initialTopicParam ? Number(initialTopicParam) : 44
+  );
+
   const [messages, setMessages] = useState<TutorChatMessage[]>([
     {
       id: 'welcome',
@@ -32,7 +50,42 @@ export const AITutorPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [chatError, setChatError] = useState<string | null>(null);
 
-  const topicId = 44; // Default to Topic 1
+  useEffect(() => {
+    async function loadCurriculumTopics() {
+      try {
+        const subjects = await fetchEnrolledSubjects();
+        const availableTopics: TopicOption[] = [];
+        for (const s of subjects) {
+          try {
+            const detail = await fetchSubjectDetail(s.id);
+            for (const ch of detail.chapters) {
+              for (const top of ch.topics) {
+                availableTopics.push({
+                  id: top.id,
+                  title: top.title,
+                  chapterTitle: ch.title,
+                  subjectName: s.name,
+                });
+              }
+            }
+          } catch {
+            // continue
+          }
+        }
+        if (availableTopics.length > 0) {
+          setTopics(availableTopics);
+          if (!initialTopicParam) {
+            setActiveTopicId(availableTopics[0].id);
+          }
+        }
+      } catch {
+        // fallback to default
+      }
+    }
+    loadCurriculumTopics();
+  }, [initialTopicParam]);
+
+  const activeTopic = topics.find((t) => t.id === activeTopicId);
 
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -76,7 +129,7 @@ export const AITutorPage: React.FC = () => {
 
     try {
       const res = await askAITutor({
-        topic_id: topicId,
+        topic_id: activeTopicId,
         message: query || 'Please analyze this diagram or problem from the syllabus.',
         image_base64: currentImg || undefined,
         conversation_history: nextHistory.slice(-6).map((m) => ({
@@ -95,7 +148,14 @@ export const AITutorPage: React.FC = () => {
         },
       ]);
     } catch (err: any) {
-      setChatError(err.message || 'Failed to get tutor response.');
+      const msg = err.message || 'Failed to get tutor response.';
+      if (msg.includes('429') || msg.toLowerCase().includes('quota')) {
+        setChatError('AI Tutor quota or rate limit reached on provider tier. Please wait a moment before sending another message.');
+      } else if (msg.includes('503') || msg.toLowerCase().includes('high demand')) {
+        setChatError('AI Tutor provider is temporarily experiencing high demand. Please try again shortly.');
+      } else {
+        setChatError(msg);
+      }
     } finally {
       setIsLoading(false);
     }
@@ -105,7 +165,7 @@ export const AITutorPage: React.FC = () => {
     <AppLayout breadcrumbs={[{ label: 'AI Tutor' }]}>
       <div className="tutor-page-container">
         {/* Tutor Header Info Bar */}
-        <div className="tutor-page-header">
+        <div className="tutor-page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
           <div className="tutor-header-left">
             <div className="tutor-page-icon">
               <Bot size={22} />
@@ -116,9 +176,45 @@ export const AITutorPage: React.FC = () => {
                 <span className="tutor-badge">Grounded in CISCE Syllabus</span>
               </div>
               <p className="tutor-page-subtitle">
-                Context: History • Chapter 1: Emergence of the Colonial Economy • Transport &amp; Communication
+                {activeTopic ? (
+                  <>Context: {activeTopic.subjectName} • {activeTopic.chapterTitle} • {activeTopic.title}</>
+                ) : (
+                  <>Context: ISC Class 11 History • Transport &amp; Communication</>
+                )}
               </p>
             </div>
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            {topics.length > 0 && (
+              <select
+                aria-label="Select Syllabus Topic"
+                value={activeTopicId}
+                onChange={(e) => {
+                  const newId = Number(e.target.value);
+                  setActiveTopicId(newId);
+                  setSearchParams({ topicId: String(newId) });
+                }}
+                className="filter-pill"
+                style={{ background: '#fff', border: '1px solid #cbd5e1', padding: '6px 12px', fontSize: '13px', borderRadius: '8px', color: '#1e293b' }}
+              >
+                {topics.map((t) => (
+                  <option key={t.id} value={t.id}>
+                    {t.chapterTitle}: {t.title}
+                  </option>
+                ))}
+              </select>
+            )}
+
+            <Link
+              to={`/learning/topics/${activeTopicId}`}
+              className="filter-pill"
+              style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: '#eef2ff', color: '#4f46e5', textDecoration: 'none', border: '1px solid #c7d2fe', padding: '6px 12px', fontSize: '13px' }}
+              title="Practice with interactive spoken voice via browser Web Speech API"
+            >
+              <Mic size={14} />
+              <span>Voice Tutor (Browser STT/TTS)</span>
+            </Link>
           </div>
         </div>
 

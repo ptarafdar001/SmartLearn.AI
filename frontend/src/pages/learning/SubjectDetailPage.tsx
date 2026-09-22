@@ -137,96 +137,111 @@ export const SubjectDetailPage: React.FC = () => {
                 </h2>
               </div>
 
-              <div className="chapter-accordion">
-                {subject.chapters.map((chapter) => {
-                  const isExpanded = !!expandedChapters[chapter.id];
-                  return (
-                    <div key={chapter.id} className="chapter-item">
-                      <button
-                        type="button"
-                        className="chapter-header"
-                        onClick={() => toggleChapter(chapter.id)}
-                        aria-expanded={isExpanded}
-                        aria-controls={`chapter-topics-${chapter.id}`}
-                      >
-                        <div className="chapter-title-group">
-                          <span className="chapter-num-badge">Ch {chapter.chapter_number}</span>
-                          <div>
-                            <h3 className="chapter-title">{chapter.title}</h3>
-                            {chapter.description && (
-                              <p className="chapter-desc-text">
-                                {chapter.description}
-                              </p>
-                            )}
-                          </div>
-                        </div>
-
-                        <div className="chapter-progress-pill">
-                          <span>
-                            {chapter.completed_topics}/{chapter.total_topics} Topics
-                          </span>
-                          <span className="chapter-pct-pill">{chapter.progress_percentage}%</span>
-                          <span aria-hidden="true" className="chapter-chevron-icon">
-                            {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-                          </span>
-                        </div>
-                      </button>
-
-                      {isExpanded && (
-                        <div
-                          id={`chapter-topics-${chapter.id}`}
-                          className="topic-list"
-                          role="region"
-                          aria-label={`Topics for chapter ${chapter.chapter_number}`}
+              {subject.chapters.length === 0 ? (
+                <div className="learn-empty-state" style={{ padding: '40px 20px', textAlign: 'center', background: '#f8fafc', borderRadius: '12px', border: '1px dashed #cbd5e1' }}>
+                  <BookOpen size={36} className="empty-state-icon" style={{ margin: '0 auto 12px', color: '#6366f1' }} />
+                  <h3 style={{ fontSize: '17px', fontWeight: 600, color: '#1e293b', marginBottom: '8px' }}>
+                    Curriculum In Preparation
+                  </h3>
+                  <p style={{ maxWidth: 520, margin: '0 auto 16px', color: '#64748b', fontSize: '13.5px', lineHeight: 1.6 }}>
+                    Verified syllabus chapters, learning objectives, and authentic previous-year questions for <strong>{subject.name} ({subject.board} {subject.grade})</strong> are currently in editorial curation. Currently, <strong>ISC Class 11 History</strong> is fully seeded with complete verified curriculum intelligence.
+                  </p>
+                  <Link to="/learning/subjects/43" className="continue-action-btn" style={{ display: 'inline-flex', padding: '8px 16px', fontSize: '13px' }}>
+                    <span>Explore Seeded ISC History Syllabus →</span>
+                  </Link>
+                </div>
+              ) : (
+                <div className="chapter-accordion">
+                  {subject.chapters.map((chapter) => {
+                    const isExpanded = !!expandedChapters[chapter.id];
+                    return (
+                      <div key={chapter.id} className="chapter-item">
+                        <button
+                          type="button"
+                          className="chapter-header"
+                          onClick={() => toggleChapter(chapter.id)}
+                          aria-expanded={isExpanded}
+                          aria-controls={`chapter-topics-${chapter.id}`}
                         >
-                          {chapter.topics.map((topic) => {
-                            const status = topic.progress?.status || 'not_started';
-                            return (
-                              <Link
-                                key={topic.id}
-                                to={`/learning/topics/${topic.id}`}
-                                className="topic-row"
-                                aria-label={`Topic ${topic.topic_number}: ${topic.title}, status: ${status}`}
-                              >
-                                <div className="topic-info">
-                                  <div
-                                    className={`topic-status-icon status-${status.replace('_', '-')}`}
-                                    aria-hidden="true"
-                                  >
-                                    {status === 'completed'
-                                      ? '✓'
-                                      : status === 'in_progress'
-                                        ? '◐'
-                                        : '○'}
-                                  </div>
-                                  <div>
-                                    <h4 className="topic-title">
-                                      {topic.topic_number}. {topic.title}
-                                    </h4>
-                                    <div className="topic-meta">
-                                      <span className="topic-meta-time">
-                                        <Clock size={12} />
-                                        <span>Est. {topic.estimated_minutes} mins</span>
-                                      </span>
-                                      {topic.progress?.progress_percentage !== undefined && (
-                                        <span> • {topic.progress.progress_percentage}% completed</span>
-                                      )}
+                          <div className="chapter-title-group">
+                            <span className="chapter-num-badge">Ch {chapter.chapter_number}</span>
+                            <div>
+                              <h3 className="chapter-title">{chapter.title}</h3>
+                              {chapter.description && (
+                                <p className="chapter-desc-text">
+                                  {chapter.description}
+                                </p>
+                              )}
+                            </div>
+                          </div>
+
+                          <div className="chapter-progress-pill">
+                            <span>
+                              {chapter.completed_topics}/{chapter.total_topics} Topics
+                            </span>
+                            <span className="chapter-pct-pill">{chapter.progress_percentage}%</span>
+                            <span aria-hidden="true" className="chapter-chevron-icon">
+                              {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                            </span>
+                          </div>
+                        </button>
+
+                        {isExpanded && (
+                          <div
+                            id={`chapter-topics-${chapter.id}`}
+                            className="topic-list"
+                            role="region"
+                            aria-label={`Topics for chapter ${chapter.chapter_number}`}
+                          >
+                            {chapter.topics.map((topic) => {
+                              const status = topic.progress?.status || 'not_started';
+                              return (
+                                <Link
+                                  key={topic.id}
+                                  to={`/learning/topics/${topic.id}`}
+                                  className="topic-row"
+                                  aria-label={`Topic ${topic.topic_number}: ${topic.title}, status: ${status}`}
+                                >
+                                  <div className="topic-info">
+                                    <div
+                                      className={`topic-status-icon status-${status.replace('_', '-')}`}
+                                      aria-hidden="true"
+                                    >
+                                      {status === 'completed'
+                                        ? '✓'
+                                        : status === 'in_progress'
+                                          ? '◐'
+                                          : '○'}
+                                    </div>
+                                    <div>
+                                      <h4 className="topic-title">
+                                        {topic.topic_number}. {topic.title}
+                                      </h4>
+                                      <div className="topic-meta">
+                                        <span className="topic-meta-time">
+                                          <Clock size={12} />
+                                          <span>Est. {topic.estimated_minutes} mins</span>
+                                        </span>
+                                        {topic.progress?.progress_percentage !== undefined && (
+                                          <span> • {topic.progress.progress_percentage}% completed</span>
+                                        )}
+                                      </div>
                                     </div>
                                   </div>
-                                </div>
 
-                                <span className="topic-action-link">
-                                  {status === 'completed' ? 'Review →' : 'Study →'}
-                                </span>
-                              </Link>
-                            );
-                          })}
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
+                                  <span className="topic-action-link">
+                                    {status === 'completed' ? 'Review →' : 'Study →'}
+                                  </span>
+                                </Link>
+                              );
+                            })}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
             </section>
           </>
         ) : (

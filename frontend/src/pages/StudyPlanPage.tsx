@@ -69,22 +69,32 @@ export const StudyPlanPage: React.FC = () => {
           <div className="plan-details-list">
             <div className="plan-item-row">
               <span className="plan-item-label">Academic Board</span>
-              <span className="plan-item-val">Council for the Indian School Certificate Examinations (CISCE)</span>
+              <span className="plan-item-val">{overview?.board || 'CISCE'}</span>
             </div>
 
             <div className="plan-item-row">
               <span className="plan-item-label">Curriculum Level</span>
-              <span className="plan-item-val">ISC Class 11 (Humanities / Arts)</span>
+              <span className="plan-item-val">
+                {overview?.grade || 'Class 11'}{overview?.academic_stream ? ` (${overview.academic_stream})` : ''}
+              </span>
             </div>
 
             <div className="plan-item-row">
               <span className="plan-item-label">Primary Academic Goal</span>
-              <span className="plan-item-val">Excel in Board Exams (Target: 95%)</span>
+              <span className="plan-item-val">
+                {overview?.goals && overview.goals.length > 0
+                  ? overview.goals.join(' • ')
+                  : 'Excel in Board Examinations'}
+              </span>
             </div>
 
             <div className="plan-item-row">
               <span className="plan-item-label">Pedagogical Learning Style</span>
-              <span className="plan-item-val">Visual &amp; Conceptual Understanding</span>
+              <span className="plan-item-val">
+                {overview?.preferred_learning_style
+                  ? `${overview.preferred_learning_style} Learning`
+                  : 'Interactive & Conceptual'}
+              </span>
             </div>
           </div>
         </div>

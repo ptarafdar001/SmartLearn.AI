@@ -1,30 +1,51 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { FileText, Video, ArrowRight, Check } from 'lucide-react';
+import { FileText, Video, ArrowRight, Check, BookOpen } from 'lucide-react';
 import { AppLayout } from '../components/layout/AppLayout';
-import { fetchSubjectDetail } from '../services/learning';
-import type { SubjectDetail } from '../types/learning';
+import { fetchEnrolledSubjects, fetchSubjectDetail } from '../services/learning';
+import type { SubjectDetail, SubjectSummary } from '../types/learning';
 
 export const StudyMaterialsPage: React.FC = () => {
+  const [enrolledSubjects, setEnrolledSubjects] = useState<SubjectSummary[]>([]);
+  const [selectedSubjectId, setSelectedSubjectId] = useState<number | null>(null);
   const [subject, setSubject] = useState<SubjectDetail | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [filterType, setFilterType] = useState<string>('all');
 
   useEffect(() => {
-    async function loadData() {
+    async function loadInitial() {
       try {
         setLoading(true);
-        // Load default enrolled subject (History id=43)
-        const data = await fetchSubjectDetail(43);
-        setSubject(data);
+        const subjects = await fetchEnrolledSubjects();
+        setEnrolledSubjects(subjects);
+        if (subjects && subjects.length > 0) {
+          const defaultId = subjects[0].id;
+          setSelectedSubjectId(defaultId);
+          const detail = await fetchSubjectDetail(defaultId);
+          setSubject(detail);
+        }
       } catch {
         // fallback
       } finally {
         setLoading(false);
       }
     }
-    loadData();
+    loadInitial();
   }, []);
+
+  const handleSelectSubject = async (subId: number) => {
+    if (subId === selectedSubjectId) return;
+    try {
+      setLoading(true);
+      setSelectedSubjectId(subId);
+      const detail = await fetchSubjectDetail(subId);
+      setSubject(detail);
+    } catch {
+      setSubject(null);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const chapters = subject?.chapters || [];
 
@@ -38,7 +59,25 @@ export const StudyMaterialsPage: React.FC = () => {
           </p>
         </div>
 
-        <div className="filter-pills-row">
+        {enrolledSubjects.length > 1 && (
+          <div className="filter-pills-row" style={{ marginTop: '12px' }}>
+            <span style={{ fontSize: '13px', fontWeight: 600, color: '#64748b', alignSelf: 'center', marginRight: '6px' }}>
+              Subject:
+            </span>
+            {enrolledSubjects.map((sub) => (
+              <button
+                key={sub.id}
+                type="button"
+                className={`filter-pill ${selectedSubjectId === sub.id ? 'active' : ''}`}
+                onClick={() => handleSelectSubject(sub.id)}
+              >
+                {sub.name}
+              </button>
+            ))}
+          </div>
+        )}
+
+        <div className="filter-pills-row" style={{ marginTop: enrolledSubjects.length > 1 ? '10px' : '0' }}>
           <button
             type="button"
             className={`filter-pill ${filterType === 'all' ? 'active' : ''}`}
@@ -69,6 +108,24 @@ export const StudyMaterialsPage: React.FC = () => {
         <div className="learn-loading-container">
           <div className="learn-spinner" />
           <p>Loading study materials catalog...</p>
+        </div>
+      ) : chapters.length === 0 ? (
+        <div className="learn-empty-state" style={{ padding: '40px 20px', textAlign: 'center', background: '#f8fafc', borderRadius: '12px', border: '1px dashed #cbd5e1' }}>
+          <BookOpen size={36} className="empty-state-icon" style={{ margin: '0 auto 12px', color: '#6366f1' }} />
+          <h3 style={{ fontSize: '17px', fontWeight: 600, color: '#1e293b', marginBottom: '8px' }}>
+            Curriculum In Preparation
+          </h3>
+          <p style={{ maxWidth: 520, margin: '0 auto 16px', color: '#64748b', fontSize: '13.5px', lineHeight: 1.6 }}>
+            Verified study notes and video lectures for this subject are currently undergoing curriculum alignment and review. Currently, <strong>ISC Class 11 History</strong> has complete verified resources.
+          </p>
+          <button
+            type="button"
+            onClick={() => handleSelectSubject(43)}
+            className="continue-action-btn"
+            style={{ display: 'inline-flex', padding: '8px 16px', fontSize: '13px' }}
+          >
+            <span>View Seeded ISC History Notes →</span>
+          </button>
         </div>
       ) : (
         <div className="materials-grid">

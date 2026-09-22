@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import {
   CheckCircle,
   ChevronDown,
@@ -15,12 +16,27 @@ import {
   fetchPracticeQuestions,
   generatePracticeQuestions,
   submitPracticeAttempt,
+  fetchEnrolledSubjects,
+  fetchSubjectDetail,
 } from '../services/learning';
 import type { PreviousYearQuestion, PracticeQuestion, PracticeAttemptResponse } from '../types/learning';
 
+interface TopicOption {
+  id: number;
+  title: string;
+  chapterTitle: string;
+  subjectName: string;
+}
+
 export const PracticeQuizzesPage: React.FC = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const initialTopicParam = searchParams.get('topicId');
+
   const [activeTab, setActiveTab] = useState<'pyqs' | 'practice'>('pyqs');
-  const [topicId] = useState<number>(44); // Seeded ISC Class 11 Topic 44
+  const [topics, setTopics] = useState<TopicOption[]>([]);
+  const [topicId, setTopicId] = useState<number>(
+    initialTopicParam ? Number(initialTopicParam) : 44
+  );
 
   // Authentic PYQs State
   const [pyqs, setPyqs] = useState<PreviousYearQuestion[]>([]);
@@ -34,6 +50,41 @@ export const PracticeQuizzesPage: React.FC = () => {
   const [attemptResults, setAttemptResults] = useState<Record<number, PracticeAttemptResponse>>({});
   const [submittingIds, setSubmittingIds] = useState<Record<number, boolean>>({});
   const [isGenerating, setIsGenerating] = useState<boolean>(false);
+
+  useEffect(() => {
+    async function loadCurriculumTopics() {
+      try {
+        const subjects = await fetchEnrolledSubjects();
+        const availableTopics: TopicOption[] = [];
+        for (const s of subjects) {
+          try {
+            const detail = await fetchSubjectDetail(s.id);
+            for (const ch of detail.chapters) {
+              for (const top of ch.topics) {
+                availableTopics.push({
+                  id: top.id,
+                  title: top.title,
+                  chapterTitle: ch.title,
+                  subjectName: s.name,
+                });
+              }
+            }
+          } catch {
+            // continue
+          }
+        }
+        if (availableTopics.length > 0) {
+          setTopics(availableTopics);
+          if (!initialTopicParam) {
+            setTopicId(availableTopics[0].id);
+          }
+        }
+      } catch {
+        // fallback
+      }
+    }
+    loadCurriculumTopics();
+  }, [initialTopicParam]);
 
   useEffect(() => {
     loadPYQs();
@@ -112,7 +163,27 @@ export const PracticeQuizzesPage: React.FC = () => {
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
+          {topics.length > 0 && (
+            <select
+              aria-label="Select Syllabus Topic"
+              value={topicId}
+              onChange={(e) => {
+                const newId = Number(e.target.value);
+                setTopicId(newId);
+                setSearchParams({ topicId: String(newId) });
+              }}
+              className="filter-pill"
+              style={{ background: '#fff', border: '1px solid #cbd5e1', padding: '6px 12px', fontSize: '12px', borderRadius: '8px', color: '#1e293b' }}
+            >
+              {topics.map((t) => (
+                <option key={t.id} value={t.id}>
+                  {t.subjectName} • {t.title}
+                </option>
+              ))}
+            </select>
+          )}
+
           {activeTab === 'practice' && (
             <button
               type="button"
@@ -124,7 +195,6 @@ export const PracticeQuizzesPage: React.FC = () => {
               <span>{isGenerating ? 'Generating...' : 'Generate AI Practice'}</span>
             </button>
           )}
-          <span className="page-count-badge">Topic: Railways &amp; Colonial Infrastructure</span>
         </div>
       </div>
 
@@ -188,6 +258,14 @@ export const PracticeQuizzesPage: React.FC = () => {
             <div className="p-8 text-center text-slate-500 text-xs flex items-center justify-center gap-2">
               <Loader2 size={16} className="animate-spin text-indigo-600" />
               <span>Loading authentic previous-year questions...</span>
+            </div>
+          ) : pyqs.length === 0 ? (
+            <div className="p-8 text-center text-slate-500 text-xs bg-slate-50 rounded-xl border border-slate-200">
+              <ShieldCheck size={28} className="mx-auto mb-2 text-slate-400" />
+              <p className="font-semibold text-slate-800 mb-1 text-sm">No Verified Authentic PYQs For This Topic Yet</p>
+              <p className="max-w-md mx-auto text-slate-600">
+                Official past-year questions for this specific syllabus unit are currently undergoing editorial verification. Switch to the <strong>AI-Generated Practice Questions</strong> tab to practice syllabus-aligned doubts.
+              </p>
             </div>
           ) : (
             <div className="grid gap-4">
