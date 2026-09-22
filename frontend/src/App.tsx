@@ -2,7 +2,9 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { LoginPage } from './pages/LoginPage';
 import { RegisterPage } from './pages/RegisterPage';
-import { DashboardPlaceholder } from './pages/DashboardPlaceholder';
+import { DashboardPage } from './pages/DashboardPage';
+import { SubjectDetailPage } from './pages/learning/SubjectDetailPage';
+import { TopicStudyPage } from './pages/learning/TopicStudyPage';
 import { ProtectedRoute } from './routes/ProtectedRoute';
 import { PublicOnlyRoute } from './routes/PublicOnlyRoute';
 import { OnboardingRoute } from './routes/OnboardingRoute';
@@ -61,9 +63,11 @@ function App() {
             <Route path="/onboarding/step4" element={<Step4Page />} />
           </Route>
 
-          {/* Protected authenticated routes */}
+          {/* Protected learning routes */}
           <Route element={<ProtectedRoute />}>
-            <Route path="/dashboard" element={<DashboardPlaceholder />} />
+            <Route path="/dashboard" element={<DashboardPage />} />
+            <Route path="/learning/subjects/:subjectId" element={<SubjectDetailPage />} />
+            <Route path="/learning/topics/:topicId" element={<TopicStudyPage />} />
           </Route>
 
           {/* Root and fallback */}
