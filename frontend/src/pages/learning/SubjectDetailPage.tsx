@@ -1,25 +1,21 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import {
-  ChevronRight,
   ChevronDown,
   ChevronUp,
   BookOpen,
   Clock,
-  LogOut,
   AlertCircle,
   ArrowLeft,
   CheckCircle2,
 } from 'lucide-react';
-import { useAuth } from '../../context/AuthContext';
-import { BrandLogo } from '../../components/common/BrandLogo';
 import { fetchSubjectDetail } from '../../services/learning';
 import type { SubjectDetail } from '../../types/learning';
 import '../../styles/learning.css';
+import { AppLayout } from '../../components/layout/AppLayout';
 
 export const SubjectDetailPage: React.FC = () => {
   const { subjectId } = useParams<{ subjectId: string }>();
-  const { user, logout } = useAuth();
 
   const [subject, setSubject] = useState<SubjectDetail | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -68,42 +64,9 @@ export const SubjectDetailPage: React.FC = () => {
     }));
   };
 
-  const studentName = user?.full_name || 'Student';
-
   return (
-    <div className="learn-layout">
-      {/* Top Navigation */}
-      <header className="learn-nav">
-        <div className="learn-nav-container">
-          <Link to="/dashboard" className="learn-nav-brand" aria-label="Back to Dashboard">
-            <BrandLogo size="sm" />
-            <span className="learn-brand-text">SmartLearn.AI</span>
-          </Link>
-
-          <div className="learn-nav-actions">
-            <div className="learn-user-pill">
-              <div className="learn-user-avatar">{studentName.charAt(0).toUpperCase()}</div>
-              <span className="learn-user-name">{studentName}</span>
-            </div>
-
-            <button type="button" className="learn-signout-btn" onClick={logout} aria-label="Sign out">
-              <LogOut size={14} />
-              <span>Sign Out</span>
-            </button>
-          </div>
-        </div>
-      </header>
-
-      {/* Main Content */}
-      <main className="learn-container">
-        {/* Breadcrumb Navigation */}
-        <nav className="learn-breadcrumbs" aria-label="Breadcrumbs">
-          <Link to="/dashboard" className="learn-breadcrumb-link">
-            Dashboard
-          </Link>
-          <ChevronRight size={14} className="learn-breadcrumb-sep" />
-          <span className="learn-breadcrumb-current">{subject?.name || 'Subject'}</span>
-        </nav>
+    <AppLayout breadcrumbs={[{ label: 'My Subjects', href: '/subjects' }, { label: subject?.name || 'Subject' }]}>
+      <div className="compact-page-wrapper">
 
         {error && (
           <div className="learn-error-box" role="alert">
@@ -276,7 +239,7 @@ export const SubjectDetailPage: React.FC = () => {
             </Link>
           </div>
         )}
-      </main>
-    </div>
+      </div>
+    </AppLayout>
   );
 };

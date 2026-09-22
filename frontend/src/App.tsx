@@ -3,6 +3,13 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import { LoginPage } from './pages/LoginPage';
 import { RegisterPage } from './pages/RegisterPage';
 import { DashboardPage } from './pages/DashboardPage';
+import { SubjectsPage } from './pages/SubjectsPage';
+import { StudyMaterialsPage } from './pages/StudyMaterialsPage';
+import { AITutorPage } from './pages/AITutorPage';
+import { PracticeQuizzesPage } from './pages/PracticeQuizzesPage';
+import { ProgressAnalyticsPage } from './pages/ProgressAnalyticsPage';
+import { StudyPlanPage } from './pages/StudyPlanPage';
+import { SettingsPage } from './pages/SettingsPage';
 import { SubjectDetailPage } from './pages/learning/SubjectDetailPage';
 import { TopicStudyPage } from './pages/learning/TopicStudyPage';
 import { ProtectedRoute } from './routes/ProtectedRoute';
@@ -15,7 +22,6 @@ import { Step4Page } from './pages/onboarding/Step4Page';
 
 export const RootRedirect: React.FC = () => {
   const { isAuthenticated, isLoading, isOnboarded, user } = useAuth();
-
 
   if (isLoading) {
     return (
@@ -46,7 +52,6 @@ export const RootRedirect: React.FC = () => {
   return <Navigate to="/onboarding/step1" replace />;
 };
 
-
 function App() {
   return (
     <BrowserRouter>
@@ -67,9 +72,18 @@ function App() {
             <Route path="/onboarding/step4" element={<Step4Page />} />
           </Route>
 
-          {/* Protected learning routes */}
+          {/* Protected student platform routes (Sidebar-based navigation) */}
           <Route element={<ProtectedRoute />}>
             <Route path="/dashboard" element={<DashboardPage />} />
+            <Route path="/subjects" element={<SubjectsPage />} />
+            <Route path="/study-materials" element={<StudyMaterialsPage />} />
+            <Route path="/ai-tutor" element={<AITutorPage />} />
+            <Route path="/practice" element={<PracticeQuizzesPage />} />
+            <Route path="/analytics" element={<ProgressAnalyticsPage />} />
+            <Route path="/study-plan" element={<StudyPlanPage />} />
+            <Route path="/settings" element={<SettingsPage />} />
+
+            {/* Curriculum syllabus & topic learning routes */}
             <Route path="/learning/subjects/:subjectId" element={<SubjectDetailPage />} />
             <Route path="/learning/topics/:topicId" element={<TopicStudyPage />} />
           </Route>

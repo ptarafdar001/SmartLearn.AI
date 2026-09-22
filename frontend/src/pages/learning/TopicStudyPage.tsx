@@ -12,13 +12,11 @@ import {
   ExternalLink,
   Bot,
   AlertCircle,
-  LogOut,
   ArrowRight,
 } from 'lucide-react';
-import { useAuth } from '../../context/AuthContext';
-import { BrandLogo } from '../../components/common/BrandLogo';
 import { fetchTopicDetail, saveTopicProgress } from '../../services/learning';
 import { TutorDrawer } from '../../components/learning/TutorDrawer';
+import { AppLayout } from '../../components/layout/AppLayout';
 import type { LearningResource, ProgressStatus, TopicDetail } from '../../types/learning';
 import '../../styles/learning.css';
 
@@ -61,7 +59,6 @@ const SELF_CHECK_QUIZ: QuizQuestion[] = [
 
 export const TopicStudyPage: React.FC = () => {
   const { topicId } = useParams<{ topicId: string }>();
-  const { user, logout } = useAuth();
 
   const [topic, setTopic] = useState<TopicDetail | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -181,38 +178,19 @@ export const TopicStudyPage: React.FC = () => {
     setSubmittedAnswers((prev) => ({ ...prev, [questionId]: true }));
   };
 
-  const studentName = user?.full_name || 'Student';
-
   // Group resources by type
   const activeResources: LearningResource[] =
     topic?.resources.filter((r) => r.resource_type === activeTab) || [];
 
   return (
-    <div className="learn-layout">
-      {/* Top Navigation */}
-      <header className="learn-nav">
-        <div className="learn-nav-container">
-          <Link to="/dashboard" className="learn-nav-brand" aria-label="SmartLearn Home">
-            <BrandLogo size="sm" />
-            <span className="learn-brand-text">SmartLearn.AI</span>
-          </Link>
-
-          <div className="learn-nav-actions">
-            <div className="learn-user-pill">
-              <div className="learn-user-avatar">{studentName.charAt(0).toUpperCase()}</div>
-              <span className="learn-user-name">{studentName}</span>
-            </div>
-
-            <button type="button" className="learn-signout-btn" onClick={logout} aria-label="Sign out">
-              <LogOut size={14} />
-              <span>Sign Out</span>
-            </button>
-          </div>
-        </div>
-      </header>
-
-      {/* Main Content */}
-      <main className="learn-container">
+    <AppLayout
+      breadcrumbs={[
+        { label: 'My Subjects', href: '/subjects' },
+        { label: topic?.subject_name || 'Subject', href: topic ? `/learning/subjects/${topic.subject_id}` : undefined },
+        { label: topic?.title || 'Topic' },
+      ]}
+    >
+      <div className="compact-page-wrapper">
         {/* Breadcrumb Navigation */}
         <nav className="learn-breadcrumbs" aria-label="Breadcrumbs">
           <Link to="/dashboard" className="learn-breadcrumb-link">
@@ -740,7 +718,6 @@ export const TopicStudyPage: React.FC = () => {
             </Link>
           </div>
         )}
-      </main>
 
       {/* Floating AI Tutor Trigger Button */}
       {topic && (
@@ -769,6 +746,7 @@ export const TopicStudyPage: React.FC = () => {
           chapterNumber={topic.chapter_number}
         />
       )}
-    </div>
+      </div>
+    </AppLayout>
   );
 };
