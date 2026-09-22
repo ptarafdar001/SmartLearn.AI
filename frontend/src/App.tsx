@@ -14,7 +14,8 @@ import { Step3Page } from './pages/onboarding/Step3Page';
 import { Step4Page } from './pages/onboarding/Step4Page';
 
 export const RootRedirect: React.FC = () => {
-  const { isAuthenticated, isLoading, isOnboarded } = useAuth();
+  const { isAuthenticated, isLoading, isOnboarded, user } = useAuth();
+
 
   if (isLoading) {
     return (
@@ -36,12 +37,15 @@ export const RootRedirect: React.FC = () => {
     return <Navigate to="/login" replace />;
   }
 
-  if (isOnboarded) {
+  const isFullyOnboarded = isOnboarded || (user?.is_onboarded ?? false);
+
+  if (isFullyOnboarded) {
     return <Navigate to="/dashboard" replace />;
   }
 
   return <Navigate to="/onboarding/step1" replace />;
 };
+
 
 function App() {
   return (

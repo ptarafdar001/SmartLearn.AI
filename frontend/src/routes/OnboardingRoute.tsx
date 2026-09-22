@@ -27,10 +27,13 @@ export const OnboardingRoute: React.FC = () => {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
+  const isFullyOnboarded = isOnboarded || (user?.is_onboarded ?? false);
+
   // If student is already fully onboarded, navigate them to dashboard
-  if (isOnboarded || user?.is_onboarded) {
+  if (isFullyOnboarded) {
     return <Navigate to="/dashboard" replace />;
   }
+
 
   return <Outlet />;
 };

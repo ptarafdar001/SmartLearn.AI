@@ -87,12 +87,15 @@ export const TutorDrawer: React.FC<TutorDrawerProps> = ({
   // Cleanup voice session on unmount or drawer close
   useEffect(() => {
     if (!isOpen) {
-      stopVoiceSession();
+      if (voiceStateRef.current !== 'idle') {
+        stopVoiceSession();
+      }
     }
     return () => {
       stopVoiceSession();
     };
   }, [isOpen]);
+
 
   // Handle escape key
   useEffect(() => {
