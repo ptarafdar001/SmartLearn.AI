@@ -54,7 +54,6 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children, breadcrumbs }) =
 
         <Link to="/dashboard" className="mobile-brand">
           <BrandLogo size="sm" />
-          <span className="mobile-brand-title">SmartLearn.AI</span>
         </Link>
 
         <div className="mobile-user-avatar">
@@ -77,10 +76,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children, breadcrumbs }) =
         <div className="sidebar-brand-box">
           <Link to="/dashboard" className="sidebar-brand" onClick={() => setMobileOpen(false)}>
             <BrandLogo size="sm" />
-            <div className="sidebar-brand-text">
-              <span className="sidebar-title">SmartLearn.AI</span>
-              <span className="sidebar-badge">Student</span>
-            </div>
+            <span className="sidebar-badge">Student</span>
           </Link>
         </div>
 
