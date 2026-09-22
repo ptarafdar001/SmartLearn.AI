@@ -4,20 +4,28 @@ Grounds responses in student academic profile, verified syllabus resources, and 
 """
 
 import base64
+from datetime import timedelta
 import logging
 import re
 from typing import Any, Dict, List, Optional, Tuple
+import uuid
 import httpx
-from fastapi import HTTPException, status
+from fastapi import HTTPException, WebSocket, WebSocketDisconnect, status
 from sqlalchemy.orm import Session
 
 from app.core.config import get_settings
+from app.core.security import create_access_token, decode_access_token
 from app.models.learning import LearningResource, Subject, Topic
 from app.models.users import User
 from app.repositories.learning_repository import LearningRepository
 from app.repositories.onboarding_repository import OnboardingRepository
 from app.repositories.user_repository import UserRepository
-from app.schemas.tutor import TutorChatMessage, TutorChatRequest, TutorChatResponse
+from app.schemas.tutor import (
+    TutorChatMessage,
+    TutorChatRequest,
+    TutorChatResponse,
+    VoiceSessionResponse,
+)
 
 logger = logging.getLogger("smartlearn.tutor")
 settings = get_settings()
@@ -338,3 +346,363 @@ class TutorService:
                 status_code=status.HTTP_502_BAD_GATEWAY,
                 detail="Unable to reach AI Tutor provider. Please check network connectivity.",
             )
+
+    # ── Voice Conversational Tutoring Engine ──────────────────────────────────
+    @classmethod
+    def create_voice_session(
+        cls, db: Session, user_id: int, topic_id: int
+    ) -> VoiceSessionResponse:
+        """Initialize an authenticated conversational voice session with ephemeral credential."""
+        user = UserRepository.get_by_id(db, user_id)
+        if not user:
+            raise ValueError("Student user not found")
+
+        topic = LearningRepository.get_topic_by_id(db, topic_id)
+        if not topic:
+            raise ValueError(f"Topic with id {topic_id} not found")
+
+        chapter = LearningRepository.get_chapter_by_id(db, topic.chapter_id)
+        subject = (
+            LearningRepository.get_subject_by_id(db, chapter.subject_id)
+            if chapter
+            else None
+        )
+        profile = OnboardingRepository.get_student_profile(db, user_id)
+
+        board_name = subject.board if subject else (profile.board if profile else "CBSE")
+        grade_name = subject.grade if subject else (profile.grade if profile else "Class 11")
+        subject_name = subject.name if subject else "General Studies"
+
+        session_id = str(uuid.uuid4())
+        expires_seconds = 900  # 15 minutes ephemeral token
+        session_token = create_access_token(
+            subject=user.id,
+            expires_delta=timedelta(seconds=expires_seconds),
+            extra_claims={
+                "topic_id": topic_id,
+                "session_id": session_id,
+                "type": "voice_session",
+            },
+        )
+
+        return VoiceSessionResponse(
+            session_id=session_id,
+            session_token=session_token,
+            ws_endpoint=f"/api/v1/tutor/voice/ws?token={session_token}",
+            topic_id=topic.id,
+            topic_title=topic.title,
+            subject_name=subject_name,
+            board=board_name,
+            grade=grade_name,
+            expires_in_seconds=expires_seconds,
+        )
+
+    @classmethod
+    def _build_voice_system_instruction(
+        cls,
+        student_name: str,
+        board: str,
+        grade: str,
+        stream: Optional[str],
+        preferred_style: str,
+        subject_name: str,
+        chapter_number: int,
+        chapter_title: str,
+        topic_number: int,
+        topic_title: str,
+        topic_description: str,
+        resources: List[LearningResource],
+    ) -> str:
+        """Construct spoken voice conversation system instruction."""
+        resource_excerpts = []
+        for r in resources:
+            if r.text_content:
+                resource_excerpts.append(
+                    f"[{r.resource_type.upper()}] {r.title}:\n{r.text_content.strip()}"
+                )
+
+        resources_text = (
+            "\n\n---\n\n".join(resource_excerpts)
+            if resource_excerpts
+            else "Standard verified syllabus topic guidelines."
+        )
+
+        stream_info = f", Stream: {stream}" if stream else ""
+
+        return (
+            f"You are the official SmartLearn.AI Conversational Voice Tutor.\n"
+            f"You are in a live, real-time voice call with the student.\n\n"
+            f"STUDENT CONTEXT:\n"
+            f"- Name: {student_name}\n"
+            f"- Board: {board}\n"
+            f"- Grade/Class: {grade}{stream_info}\n"
+            f"- Preferred Learning Style: {preferred_style}\n\n"
+            f"CURRICULUM CONTEXT:\n"
+            f"- Subject: {subject_name}\n"
+            f"- Chapter {chapter_number}: {chapter_title}\n"
+            f"- Topic {topic_number}: {topic_title}\n"
+            f"- Topic Summary: {topic_description}\n\n"
+            f"VERIFIED SYLLABUS GROUNDING MATERIAL:\n"
+            f"{resources_text}\n\n"
+            f"SPOKEN VOICE RULES:\n"
+            f"1. Spoken Audio Output: Your response will be spoken aloud to the student. Keep answers conversational, natural, warm, and brief (typically 2 to 4 sentences max per turn).\n"
+            f"2. No Markdown Formatting: Do NOT use markdown symbols (no asterisks, bold tags, bullet points, headers, or hashtags) because they sound awkward when spoken aloud.\n"
+            f"3. Socratic Turn-Taking: Address the student directly by name occasionally, explain one concept at a time, and end with an engaging guiding check for understanding (e.g., 'Does that make sense, or would you like a quick example?').\n"
+            f"4. Curriculum Grounding: Stay strictly grounded in {board} {grade} {subject_name} syllabus expectations.\n"
+            f"5. Scope Management: If the student asks something outside {board} {grade} {subject_name}, politely mention in one sentence that it is outside this topic and gently redirect them."
+        )
+
+    @classmethod
+    def process_voice_turn(
+        cls,
+        db: Session,
+        user_id: int,
+        topic_id: int,
+        speech_text: str,
+        conversation_history: List[TutorChatMessage],
+        client: Optional[httpx.Client] = None,
+    ) -> Dict[str, Any]:
+        """Process an incremental or finalized conversational voice turn."""
+        user = UserRepository.get_by_id(db, user_id)
+        if not user:
+            raise ValueError("Student user not found")
+
+        topic = LearningRepository.get_topic_by_id(db, topic_id)
+        if not topic:
+            raise ValueError(f"Topic with id {topic_id} not found")
+
+        chapter = LearningRepository.get_chapter_by_id(db, topic.chapter_id)
+        subject = (
+            LearningRepository.get_subject_by_id(db, chapter.subject_id)
+            if chapter
+            else None
+        )
+        profile = OnboardingRepository.get_student_profile(db, user_id)
+        learning_pref = OnboardingRepository.get_learning_preference(db, user_id)
+
+        board_name = subject.board if subject else (profile.board if profile else "CBSE")
+        grade_name = subject.grade if subject else (profile.grade if profile else "Class 11")
+        stream_name = (
+            subject.academic_stream
+            if subject and subject.academic_stream
+            else (profile.academic_stream if profile else None)
+        )
+        subject_name = subject.name if subject else "General Studies"
+        chapter_title = chapter.title if chapter else "Current Chapter"
+        chapter_num = chapter.chapter_number if chapter else 1
+
+        resources = LearningRepository.get_resources_by_topic_id(
+            db, topic.id, only_active=True
+        )
+        grounded_titles = [r.title for r in resources if r.is_verified]
+
+        system_instruction = cls._build_voice_system_instruction(
+            student_name=user.full_name,
+            board=board_name,
+            grade=grade_name,
+            stream=stream_name,
+            preferred_style=learning_pref.preferred_style if learning_pref else "Auditory",
+            subject_name=subject_name,
+            chapter_number=chapter_num,
+            chapter_title=chapter_title,
+            topic_number=topic.topic_number,
+            topic_title=topic.title,
+            topic_description=topic.description or "",
+            resources=resources,
+        )
+
+        api_key = settings.GEMINI_API_KEY
+        if not api_key:
+            raise HTTPException(
+                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                detail="AI Tutor voice service is not configured. GEMINI_API_KEY is required.",
+            )
+
+        gemini_payload = cls._build_gemini_payload(
+            system_instruction=system_instruction,
+            conversation_history=conversation_history,
+            current_message=speech_text,
+            image_part=None,
+        )
+
+        reply_text = cls._call_gemini_api(
+            api_key=api_key,
+            model=settings.AI_TUTOR_MODEL,
+            payload=gemini_payload,
+            client=client,
+        )
+
+        is_out_of_scope = (
+            "outside the syllabus" in reply_text.lower()
+            or "not covered in this topic" in reply_text.lower()
+            or "outside of our topic" in reply_text.lower()
+        )
+
+        return {
+            "reply": reply_text,
+            "topic_id": topic.id,
+            "topic_title": topic.title,
+            "subject_name": subject_name,
+            "board": board_name,
+            "grade": grade_name,
+            "grounded_resource_titles": grounded_titles,
+            "is_out_of_scope": is_out_of_scope,
+        }
+
+    @classmethod
+    async def handle_voice_websocket(
+        cls,
+        websocket: WebSocket,
+        token: str,
+        db: Session,
+        client: Optional[httpx.Client] = None,
+    ) -> None:
+        """Handle full-duplex WebSocket conversational turn-taking with interruption."""
+        # 1. Authenticate token
+        try:
+            payload = decode_access_token(token)
+            user_id = int(payload.get("sub"))
+            topic_id = int(payload.get("topic_id", 0))
+            session_id = payload.get("session_id", "default")
+        except Exception as e:
+            logger.warning(f"Voice WebSocket auth rejection: {e}")
+            await websocket.close(code=4401, reason="Invalid or expired session token")
+            return
+
+        user = UserRepository.get_by_id(db, user_id)
+        if not user or not user.is_active:
+            await websocket.close(code=4401, reason="Inactive or non-existent user")
+            return
+
+        topic = LearningRepository.get_topic_by_id(db, topic_id)
+        if not topic:
+            await websocket.close(code=4404, reason="Curriculum topic not found")
+            return
+
+        chapter = LearningRepository.get_chapter_by_id(db, topic.chapter_id)
+        subject = (
+            LearningRepository.get_subject_by_id(db, chapter.subject_id)
+            if chapter
+            else None
+        )
+        profile = OnboardingRepository.get_student_profile(db, user_id)
+
+        board_name = subject.board if subject else (profile.board if profile else "CBSE")
+        grade_name = subject.grade if subject else (profile.grade if profile else "Class 11")
+        subject_name = subject.name if subject else "General Studies"
+
+        await websocket.accept()
+
+        # 2. Emit initial session_ready handshake
+        await websocket.send_json({
+            "type": "session_ready",
+            "session_id": session_id,
+            "state": "listening",
+            "topic_id": topic.id,
+            "topic_title": topic.title,
+            "subject_name": subject_name,
+            "board": board_name,
+            "grade": grade_name,
+            "message": f"Connected to Voice Tutor for {topic.title}. You may start speaking.",
+        })
+
+        conversation_history: List[TutorChatMessage] = []
+
+        try:
+            while True:
+                msg = await websocket.receive_json()
+                event_type = msg.get("type", "")
+
+                if event_type == "ping":
+                    await websocket.send_json({"type": "pong"})
+                    continue
+
+                if event_type == "interrupt":
+                    logger.info(f"Student barged in / interrupted voice session {session_id}")
+                    await websocket.send_json({
+                        "type": "tutor_interrupted",
+                        "state": "listening",
+                        "message": "Playback halted. Listening to student.",
+                    })
+                    continue
+
+                if event_type == "speech_interim":
+                    interim_text = msg.get("text", "")
+                    await websocket.send_json({
+                        "type": "transcript_echo",
+                        "state": "listening",
+                        "text": interim_text,
+                    })
+                    continue
+
+                if event_type == "speech_final":
+                    speech_text = msg.get("text", "").strip()
+                    if not speech_text:
+                        await websocket.send_json({"type": "listening", "state": "listening"})
+                        continue
+
+                    # Transition to thinking state
+                    await websocket.send_json({
+                        "type": "thinking",
+                        "state": "thinking",
+                        "transcript": speech_text,
+                    })
+
+                    try:
+                        turn_result = cls.process_voice_turn(
+                            db=db,
+                            user_id=user.id,
+                            topic_id=topic.id,
+                            speech_text=speech_text,
+                            conversation_history=conversation_history,
+                            client=client,
+                        )
+
+                        reply_text = turn_result["reply"]
+
+                        # Append to history
+                        conversation_history.append(
+                            TutorChatMessage(role="student", content=speech_text)
+                        )
+                        conversation_history.append(
+                            TutorChatMessage(role="tutor", content=reply_text)
+                        )
+
+                        # Trim history to last 10 turns
+                        if len(conversation_history) > 10:
+                            conversation_history = conversation_history[-10:]
+
+                        # Emit speaking event
+                        await websocket.send_json({
+                            "type": "speaking",
+                            "state": "speaking",
+                            "text": reply_text,
+                            "user_transcript": speech_text,
+                            "grounded_resource_titles": turn_result["grounded_resource_titles"],
+                            "is_out_of_scope": turn_result["is_out_of_scope"],
+                        })
+
+                    except HTTPException as http_exc:
+                        await websocket.send_json({
+                            "type": "error",
+                            "state": "error",
+                            "status_code": http_exc.status_code,
+                            "detail": http_exc.detail,
+                        })
+                    except Exception as err:
+                        logger.error(f"Voice generation error: {err}")
+                        await websocket.send_json({
+                            "type": "error",
+                            "state": "error",
+                            "detail": "Voice tutor processing error. Please try speaking again.",
+                        })
+
+        except WebSocketDisconnect:
+            logger.info(f"Voice WebSocket disconnected gracefully for session {session_id}")
+        except Exception as e:
+            logger.error(f"Voice WebSocket unhandled exception: {e}")
+            try:
+                await websocket.close(code=1011, reason="Server voice processing error")
+            except Exception:
+                pass
+

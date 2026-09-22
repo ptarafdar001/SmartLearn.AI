@@ -337,3 +337,108 @@ def test_tutor_chat_topic_not_found(client: TestClient, db_session: Session):
         )
         assert resp.status_code == 404
         assert "not found" in resp.json()["detail"].lower()
+
+
+# ── 8. Voice Session Creation ─────────────────────────────────────────────────
+def test_create_voice_session_success_and_auth(client: TestClient, db_session: Session):
+    """Verify voice session creation requires auth and returns ephemeral token."""
+    # 401 unauthenticated
+    resp_unauth = client.post("/api/v1/tutor/voice/session", json={"topic_id": 1})
+    assert resp_unauth.status_code == 401
+
+    student = create_test_student(
+        client, db_session, "voice_session_test@example.com", "Voice Student"
+    )
+    topic = db_session.query(Topic).first()
+
+    # Success with auth
+    resp = client.post(
+        "/api/v1/tutor/voice/session",
+        json={"topic_id": topic.id},
+        headers=student["headers"],
+    )
+    assert resp.status_code == 200
+    data = resp.json()
+    assert "session_id" in data
+    assert "session_token" in data
+    assert "/api/v1/tutor/voice/ws" in data["ws_endpoint"]
+    assert data["topic_id"] == topic.id
+    assert data["board"] == "ISC"
+    assert data["grade"] == "Class 11"
+    assert data["expires_in_seconds"] == 900
+
+
+# ── 9. Voice WebSocket Full-Duplex Turn-Taking & Interruption ─────────────────
+def test_voice_websocket_lifecycle_and_interruption(client: TestClient, db_session: Session):
+    """Verify WebSocket handshake, interim transcript, barge-in, and spoken response generation."""
+    student = create_test_student(
+        client, db_session, "voice_ws_test@example.com", "Voice WS Student"
+    )
+    topic = db_session.query(Topic).first()
+
+    # 1. Create session to get ephemeral token
+    resp_session = client.post(
+        "/api/v1/tutor/voice/session",
+        json={"topic_id": topic.id},
+        headers=student["headers"],
+    )
+    assert resp_session.status_code == 200
+    token = resp_session.json()["session_token"]
+
+    mock_gemini_resp = {
+        "candidates": [
+            {
+                "content": {
+                    "parts": [
+                        {
+                            "text": "The 1853 railway between Bombay and Thane changed colonial trade dramatically. Does that answer your question?"
+                        }
+                    ]
+                }
+            }
+        ]
+    }
+
+    mock_client_instance = MagicMock()
+    mock_client_instance.__enter__.return_value = mock_client_instance
+    mock_client_instance.post.return_value = MagicMock(
+        status_code=200,
+        json=lambda: mock_gemini_resp,
+    )
+
+    with patch.object(settings, "GEMINI_API_KEY", "mock-voice-key"):
+        with patch("app.services.tutor_service.httpx.Client", return_value=mock_client_instance):
+            with client.websocket_connect(f"/api/v1/tutor/voice/ws?token={token}") as ws:
+                # Expect session_ready event
+                ready_event = ws.receive_json()
+                assert ready_event["type"] == "session_ready"
+                assert ready_event["state"] == "listening"
+                assert ready_event["topic_id"] == topic.id
+
+                # Test ping / pong
+                ws.send_json({"type": "ping"})
+                pong = ws.receive_json()
+                assert pong["type"] == "pong"
+
+                # Test interim speech echo
+                ws.send_json({"type": "speech_interim", "text": "What about Dalhousie"})
+                echo = ws.receive_json()
+                assert echo["type"] == "transcript_echo"
+                assert echo["text"] == "What about Dalhousie"
+
+                # Test barge-in / interrupt
+                ws.send_json({"type": "interrupt"})
+                interrupt_ack = ws.receive_json()
+                assert interrupt_ack["type"] == "tutor_interrupted"
+                assert interrupt_ack["state"] == "listening"
+
+                # Test final speech turn
+                ws.send_json({"type": "speech_final", "text": "Tell me about the 1853 railway."})
+                thinking_event = ws.receive_json()
+                assert thinking_event["type"] == "thinking"
+
+                speaking_event = ws.receive_json()
+                assert speaking_event["type"] == "speaking"
+                assert "1853 railway between Bombay and Thane" in speaking_event["text"]
+                assert speaking_event["is_out_of_scope"] is False
+

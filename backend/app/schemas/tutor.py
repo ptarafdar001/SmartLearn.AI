@@ -39,3 +39,24 @@ class TutorChatResponse(BaseModel):
     is_out_of_scope: bool = False
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class VoiceSessionRequest(BaseModel):
+    """Payload to initiate a real-time conversational voice session."""
+    topic_id: int = Field(..., description="Topic ID for curriculum grounding")
+
+
+class VoiceSessionResponse(BaseModel):
+    """Ephemeral session token and WebSocket connection details."""
+    session_id: str
+    session_token: str
+    ws_endpoint: str
+    topic_id: int
+    topic_title: str
+    subject_name: str
+    board: str
+    grade: str
+    expires_in_seconds: int
+
+    model_config = ConfigDict(from_attributes=True)
+

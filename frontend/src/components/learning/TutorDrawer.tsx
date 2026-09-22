@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { askAITutor } from '../../services/tutor';
-import type { TutorChatMessage } from '../../types/tutor';
+import { askAITutor, createVoiceSession } from '../../services/tutor';
+import type { TutorChatMessage, VoiceSessionResponse, VoiceState } from '../../types/tutor';
 
 interface TutorDrawerProps {
   isOpen: boolean;
@@ -10,6 +10,13 @@ interface TutorDrawerProps {
   subjectName: string;
   chapterTitle: string;
   chapterNumber: number;
+}
+
+interface VoiceTranscriptItem {
+  id: string;
+  role: 'student' | 'tutor';
+  text: string;
+  timestamp: string;
 }
 
 const STARTER_PROMPTS = [
@@ -28,6 +35,10 @@ export const TutorDrawer: React.FC<TutorDrawerProps> = ({
   chapterTitle,
   chapterNumber,
 }) => {
+  // Mode: 'chat' or 'voice'
+  const [activeTab, setActiveTab] = useState<'chat' | 'voice'>('chat');
+
+  // ── Chat State ─────────────────────────────────────────────────────────────
   const [messages, setMessages] = useState<TutorChatMessage[]>([
     {
       id: 'welcome',
@@ -39,15 +50,49 @@ export const TutorDrawer: React.FC<TutorDrawerProps> = ({
   const [inputMessage, setInputMessage] = useState<string>('');
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
+  const [chatError, setChatError] = useState<string | null>(null);
 
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-  // Auto-scroll on new message
+  // ── Voice State ────────────────────────────────────────────────────────────
+  const [voiceState, setVoiceState] = useState<VoiceState>('idle');
+  const [isMuted, setIsMuted] = useState<boolean>(false);
+  const [voiceError, setVoiceError] = useState<string | null>(null);
+  const [interimSpeech, setInterimSpeech] = useState<string>('');
+  const [voiceTranscripts, setVoiceTranscripts] = useState<VoiceTranscriptItem[]>([]);
+  const voiceEndRef = useRef<HTMLDivElement | null>(null);
+
+  const wsRef = useRef<WebSocket | null>(null);
+  const streamRef = useRef<MediaStream | null>(null);
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const analyserRef = useRef<AnalyserNode | null>(null);
+  const recognitionRef = useRef<any | null>(null);
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const animFrameRef = useRef<number | null>(null);
+  const activeSessionRef = useRef<VoiceSessionResponse | null>(null);
+  const voiceStateRef = useRef<VoiceState>('idle');
+  voiceStateRef.current = voiceState;
+
+  // Auto-scroll on new chat message
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, isLoading]);
+
+  // Auto-scroll on voice transcripts
+  useEffect(() => {
+    voiceEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [voiceTranscripts, interimSpeech]);
+
+  // Cleanup voice session on unmount or drawer close
+  useEffect(() => {
+    if (!isOpen) {
+      stopVoiceSession();
+    }
+    return () => {
+      stopVoiceSession();
+    };
+  }, [isOpen]);
 
   // Handle escape key
   useEffect(() => {
@@ -60,21 +105,22 @@ export const TutorDrawer: React.FC<TutorDrawerProps> = ({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isOpen, onClose]);
 
+  // ── Chat Functions ─────────────────────────────────────────────────────────
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
     if (!file.type.startsWith('image/')) {
-      setError('Please select a valid image file (PNG, JPEG, or WEBP).');
+      setChatError('Please select a valid image file (PNG, JPEG, or WEBP).');
       return;
     }
 
     if (file.size > 7 * 1024 * 1024) {
-      setError('Image size exceeds 7MB limit. Please choose a smaller image.');
+      setChatError('Image size exceeds 7MB limit. Please choose a smaller image.');
       return;
     }
 
-    setError(null);
+    setChatError(null);
     const reader = new FileReader();
     reader.onload = () => {
       setSelectedImage(reader.result as string);
@@ -94,7 +140,7 @@ export const TutorDrawer: React.FC<TutorDrawerProps> = ({
     if (!query && !selectedImage) return;
     if (isLoading) return;
 
-    setError(null);
+    setChatError(null);
     const timestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     const currentImg = selectedImage;
 
@@ -115,7 +161,6 @@ export const TutorDrawer: React.FC<TutorDrawerProps> = ({
     setIsLoading(true);
 
     try {
-      // Build conversation turns for context
       const historyPayload = messages
         .filter((m) => m.id !== 'welcome')
         .slice(-10)
@@ -143,7 +188,7 @@ export const TutorDrawer: React.FC<TutorDrawerProps> = ({
       const errMsg =
         err.message ||
         'Unable to contact the AI Tutor. Please check your connection or server configuration.';
-      setError(errMsg);
+      setChatError(errMsg);
     } finally {
       setIsLoading(false);
     }
@@ -154,6 +199,397 @@ export const TutorDrawer: React.FC<TutorDrawerProps> = ({
       e.preventDefault();
       handleSend();
     }
+  };
+
+  // ── Voice Session Logic ────────────────────────────────────────────────────
+  const resolveWsUrl = (wsEndpoint: string, token: string): string => {
+    const base = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api/v1';
+    const wsBase = base.replace(/^http(s)?:/, (match: string) => (match === 'https:' ? 'wss:' : 'ws:'));
+    const cleanBase = wsBase.replace(/\/api\/v1\/?$/, '');
+    const cleanEndpoint = wsEndpoint.startsWith('/') ? wsEndpoint : `/${wsEndpoint}`;
+    return `${cleanBase}${cleanEndpoint}?token=${encodeURIComponent(token)}`;
+  };
+
+  const startVoiceSession = async () => {
+    setVoiceError(null);
+    setVoiceState('connecting');
+
+    // 1. Microphone check & acquisition
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      setVoiceError('Audio capture is not supported in this browser environment. You can use Text Chat!');
+      setVoiceState('error');
+      return;
+    }
+
+    let stream: MediaStream;
+    try {
+      stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      streamRef.current = stream;
+    } catch (micErr: any) {
+      if (micErr.name === 'NotAllowedError' || micErr.name === 'PermissionDeniedError') {
+        setVoiceError('Microphone permission was denied. Please allow microphone access in your browser settings to talk with your AI Tutor.');
+      } else if (micErr.name === 'NotFoundError' || micErr.name === 'DevicesNotFoundError') {
+        setVoiceError('No microphone found on your device. Please plug in a mic or switch to Text Chat.');
+      } else {
+        setVoiceError(`Could not access microphone: ${micErr.message || micErr.name}`);
+      }
+      setVoiceState('error');
+      return;
+    }
+
+    // 2. Setup Audio Visualizer (Web Audio API)
+    try {
+      const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
+      if (AudioCtx) {
+        const audioCtx = new AudioCtx();
+        audioContextRef.current = audioCtx;
+        const analyser = audioCtx.createAnalyser();
+        analyser.fftSize = 64;
+        analyserRef.current = analyser;
+
+        const source = audioCtx.createMediaStreamSource(stream);
+        source.connect(analyser);
+        startVisualizerLoop();
+      }
+    } catch (e) {
+      console.warn('Web Audio visualizer setup error:', e);
+    }
+
+    // 3. Create backend voice session (ephemeral JWT token)
+    let session: VoiceSessionResponse;
+    try {
+      session = await createVoiceSession(topicId);
+      activeSessionRef.current = session;
+    } catch (err: any) {
+      setVoiceError(err.message || 'Failed to initialize voice session token from server.');
+      setVoiceState('error');
+      stopMediaStream();
+      return;
+    }
+
+    // 4. Connect WebSocket
+    try {
+      const wsUrl = resolveWsUrl(session.ws_endpoint, session.session_token);
+      const ws = new WebSocket(wsUrl);
+      wsRef.current = ws;
+
+      ws.onopen = () => {
+        setVoiceState('listening');
+        initSpeechRecognition();
+      };
+
+      ws.onmessage = (event) => {
+        try {
+          const data = JSON.parse(event.data);
+          handleWebSocketMessage(data);
+        } catch (e) {
+          console.warn('Failed to parse WebSocket message:', event.data);
+        }
+      };
+
+      ws.onerror = (evt) => {
+        console.error('Tutor voice WebSocket error:', evt);
+        setVoiceError('Voice connection error. Please reconnect or switch to text chat.');
+        setVoiceState('error');
+      };
+
+      ws.onclose = (evt) => {
+        if (voiceStateRef.current !== 'idle') {
+          if (!evt.wasClean) {
+            setVoiceError('Voice session disconnected unexpectedly.');
+            setVoiceState('error');
+          }
+        }
+      };
+    } catch (wsErr: any) {
+      setVoiceError(`Failed to establish voice connection: ${wsErr.message}`);
+      setVoiceState('error');
+      stopMediaStream();
+    }
+  };
+
+  const handleWebSocketMessage = (data: any) => {
+    switch (data.type) {
+      case 'session_ready':
+        setVoiceState('listening');
+        break;
+
+      case 'thinking':
+        setVoiceState('thinking');
+        break;
+
+      case 'speaking':
+      case 'response_text':
+        setVoiceState('speaking');
+        if (data.text) {
+          const tutorTurn: VoiceTranscriptItem = {
+            id: `v-tutor-${Date.now()}`,
+            role: 'tutor',
+            text: data.text,
+            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          };
+          setVoiceTranscripts((prev) => [...prev, tutorTurn]);
+          speakAloud(data.text);
+        }
+        break;
+
+      case 'interrupted':
+        if ('speechSynthesis' in window) {
+          window.speechSynthesis.cancel();
+        }
+        setVoiceState('listening');
+        break;
+
+      case 'error':
+        setVoiceError(data.message || 'An error occurred during voice communication.');
+        setVoiceState('error');
+        break;
+
+      default:
+        break;
+    }
+  };
+
+  const speakAloud = (text: string) => {
+    const UtteranceClass =
+      (window as any).SpeechSynthesisUtterance ||
+      (typeof SpeechSynthesisUtterance !== 'undefined' ? SpeechSynthesisUtterance : null);
+
+    if (typeof window === 'undefined' || !window.speechSynthesis || !UtteranceClass) {
+      return;
+    }
+
+
+
+    try {
+      window.speechSynthesis.cancel(); // cancel any previous utterance
+      const cleanText = text.replace(/[*_#`]/g, '');
+      const utterance = new UtteranceClass(cleanText);
+      utterance.rate = 1.0;
+      utterance.pitch = 1.0;
+
+
+      utterance.onend = () => {
+        if (voiceStateRef.current === 'speaking') {
+          setVoiceState('listening');
+        }
+      };
+
+      utterance.onerror = (event: any) => {
+        if (event.error !== 'canceled' && event.error !== 'interrupted') {
+          console.warn('Speech synthesis utterance error:', event.error);
+        }
+        if (voiceStateRef.current === 'speaking') {
+          setVoiceState('listening');
+        }
+      };
+
+
+      window.speechSynthesis.speak(utterance);
+    } catch (e) {
+      console.warn('Speech synthesis speak failure:', e);
+    }
+  };
+
+
+  const initSpeechRecognition = () => {
+    const SpeechRec = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SpeechRec) {
+      console.info('Web SpeechRecognition not supported in this browser.');
+      return;
+    }
+
+    try {
+      const recognition = new SpeechRec();
+      recognition.continuous = true;
+      recognition.interimResults = true;
+      recognition.lang = 'en-US';
+
+      recognition.onresult = (event: any) => {
+        let interim = '';
+        let final = '';
+
+        for (let i = event.resultIndex; i < event.results.length; ++i) {
+          const res = event.results[i];
+          if (res.isFinal) {
+            final += res[0].transcript;
+          } else {
+            interim += res[0].transcript;
+          }
+        }
+
+        // Barge-in check: if tutor is speaking, user speaking interrupts it!
+        if ((interim || final) && voiceStateRef.current === 'speaking') {
+          interruptTutor();
+        }
+
+        if (interim) {
+          setInterimSpeech(interim);
+          if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
+            wsRef.current.send(
+              JSON.stringify({
+                type: 'speech_interim',
+                text: interim,
+                session_id: activeSessionRef.current?.session_id,
+              })
+            );
+          }
+        }
+
+        if (final && final.trim()) {
+          const trimmed = final.trim();
+          setInterimSpeech('');
+          const studentTurn: VoiceTranscriptItem = {
+            id: `v-student-${Date.now()}`,
+            role: 'student',
+            text: trimmed,
+            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          };
+          setVoiceTranscripts((prev) => [...prev, studentTurn]);
+          setVoiceState('thinking');
+
+          if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
+            wsRef.current.send(
+              JSON.stringify({
+                type: 'speech_final',
+                text: trimmed,
+                session_id: activeSessionRef.current?.session_id,
+              })
+            );
+          }
+        }
+      };
+
+      recognition.onerror = (event: any) => {
+        if (event.error !== 'no-speech') {
+          console.warn('SpeechRecognition error:', event.error);
+        }
+      };
+
+      recognition.onend = () => {
+        // Restart recognition if session is still active and listening
+        if (voiceStateRef.current !== 'idle' && voiceStateRef.current !== 'error' && recognitionRef.current) {
+          try {
+            recognition.start();
+          } catch {
+            // Already started or restarting
+          }
+        }
+      };
+
+      recognition.start();
+      recognitionRef.current = recognition;
+    } catch (e) {
+      console.warn('Speech recognition initiation error:', e);
+    }
+  };
+
+  const startVisualizerLoop = () => {
+    const draw = () => {
+      const canvas = canvasRef.current;
+      const analyser = analyserRef.current;
+      if (canvas && analyser) {
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          const bufferLength = analyser.frequencyBinCount;
+          const dataArray = new Uint8Array(bufferLength);
+          analyser.getByteFrequencyData(dataArray);
+
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+          const barWidth = (canvas.width / bufferLength) * 2.2;
+          let x = 0;
+
+          for (let i = 0; i < bufferLength; i++) {
+            const barHeight = (dataArray[i] / 255) * (canvas.height - 4);
+            const gradient = ctx.createLinearGradient(0, canvas.height, 0, 0);
+            gradient.addColorStop(0, '#4f46e5');
+            gradient.addColorStop(1, '#818cf8');
+
+            ctx.fillStyle = isMuted ? '#94a3b8' : gradient;
+            ctx.fillRect(x, canvas.height - barHeight - 2, barWidth - 1, barHeight + 2);
+            x += barWidth;
+          }
+        }
+      }
+      animFrameRef.current = requestAnimationFrame(draw);
+    };
+    draw();
+  };
+
+  const toggleMute = () => {
+    if (streamRef.current) {
+      const audioTracks = streamRef.current.getAudioTracks();
+      const newMutedState = !isMuted;
+      audioTracks.forEach((track) => {
+        track.enabled = !newMutedState;
+      });
+      setIsMuted(newMutedState);
+
+      if (recognitionRef.current) {
+        if (newMutedState) {
+          try {
+            recognitionRef.current.stop();
+          } catch {}
+        } else {
+          try {
+            recognitionRef.current.start();
+          } catch {}
+        }
+      }
+    }
+  };
+
+  const interruptTutor = () => {
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+    }
+    if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
+      wsRef.current.send(JSON.stringify({ type: 'interrupt' }));
+    }
+    setVoiceState('listening');
+  };
+
+  const stopMediaStream = () => {
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach((track) => track.stop());
+      streamRef.current = null;
+    }
+    if (audioContextRef.current && audioContextRef.current.state !== 'closed') {
+      audioContextRef.current.close().catch(() => {});
+      audioContextRef.current = null;
+    }
+    if (animFrameRef.current) {
+      cancelAnimationFrame(animFrameRef.current);
+      animFrameRef.current = null;
+    }
+  };
+
+  const stopVoiceSession = () => {
+    stopMediaStream();
+
+    if (recognitionRef.current) {
+      try {
+        recognitionRef.current.stop();
+      } catch {}
+      recognitionRef.current = null;
+    }
+
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+    }
+
+    if (wsRef.current) {
+      try {
+        wsRef.current.close();
+      } catch {}
+      wsRef.current = null;
+    }
+
+    setVoiceState('idle');
+    setInterimSpeech('');
+    setIsMuted(false);
+    activeSessionRef.current = null;
   };
 
   if (!isOpen) return null;
@@ -193,140 +629,338 @@ export const TutorDrawer: React.FC<TutorDrawerProps> = ({
           </button>
         </div>
 
-        {/* Error Alert Banner */}
-        {error && (
-          <div className="tutor-error-banner" role="alert">
-            <span>⚠️</span>
-            <div style={{ flex: 1 }}>{error}</div>
-            <button
-              type="button"
-              style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '13px' }}
-              onClick={() => setError(null)}
-              aria-label="Dismiss error"
-            >
-              ✕
-            </button>
-          </div>
-        )}
+        {/* Tab Switcher: Chat vs Live Voice */}
+        <div className="tutor-mode-tabs" role="tablist">
+          <button
+            type="button"
+            role="tab"
+            aria-selected={activeTab === 'chat'}
+            className={`tutor-mode-tab ${activeTab === 'chat' ? 'active' : ''}`}
+            onClick={() => setActiveTab('chat')}
+          >
+            💬 Chat Doubt-Solving
+          </button>
+          <button
+            type="button"
+            role="tab"
+            aria-selected={activeTab === 'voice'}
+            className={`tutor-mode-tab ${activeTab === 'voice' ? 'active' : ''}`}
+            onClick={() => {
+              setActiveTab('voice');
+              if (voiceState === 'idle') {
+                startVoiceSession();
+              }
+            }}
+          >
+            🎙️ Live Voice Tutor
+          </button>
+        </div>
 
-        {/* Message Thread */}
-        <div className="tutor-messages-container" role="log" aria-live="polite">
-          {messages.map((msg) => (
-            <div
-              key={msg.id}
-              className={`tutor-bubble-row ${msg.role === 'student' ? 'student-row' : 'tutor-row'}`}
-            >
-              {msg.role === 'tutor' && (
-                <div className="tutor-bubble-avatar" aria-hidden="true">🤖</div>
+        {/* ── TAB 1: TEXT & IMAGE CHAT ────────────────────────────────────── */}
+        {activeTab === 'chat' && (
+          <>
+            {/* Error Alert Banner */}
+            {chatError && (
+              <div className="tutor-error-banner" role="alert">
+                <span>⚠️</span>
+                <div style={{ flex: 1 }}>{chatError}</div>
+                <button
+                  type="button"
+                  style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '13px' }}
+                  onClick={() => setChatError(null)}
+                  aria-label="Dismiss error"
+                >
+                  ✕
+                </button>
+              </div>
+            )}
+
+            {/* Message Thread */}
+            <div className="tutor-messages-container" role="log" aria-live="polite">
+              {messages.map((msg) => (
+                <div
+                  key={msg.id}
+                  className={`tutor-bubble-row ${msg.role === 'student' ? 'student-row' : 'tutor-row'}`}
+                >
+                  {msg.role === 'tutor' && (
+                    <div className="tutor-bubble-avatar" aria-hidden="true">🤖</div>
+                  )}
+
+                  <div className={`tutor-bubble ${msg.role === 'student' ? 'student-bubble' : 'tutor-bubble-content'}`}>
+                    {msg.imageUrl && (
+                      <div className="tutor-msg-image-wrap">
+                        <img src={msg.imageUrl} alt="Student attached doubt" className="tutor-msg-image" />
+                      </div>
+                    )}
+                    <div style={{ whiteSpace: 'pre-line' }}>{msg.content}</div>
+                    <div className="tutor-msg-time">{msg.timestamp}</div>
+                  </div>
+                </div>
+              ))}
+
+              {isLoading && (
+                <div className="tutor-bubble-row tutor-row">
+                  <div className="tutor-bubble-avatar" aria-hidden="true">🤖</div>
+                  <div className="tutor-bubble tutor-bubble-content loading-bubble">
+                    <div className="tutor-typing-indicator" aria-label="Tutor is thinking">
+                      <span />
+                      <span />
+                      <span />
+                    </div>
+                    <span style={{ fontSize: '13px', color: '#64748b', marginLeft: '8px' }}>
+                      Analyzing doubt against syllabus...
+                    </span>
+                  </div>
+                </div>
               )}
 
-              <div className={`tutor-bubble ${msg.role === 'student' ? 'student-bubble' : 'tutor-bubble-content'}`}>
-                {msg.imageUrl && (
-                  <div className="tutor-msg-image-wrap">
-                    <img src={msg.imageUrl} alt="Student attached doubt" className="tutor-msg-image" />
-                  </div>
-                )}
-                <div style={{ whiteSpace: 'pre-line' }}>{msg.content}</div>
-                <div className="tutor-msg-time">{msg.timestamp}</div>
-              </div>
+              <div ref={messagesEndRef} />
             </div>
-          ))}
 
-          {isLoading && (
-            <div className="tutor-bubble-row tutor-row">
-              <div className="tutor-bubble-avatar" aria-hidden="true">🤖</div>
-              <div className="tutor-bubble tutor-bubble-content loading-bubble">
-                <div className="tutor-typing-indicator" aria-label="Tutor is thinking">
-                  <span />
-                  <span />
-                  <span />
-                </div>
-                <span style={{ fontSize: '13px', color: '#64748b', marginLeft: '8px' }}>
-                  Analyzing doubt against syllabus...
+            {/* Quick Starter Prompt Chips */}
+            {messages.length <= 3 && !isLoading && (
+              <div className="tutor-starter-chips" aria-label="Suggested questions">
+                <span style={{ fontSize: '11px', color: '#64748b', fontWeight: 600, width: '100%', marginBottom: '4px' }}>
+                  Suggested Starter Prompts:
                 </span>
+                {STARTER_PROMPTS.map((prompt, idx) => (
+                  <button
+                    key={idx}
+                    type="button"
+                    className="tutor-chip"
+                    onClick={() => handleSend(prompt)}
+                  >
+                    {prompt}
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {/* Input Area */}
+            <div className="tutor-input-section">
+              {selectedImage && (
+                <div className="tutor-image-preview">
+                  <img src={selectedImage} alt="Selected attachment preview" />
+                  <button
+                    type="button"
+                    className="tutor-remove-img-btn"
+                    onClick={removeSelectedImage}
+                    title="Remove image"
+                    aria-label="Remove attached image"
+                  >
+                    ✕
+                  </button>
+                </div>
+              )}
+
+              <div className="tutor-input-row">
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  accept="image/png, image/jpeg, image/webp"
+                  style={{ display: 'none' }}
+                  onChange={handleImageSelect}
+                  id="tutor-file-upload"
+                />
+                <label
+                  htmlFor="tutor-file-upload"
+                  className="tutor-attach-btn"
+                  title="Upload textbook photo or diagram doubt"
+                  aria-label="Upload photo or diagram doubt"
+                >
+                  📷
+                </label>
+
+                <textarea
+                  className="tutor-textarea"
+                  placeholder="Ask a question or explain your doubt..."
+                  value={inputMessage}
+                  onChange={(e) => setInputMessage(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  rows={1}
+                  aria-label="Tutor message input"
+                  disabled={isLoading}
+                />
+
+                <button
+                  type="button"
+                  className="tutor-send-btn"
+                  onClick={() => handleSend()}
+                  disabled={(!inputMessage.trim() && !selectedImage) || isLoading}
+                  aria-label="Send message to AI Tutor"
+                >
+                  ➤
+                </button>
               </div>
             </div>
-          )}
-
-          <div ref={messagesEndRef} />
-        </div>
-
-        {/* Quick Starter Prompt Chips */}
-        {messages.length <= 3 && !isLoading && (
-          <div className="tutor-starter-chips" aria-label="Suggested questions">
-            <span style={{ fontSize: '11px', color: '#64748b', fontWeight: 600, width: '100%', marginBottom: '4px' }}>
-              Suggested Starter Prompts:
-            </span>
-            {STARTER_PROMPTS.map((prompt, idx) => (
-              <button
-                key={idx}
-                type="button"
-                className="tutor-chip"
-                onClick={() => handleSend(prompt)}
-              >
-                {prompt}
-              </button>
-            ))}
-          </div>
+          </>
         )}
 
-        {/* Input Area */}
-        <div className="tutor-input-section">
-          {selectedImage && (
-            <div className="tutor-image-preview">
-              <img src={selectedImage} alt="Selected attachment preview" />
-              <button
-                type="button"
-                className="tutor-remove-img-btn"
-                onClick={removeSelectedImage}
-                title="Remove image"
-                aria-label="Remove attached image"
-              >
-                ✕
-              </button>
+        {/* ── TAB 2: LIVE VOICE TUTOR ─────────────────────────────────────── */}
+        {activeTab === 'voice' && (
+          <div className="tutor-voice-container">
+            {/* Voice Error Banner */}
+            {voiceError && (
+              <div className="tutor-error-banner" role="alert" style={{ margin: '12px 16px' }}>
+                <span>⚠️</span>
+                <div style={{ flex: 1 }}>{voiceError}</div>
+                <button
+                  type="button"
+                  style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '13px' }}
+                  onClick={() => setVoiceError(null)}
+                  aria-label="Dismiss error"
+                >
+                  ✕
+                </button>
+              </div>
+            )}
+
+            {/* Voice Hero Visualizer Area */}
+            <div className="tutor-voice-hero">
+              <div className="tutor-voice-orb-container">
+                {voiceState === 'listening' && <div className="tutor-voice-pulse-ring" />}
+                <div className={`tutor-voice-orb ${voiceState}`}>
+                  {voiceState === 'connecting' && '⏳'}
+                  {voiceState === 'listening' && (isMuted ? '🔇' : '🎙️')}
+                  {voiceState === 'thinking' && '🧠'}
+                  {voiceState === 'speaking' && '🔊'}
+                  {voiceState === 'idle' && '🎧'}
+                  {voiceState === 'error' && '⚠️'}
+                </div>
+              </div>
+
+              {/* Status Badge */}
+              <div className={`tutor-voice-status-badge status-badge-${voiceState}`}>
+                {voiceState === 'connecting' && 'Connecting...'}
+                {voiceState === 'listening' && (isMuted ? 'Microphone Muted' : 'Listening...')}
+                {voiceState === 'thinking' && 'Thinking...'}
+                {voiceState === 'speaking' && 'Speaking...'}
+                {voiceState === 'idle' && 'Voice Idle'}
+                {voiceState === 'error' && 'Connection Issue'}
+              </div>
+
+              {/* Guidance text */}
+              <p className="tutor-voice-status-text">
+                {voiceState === 'listening' && !isMuted && 'Speak naturally! Ask questions or discuss syllabus topics.'}
+                {voiceState === 'listening' && isMuted && 'Microphone is currently muted. Click unmute below.'}
+                {voiceState === 'thinking' && 'Consulting curriculum learning materials...'}
+                {voiceState === 'speaking' && 'AI Tutor is explaining. Interrupt anytime by speaking!'}
+                {voiceState === 'connecting' && 'Securing voice session and initializing speech stream...'}
+                {voiceState === 'idle' && 'Tap Start to begin conversational voice tutoring.'}
+                {voiceState === 'error' && 'Voice session encountered an error. Check permissions or retry.'}
+              </p>
+
+              {/* Live Audio Spectrum Canvas */}
+              {(voiceState === 'listening' || voiceState === 'speaking') && (
+                <canvas
+                  ref={canvasRef}
+                  width={320}
+                  height={48}
+                  className="tutor-voice-canvas"
+                  aria-label="Audio frequency waveform"
+                />
+              )}
             </div>
-          )}
 
-          <div className="tutor-input-row">
-            <input
-              type="file"
-              ref={fileInputRef}
-              accept="image/png, image/jpeg, image/webp"
-              style={{ display: 'none' }}
-              onChange={handleImageSelect}
-              id="tutor-file-upload"
-            />
-            <label
-              htmlFor="tutor-file-upload"
-              className="tutor-attach-btn"
-              title="Upload textbook photo or diagram doubt"
-              aria-label="Upload photo or diagram doubt"
-            >
-              📷
-            </label>
+            {/* Live Conversation Transcript Panel */}
+            <div className="tutor-voice-transcript-panel" role="log" aria-live="polite">
+              {voiceTranscripts.length === 0 && !interimSpeech && (
+                <div style={{ textAlign: 'center', color: '#94a3b8', fontSize: '13px', margin: 'auto' }}>
+                  Spoken conversation transcript will appear here in real-time.
+                </div>
+              )}
 
-            <textarea
-              className="tutor-textarea"
-              placeholder="Ask a question or explain your doubt..."
-              value={inputMessage}
-              onChange={(e) => setInputMessage(e.target.value)}
-              onKeyDown={handleKeyDown}
-              rows={1}
-              aria-label="Tutor message input"
-              disabled={isLoading}
-            />
+              {voiceTranscripts.map((t) => (
+                <div
+                  key={t.id}
+                  className={`tutor-bubble-row ${t.role === 'student' ? 'student-row' : 'tutor-row'}`}
+                >
+                  {t.role === 'tutor' && (
+                    <div className="tutor-bubble-avatar" aria-hidden="true">🤖</div>
+                  )}
+                  <div className={`tutor-bubble ${t.role === 'student' ? 'student-bubble' : 'tutor-bubble-content'}`}>
+                    <div>{t.text}</div>
+                    <div className="tutor-msg-time">{t.timestamp}</div>
+                  </div>
+                </div>
+              ))}
 
-            <button
-              type="button"
-              className="tutor-send-btn"
-              onClick={() => handleSend()}
-              disabled={(!inputMessage.trim() && !selectedImage) || isLoading}
-              aria-label="Send message to AI Tutor"
-            >
-              ➤
-            </button>
+              {/* Live Interim Student Speech */}
+              {interimSpeech && (
+                <div className="tutor-bubble-row student-row">
+                  <div className="tutor-bubble student-bubble tutor-live-interim">
+                    <span>{interimSpeech}...</span>
+                  </div>
+                </div>
+              )}
+
+              <div ref={voiceEndRef} />
+            </div>
+
+            {/* Voice Controls Bar */}
+            <div className="tutor-voice-controls">
+              {voiceState === 'idle' ? (
+                <button
+                  type="button"
+                  className="voice-btn voice-btn-primary"
+                  onClick={startVoiceSession}
+                  aria-label="Start Voice Conversation"
+                >
+                  🎙️ Start Voice Conversation
+                </button>
+              ) : (
+                <>
+                  {/* Mute / Unmute Button */}
+                  <button
+                    type="button"
+                    className={`voice-btn voice-btn-circle voice-btn-mute ${isMuted ? 'active' : ''}`}
+                    onClick={toggleMute}
+                    title={isMuted ? 'Unmute microphone' : 'Mute microphone'}
+                    aria-label={isMuted ? 'Unmute microphone' : 'Mute microphone'}
+                  >
+                    {isMuted ? '🔇' : '🎙️'}
+                  </button>
+
+                  {/* Interrupt / Stop Tutor Speaking Button */}
+                  {voiceState === 'speaking' && (
+                    <button
+                      type="button"
+                      className="voice-btn voice-btn-interrupt"
+                      onClick={interruptTutor}
+                      title="Stop speaking (interrupt)"
+                      aria-label="Stop tutor speaking"
+                    >
+                      ⏹️ Stop Voice
+                    </button>
+                  )}
+
+                  {/* End Session Button */}
+                  <button
+                    type="button"
+                    className="voice-btn voice-btn-end"
+                    onClick={stopVoiceSession}
+                    title="End voice session"
+                    aria-label="End voice session"
+                  >
+                    🛑 End Call
+                  </button>
+
+                  {/* Reconnect Button if error */}
+                  {voiceState === 'error' && (
+                    <button
+                      type="button"
+                      className="voice-btn voice-btn-primary"
+                      onClick={startVoiceSession}
+                      aria-label="Retry Voice Session"
+                    >
+                      🔄 Retry
+                    </button>
+                  )}
+                </>
+              )}
+            </div>
           </div>
-        </div>
+        )}
       </aside>
     </div>
   );

@@ -27,3 +27,25 @@ export interface TutorChatResponse {
   grounded_resource_titles: string[];
   is_out_of_scope: boolean;
 }
+
+export interface VoiceSessionResponse {
+  session_id: string;
+  session_token: string;
+  ws_endpoint: string;
+  topic_id: number;
+  topic_title: string;
+  subject_name: string;
+  board: string;
+  grade: string;
+  expires_in_seconds: number;
+}
+
+export type VoiceState =
+  | 'idle'
+  | 'connecting'
+  | 'connected'
+  | 'listening'
+  | 'thinking'
+  | 'speaking'
+  | 'error';
+
