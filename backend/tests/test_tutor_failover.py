@@ -21,12 +21,26 @@ from app.core.config import get_settings
 from app.db.seed_curriculum import seed_isc_history_curriculum
 from app.db.session import SessionLocal
 from app.main import app
-from app.models.learning import Topic
+from app.models.learning import Chapter, Subject, Topic
 from app.repositories.user_repository import UserRepository
 from app.services.llm.base import ProviderErrorCode, ProviderException
 from app.services.llm.failover_service import LLMFailoverService
 
 settings = get_settings()
+
+
+def get_isc_topic(db: Session) -> Topic:
+    topic = (
+        db.query(Topic)
+        .join(Chapter, Topic.chapter_id == Chapter.id)
+        .join(Subject, Chapter.subject_id == Subject.id)
+        .filter(Subject.code == "isc-11-hist")
+        .first()
+    )
+    if not topic:
+        topic = db.query(Topic).filter(Topic.id == 44).first()
+    assert topic is not None
+    return topic
 
 
 @pytest.fixture(scope="module")
@@ -110,7 +124,7 @@ def create_test_student(client: TestClient, db: Session, email: str, full_name: 
 def test_primary_provider_success(client: TestClient, db_session: Session):
     """Verify Gemini as primary provider returns grounded response."""
     student = create_test_student(client, db_session, "primary_ok@example.com", "Primary Student")
-    topic = db_session.query(Topic).first()
+    topic = get_isc_topic(db_session)
 
     mock_client = MagicMock()
     mock_client.__enter__.return_value = mock_client
@@ -140,7 +154,7 @@ def test_primary_provider_success(client: TestClient, db_session: Session):
 def test_quota_exhaustion_fallback_to_groq(client: TestClient, db_session: Session):
     """When Gemini returns 429 RESOURCE_EXHAUSTED, failover seamlessly calls Groq."""
     student = create_test_student(client, db_session, "quota_fb@example.com", "Quota Student")
-    topic = db_session.query(Topic).first()
+    topic = get_isc_topic(db_session)
 
     def mock_post(url, *args, **kwargs):
         if "generativelanguage.googleapis.com" in str(url):
@@ -187,7 +201,7 @@ def test_quota_exhaustion_fallback_to_groq(client: TestClient, db_session: Sessi
 def test_temporary_outage_fallback(client: TestClient, db_session: Session):
     """When Gemini and Groq fail with 503, failover routes to OpenRouter."""
     student = create_test_student(client, db_session, "outage_fb@example.com", "Outage Student")
-    topic = db_session.query(Topic).first()
+    topic = get_isc_topic(db_session)
 
     def mock_post(url, *args, **kwargs):
         if "generativelanguage.googleapis.com" in str(url):
@@ -233,7 +247,7 @@ def test_temporary_outage_fallback(client: TestClient, db_session: Session):
 def test_all_providers_exhausted(client: TestClient, db_session: Session):
     """When all configured providers fail with quota/outages, clean 429/503 is returned."""
     student = create_test_student(client, db_session, "all_exhausted@example.com", "Exhausted Student")
-    topic = db_session.query(Topic).first()
+    topic = get_isc_topic(db_session)
 
     mock_client = MagicMock()
     mock_client.__enter__.return_value = mock_client
@@ -259,7 +273,7 @@ def test_all_providers_exhausted(client: TestClient, db_session: Session):
 def test_invalid_credentials_disables_bad_provider(client: TestClient, db_session: Session):
     """When a provider fails with AUTH_ERROR, failover skips it on subsequent calls."""
     student = create_test_student(client, db_session, "auth_disable@example.com", "Auth Student")
-    topic = db_session.query(Topic).first()
+    topic = get_isc_topic(db_session)
 
     call_count = {"gemini": 0, "groq": 0}
 
@@ -311,7 +325,7 @@ def test_invalid_credentials_disables_bad_provider(client: TestClient, db_sessio
 def test_unsupported_image_modality_fails_fast(client: TestClient, db_session: Session):
     """When student attaches an image but no configured provider supports vision, 422 is returned."""
     student = create_test_student(client, db_session, "img_modality@example.com", "Image Modality Student")
-    topic = db_session.query(Topic).first()
+    topic = get_isc_topic(db_session)
 
     fake_png = b"\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x01\x00\x00\x00\x01\x08\x06\x00\x00\x00\x1f\x15c4\x00\x00\x00\nIDATx\x9cc\x00\x01\x00\x00\x05\x00\x01\r\n-\xb4\x00\x00\x00\x00IEND\xaeB`\x82"
     fake_b64 = f"data:image/png;base64,{base64.b64encode(fake_png).decode('utf-8')}"
@@ -337,7 +351,7 @@ def test_unsupported_image_modality_fails_fast(client: TestClient, db_session: S
 def test_timeout_failover(client: TestClient, db_session: Session):
     """When Gemini times out, failover proceeds to Groq."""
     student = create_test_student(client, db_session, "timeout_fb@example.com", "Timeout Student")
-    topic = db_session.query(Topic).first()
+    topic = get_isc_topic(db_session)
 
     def mock_post(url, *args, **kwargs):
         if "generativelanguage.googleapis.com" in str(url):
@@ -372,7 +386,7 @@ def test_timeout_failover(client: TestClient, db_session: Session):
 def test_voice_turn_failover_preservation(client: TestClient, db_session: Session):
     """Verify voice turn processing uses failover and preserves speech instructions."""
     student = create_test_student(client, db_session, "voice_fb@example.com", "Voice Student")
-    topic = db_session.query(Topic).first()
+    topic = get_isc_topic(db_session)
 
     # Create voice session
     session_resp = client.post(

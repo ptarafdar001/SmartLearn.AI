@@ -1,0 +1,312 @@
+{
+  "subject_code": "cbse-class-10-math-std",
+  "board": "CBSE",
+  "grade": "Class 10",
+  "academic_stream": null,
+  "subject_name": "Mathematics Standard",
+  "category": "core",
+  "curriculum_status": "content_available",
+  "source_provenance": {
+    "source_authority": "CBSE / NCERT",
+    "source_name": "CBSE Secondary Mathematics Curriculum (Subject Code 041) 2026-27",
+    "source_url": "https://cbseacademic.nic.in/curriculum_2026.html",
+    "syllabus_version": "Academic Year 2026-27",
+    "document_ref": "CBSE-Acad-Sec-2026-Math-041.pdf",
+    "retrieval_date": "2026-09-23",
+    "verification_status": "verified_published",
+    "license_or_terms": "Official Public NCERT/CBSE Syllabus - Permitted Educational Use"
+  },
+  "chapters": [
+    {
+      "chapter_number": 1,
+      "title": "Real Numbers",
+      "section": "Unit I: Number Systems",
+      "description": "Fundamental Theorem of Arithmetic - statements after reviewing work done earlier and after illustrating and motivating through examples, Proofs of irrationality of root 2, root 3, root 5.",
+      "topics": [
+        {
+          "topic_number": 1,
+          "title": "Fundamental Theorem of Arithmetic, HCF and LCM",
+          "description": "Prime factorisation of composite numbers, uniqueness of factorisation, calculating HCF and LCM, and verification formula HCF x LCM = a x b.",
+          "estimated_minutes": 25,
+          "learning_objectives": [
+            {
+              "code": "CBSE10-MATH-CH01-LO01",
+              "description": "State and apply the Fundamental Theorem of Arithmetic to express composite numbers as products of prime factors.",
+              "taxonomy_level": "understand",
+              "is_core": true,
+              "is_verified": true
+            },
+            {
+              "code": "CBSE10-MATH-CH01-LO02",
+              "description": "Calculate HCF and LCM of positive integers using prime factorisation and verify the relationship HCF(a,b) * LCM(a,b) = a * b.",
+              "taxonomy_level": "apply",
+              "is_core": true,
+              "is_verified": true
+            }
+          ],
+          "resources": [
+            {
+              "title": "NCERT Mathematics Class X: Real Numbers & Prime Factorisation",
+              "resource_type": "notes",
+              "provider": "ncert",
+              "source_name": "NCERT Class X Mathematics Textbook Chapter 1",
+              "source_url": "https://ncert.nic.in/textbook.php?jemh1=1-14",
+              "text_content": "# Real Numbers: Fundamental Theorem of Arithmetic\n\n### 1. Statement of the Theorem\nEvery composite number can be expressed (factorised) as a product of primes, and this factorisation is unique, apart from the order in which the prime factors occur.\n\n### 2. Relation Between HCF and LCM for Two Positive Integers\nFor any two positive integers $a$ and $b$:\n$$\\text{HCF}(a, b) \\times \\text{LCM}(a, b) = a \\times b$$\n\n*Note*: This relationship holds strictly for two numbers, not for three or more numbers.",
+              "order_index": 1,
+              "is_verified": true
+            }
+          ],
+          "study_notes": {
+            "notes_type": "comprehensive",
+            "title": "Real Numbers: Prime Factorisation, HCF, LCM & Irrationality Proofs",
+            "overview": "Rigorous algebraic foundations of real numbers, prime factorisation uniqueness, and contradiction proofs of irrationality aligned with CBSE 2026-27.",
+            "learning_objectives": [
+              "Express any composite number as unique prime factors",
+              "Find HCF and LCM using prime powers",
+              "Construct formal proofs of irrationality by contradiction"
+            ],
+            "explanation_markdown": "# Real Numbers Foundations\n\n### 1. Fundamental Theorem of Arithmetic\nEvery integer $n > 1$ is either prime or can be represented uniquely as a product of prime powers: $n = p_1^{a_1} p_2^{a_2} \\cdots p_k^{a_k}$.\n\n### 2. Method of Contradiction for Irrationality\nTo prove $\\sqrt{2}$ is irrational, assume $\\sqrt{2} = \\frac{a}{b}$ where $a, b$ are coprime integers with $b \\neq 0$. Squaring gives $2b^2 = a^2$, implying $2$ divides $a^2$ and therefore $2$ divides $a$. Substituting $a = 2c$ leads to $2$ dividing $b$, which contradicts the coprime assumption.",
+            "key_terms": [
+              {
+                "term": "Fundamental Theorem of Arithmetic",
+                "definition": "Theorem stating that every composite number has a unique prime factorisation up to the order of factors."
+              },
+              {
+                "term": "Coprime Integers",
+                "definition": "Two positive integers whose highest common factor (HCF) is equal to 1."
+              }
+            ],
+            "formulas_and_dates": [
+              {
+                "name": "HCF and LCM Product Rule",
+                "formula": "HCF(a, b) * LCM(a, b) = a * b"
+              }
+            ],
+            "diagrams": [
+              {
+                "caption": "Real Number Hierarchy",
+                "mermaid_code": "graph TD\n    A[Real Numbers R] --> B[Rational Numbers Q]\n    A --> C[Irrational Numbers P]\n    B --> D[Integers Z]\n    B --> E[Fractions & Terminating Decimals]\n    D --> F[Whole Numbers W]\n    F --> G[Natural Numbers N]"
+              }
+            ],
+            "common_misconceptions": [
+              {
+                "misconception": "The product rule HCF(a,b,c) * LCM(a,b,c) = a * b * c holds for three numbers.",
+                "correction": "This identity is valid ONLY for two numbers. For three numbers, higher-order intersection terms must be used."
+              }
+            ],
+            "exam_points": [
+              "Irrationality proof for root 2, root 3, or 5 - 2*root 3 is guaranteed in Section B or C (2 or 3 marks) of CBSE Class 10 Math papers.",
+              "If HCF(306, 657) = 9, LCM = (306 * 657) / 9 = 22,338."
+            ],
+            "source_references": [
+              {
+                "title": "NCERT Class X Mathematics Chapter 1",
+                "url": "https://ncert.nic.in/textbook.php?jemh1=1-14"
+              }
+            ],
+            "version": 1,
+            "is_verified": true
+          },
+          "pyqs": [
+            {
+              "board": "CBSE",
+              "grade": "Class 10",
+              "exam_year": 2023,
+              "paper_code": "CBSE-30/1/1-2023",
+              "question_number": "Question 21",
+              "marks": 2,
+              "question_text": "Given that HCF(306, 657) = 9, find LCM(306, 657).",
+              "marking_scheme": "We know that HCF(a, b) * LCM(a, b) = a * b (1/2 mark).\n9 * LCM(306, 657) = 306 * 657 (1/2 mark).\nLCM(306, 657) = (306 * 657) / 9 = 34 * 657 = 22,338 (1 mark).",
+              "source_name": "CBSE Official Class 10 Board Examination Paper 2023 (Math Standard)",
+              "source_url": "https://cbseacademic.nic.in/curriculum_2026.html",
+              "is_verified": true
+            },
+            {
+              "board": "CBSE",
+              "grade": "Class 10",
+              "exam_year": 2022,
+              "paper_code": "CBSE-30/2/1-2022",
+              "question_number": "Question 26",
+              "marks": 3,
+              "question_text": "Prove that root 5 is an irrational number.",
+              "marking_scheme": "1. Assume root 5 is rational, root 5 = a/b where a, b are coprime integers and b != 0 (1/2 mark).\n2. 5b^2 = a^2 => 5 divides a^2, hence 5 divides a (1 mark).\n3. Let a = 5c => 5b^2 = 25c^2 => b^2 = 5c^2 => 5 divides b^2, hence 5 divides b (1 mark).\n4. 5 is a common factor of both a and b, contradicting that a and b are coprime. Hence root 5 is irrational (1/2 mark).",
+              "source_name": "CBSE Official Class 10 Board Examination Paper 2022 (Math Standard)",
+              "source_url": "https://cbseacademic.nic.in/curriculum_2026.html",
+              "is_verified": true
+            }
+          ],
+          "practice_questions": [
+            {
+              "question_text": "If two positive integers p and q can be expressed as p = a * b^2 and q = a^3 * b, where a and b are prime numbers, then what is LCM(p, q)?",
+              "question_type": "mcq",
+              "options": [
+                {"id": "A", "text": "a * b"},
+                {"id": "B", "text": "a^2 * b^2"},
+                {"id": "C", "text": "a^3 * b^2"},
+                {"id": "D", "text": "a^4 * b^3"}
+              ],
+              "correct_answer": "C",
+              "explanation": "LCM is the product of the highest power of each prime factor involved. For factor a, highest power is a^3; for factor b, highest power is b^2. Therefore LCM = a^3 * b^2.",
+              "difficulty": "medium",
+              "marks": 1,
+              "is_ai_generated": true,
+              "generation_provenance": {
+                "model": "smartlearn-curator-v1",
+                "template": "prime-power-lcm-v1",
+                "verified_by": "SmartLearn Academic Review"
+              }
+            }
+          ]
+        },
+        {
+          "topic_number": 2,
+          "title": "Proofs of Irrationality for Square Roots and Linear Combinations",
+          "description": "Contradiction proofs for root 2, root 3, root 5, and expressions like a + b*root(p).",
+          "estimated_minutes": 25,
+          "learning_objectives": [
+            {
+              "code": "CBSE10-MATH-CH01-LO03",
+              "description": "Construct valid algebraic contradiction proofs showing irrationality of square roots of primes and linear combinations.",
+              "taxonomy_level": "analyze",
+              "is_core": true,
+              "is_verified": true
+            }
+          ],
+          "resources": [],
+          "pyqs": [],
+          "practice_questions": []
+        }
+      ]
+    },
+    {
+      "chapter_number": 2,
+      "title": "Polynomials",
+      "section": "Unit II: Algebra",
+      "description": "Zeros of a polynomial. Relationship between zeros and coefficients of quadratic polynomials.",
+      "topics": [
+        {"topic_number": 1, "title": "Geometric Meaning of Zeros of a Polynomial", "estimated_minutes": 20, "learning_objectives": [], "resources": [], "pyqs": [], "practice_questions": []},
+        {"topic_number": 2, "title": "Relationship Between Zeros and Coefficients of Quadratic Polynomials", "estimated_minutes": 30, "learning_objectives": [], "resources": [], "pyqs": [], "practice_questions": []}
+      ]
+    },
+    {
+      "chapter_number": 3,
+      "title": "Pair of Linear Equations in Two Variables",
+      "section": "Unit II: Algebra",
+      "description": "Pair of linear equations in two variables and graphical method of their solution, consistency/inconsistency. Algebraic conditions for number of solutions. Solution of a pair of linear equations in two variables algebraically - by substitution, by elimination.",
+      "topics": [
+        {"topic_number": 1, "title": "Graphical Method of Finding Solutions and Consistency Criteria", "estimated_minutes": 30, "learning_objectives": [], "resources": [], "pyqs": [], "practice_questions": []},
+        {"topic_number": 2, "title": "Algebraic Methods: Substitution and Elimination", "estimated_minutes": 35, "learning_objectives": [], "resources": [], "pyqs": [], "practice_questions": []}
+      ]
+    },
+    {
+      "chapter_number": 4,
+      "title": "Quadratic Equations",
+      "section": "Unit II: Algebra",
+      "description": "Standard form of a quadratic equation ax^2 + bx + c = 0, (a != 0). Solutions of quadratic equations (only real roots) by factorization, and by using quadratic formula. Relationship between discriminant and nature of roots.",
+      "topics": [
+        {"topic_number": 1, "title": "Factorization Method and Quadratic Formula", "estimated_minutes": 30, "learning_objectives": [], "resources": [], "pyqs": [], "practice_questions": []},
+        {"topic_number": 2, "title": "Nature of Roots and Discriminant Applications", "estimated_minutes": 25, "learning_objectives": [], "resources": [], "pyqs": [], "practice_questions": []}
+      ]
+    },
+    {
+      "chapter_number": 5,
+      "title": "Arithmetic Progressions",
+      "section": "Unit II: Algebra",
+      "description": "Motivation for studying Arithmetic Progression Derivation of the nth term and sum of the first n terms of A.P. and their application in solving daily life problems.",
+      "topics": [
+        {"topic_number": 1, "title": "Definition and nth Term of an Arithmetic Progression", "estimated_minutes": 30, "learning_objectives": [], "resources": [], "pyqs": [], "practice_questions": []},
+        {"topic_number": 2, "title": "Sum of First n Terms of an AP and Real-World Applications", "estimated_minutes": 30, "learning_objectives": [], "resources": [], "pyqs": [], "practice_questions": []}
+      ]
+    },
+    {
+      "chapter_number": 6,
+      "title": "Triangles",
+      "section": "Unit III: Coordinate Geometry & Geometry",
+      "description": "Definitions, examples, counter examples of similar triangles. Basic Proportionality Theorem (Thales' theorem) and criteria for similarity.",
+      "topics": [
+        {"topic_number": 1, "title": "Basic Proportionality Theorem and Its Converse", "estimated_minutes": 35, "learning_objectives": [], "resources": [], "pyqs": [], "practice_questions": []},
+        {"topic_number": 2, "title": "Criteria for Similarity of Triangles (AAA, SSS, SAS)", "estimated_minutes": 30, "learning_objectives": [], "resources": [], "pyqs": [], "practice_questions": []}
+      ]
+    },
+    {
+      "chapter_number": 7,
+      "title": "Coordinate Geometry",
+      "section": "Unit III: Coordinate Geometry",
+      "description": "Review: Concepts of coordinate geometry, graphs of linear equations. Distance formula. Section formula (internal division).",
+      "topics": [
+        {"topic_number": 1, "title": "Distance Formula and Collinearity of Points", "estimated_minutes": 25, "learning_objectives": [], "resources": [], "pyqs": [], "practice_questions": []},
+        {"topic_number": 2, "title": "Section Formula and Midpoint Formula", "estimated_minutes": 30, "learning_objectives": [], "resources": [], "pyqs": [], "practice_questions": []}
+      ]
+    },
+    {
+      "chapter_number": 8,
+      "title": "Introduction to Trigonometry",
+      "section": "Unit V: Trigonometry",
+      "description": "Trigonometric ratios of an acute angle of a right-angled triangle. Proof of their existence; Values of the trigonometric ratios of 30, 45 and 60 degrees. Trigonometric identities.",
+      "topics": [
+        {"topic_number": 1, "title": "Trigonometric Ratios of Acute Angles in Right Triangles", "estimated_minutes": 30, "learning_objectives": [], "resources": [], "pyqs": [], "practice_questions": []},
+        {"topic_number": 2, "title": "Trigonometric Ratios of Specific Angles and Identities", "estimated_minutes": 30, "learning_objectives": [], "resources": [], "pyqs": [], "practice_questions": []}
+      ]
+    },
+    {
+      "chapter_number": 9,
+      "title": "Some Applications of Trigonometry",
+      "section": "Unit V: Trigonometry",
+      "description": "Simple problems on heights and distances. Problems should not involve more than two right triangles. Angles of elevation / depression should be only 30, 45, and 60 degrees.",
+      "topics": [
+        {"topic_number": 1, "title": "Angles of Elevation and Depression: Single Triangle Scenarios", "estimated_minutes": 25, "learning_objectives": [], "resources": [], "pyqs": [], "practice_questions": []},
+        {"topic_number": 2, "title": "Heights and Distances: Two-Triangle Multi-Step Problems", "estimated_minutes": 35, "learning_objectives": [], "resources": [], "pyqs": [], "practice_questions": []}
+      ]
+    },
+    {
+      "chapter_number": 10,
+      "title": "Circles",
+      "section": "Unit IV: Geometry",
+      "description": "Tangent to a circle at, point of contact. (Prove) The tangent at any point of a circle is perpendicular to the radius through the point of contact. (Prove) The lengths of tangents drawn from an external point to a circle are equal.",
+      "topics": [
+        {"topic_number": 1, "title": "Tangent-Radius Perpendicularity Theorem", "estimated_minutes": 25, "learning_objectives": [], "resources": [], "pyqs": [], "practice_questions": []},
+        {"topic_number": 2, "title": "Equal Lengths of Tangents from an External Point", "estimated_minutes": 30, "learning_objectives": [], "resources": [], "pyqs": [], "practice_questions": []}
+      ]
+    },
+    {
+      "chapter_number": 11,
+      "title": "Areas Related to Circles",
+      "section": "Unit VI: Mensuration",
+      "description": "Area of sectors and segments of a circle. Problems based on areas and perimeter / circumference of the above said plane figures.",
+      "topics": [
+        {"topic_number": 1, "title": "Perimeter and Area of Sectors of a Circle", "estimated_minutes": 30, "learning_objectives": [], "resources": [], "pyqs": [], "practice_questions": []},
+        {"topic_number": 2, "title": "Area of Major and Minor Segments with Central Angles", "estimated_minutes": 30, "learning_objectives": [], "resources": [], "pyqs": [], "practice_questions": []}
+      ]
+    },
+    {
+      "chapter_number": 12,
+      "title": "Surface Areas and Volumes",
+      "section": "Unit VI: Mensuration",
+      "description": "Surface areas and volumes of combinations of cubes, cuboids, spheres, hemispheres and right circular cylinders/cones.",
+      "topics": [
+        {"topic_number": 1, "title": "Surface Areas of Combined Solids (Cylinder, Cone, Hemisphere)", "estimated_minutes": 35, "learning_objectives": [], "resources": [], "pyqs": [], "practice_questions": []},
+        {"topic_number": 2, "title": "Volume of Combined Solids and Liquid Capacity Calculations", "estimated_minutes": 35, "learning_objectives": [], "resources": [], "pyqs": [], "practice_questions": []}
+      ]
+    },
+    {
+      "chapter_number": 13,
+      "title": "Statistics",
+      "section": "Unit VII: Statistics and Probability",
+      "description": "Mean, median and mode of grouped data (bimodal situation to be avoided).",
+      "topics": [
+        {"topic_number": 1, "title": "Mean of Grouped Data (Direct and Assumed Mean Methods)", "estimated_minutes": 25, "learning_objectives": [], "resources": [], "pyqs": [], "practice_questions": []},
+        {"topic_number": 2, "title": "Median and Mode of Grouped Frequency Distributions", "estimated_minutes": 30, "learning_objectives": [], "resources": [], "pyqs": [], "practice_questions": []}
+      ]
+    },
+    {
+      "chapter_number": 14,
+      "title": "Probability",
+      "section": "Unit VII: Statistics and Probability",
+      "description": "Classical definition of probability. Simple problems on finding the probability of an event.",
+      "topics": [
+        {"topic_number": 1, "title": "Classical Theoretical Probability and Complementary Events", "estimated_minutes": 25, "learning_objectives": [], "resources": [], "pyqs": [], "practice_questions": []}
+      ]
+    }
+  ],
+  "subject_pyqs": []
+}

@@ -120,7 +120,7 @@ def get_auth_student(client: TestClient, db_session: Session, email: str = "curr
 def test_get_topic_objectives(client: TestClient, db_session: Session):
     """Verify topic syllabus objectives can be retrieved with Bloom taxonomy."""
     auth = get_auth_student(client, db_session, "obj_test@example.com")
-    topic = db_session.query(Topic).first()
+    topic = db_session.query(Topic).filter(Topic.id == 44).first() or db_session.query(Topic).join(LearningObjective).first()
     assert topic is not None
 
     resp = client.get(
@@ -138,7 +138,8 @@ def test_get_topic_objectives(client: TestClient, db_session: Session):
 def test_get_authentic_pyqs_metadata(client: TestClient, db_session: Session):
     """Verify authentic PYQs have official examination year, paper code, and marks."""
     auth = get_auth_student(client, db_session, "pyq_test@example.com")
-    topic = db_session.query(Topic).first()
+    topic = db_session.query(Topic).filter(Topic.id == 44).first() or db_session.query(Topic).join(PreviousYearQuestion).first()
+    assert topic is not None
 
     resp = client.get(
         f"/api/v1/learning/topics/{topic.id}/pyqs",
@@ -159,7 +160,8 @@ def test_get_authentic_pyqs_metadata(client: TestClient, db_session: Session):
 def test_ai_practice_questions_explicitly_labeled(client: TestClient, db_session: Session):
     """Verify generated practice questions are strictly tagged as AI-generated."""
     auth = get_auth_student(client, db_session, "practice_test@example.com")
-    topic = db_session.query(Topic).first()
+    topic = db_session.query(Topic).filter(Topic.id == 44).first() or db_session.query(Topic).join(PracticeQuestion).first()
+    assert topic is not None
 
     resp = client.get(
         f"/api/v1/learning/topics/{topic.id}/practice-questions",
@@ -207,7 +209,8 @@ def test_submit_practice_attempt(client: TestClient, db_session: Session):
 def test_get_topic_study_notes(client: TestClient, db_session: Session):
     """Verify 10-part study notes are served with structured sections."""
     auth = get_auth_student(client, db_session, "notes_test@example.com")
-    topic = db_session.query(Topic).first()
+    topic = db_session.query(Topic).filter(Topic.id == 44).first() or db_session.query(Topic).join(TopicStudyNotes).first()
+    assert topic is not None
 
     resp = client.get(
         f"/api/v1/learning/topics/{topic.id}/notes?type=comprehensive",
@@ -225,7 +228,8 @@ def test_get_topic_study_notes(client: TestClient, db_session: Session):
 def test_out_of_scope_redirection_guard(client: TestClient, db_session: Session):
     """Verify questions outside topic syllabus are gracefully redirected by backend."""
     auth = get_auth_student(client, db_session, "scope_test@example.com")
-    topic = db_session.query(Topic).first()
+    topic = db_session.query(Topic).filter(Topic.id == 44).first() or db_session.query(Topic).first()
+    assert topic is not None
 
     with patch.object(settings, "GEMINI_API_KEY", "mock-test-key"):
         resp = client.post(

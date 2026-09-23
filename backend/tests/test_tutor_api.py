@@ -16,7 +16,7 @@ from app.core.config import get_settings
 from app.db.seed_curriculum import seed_isc_history_curriculum
 from app.db.session import SessionLocal
 from app.main import app
-from app.models.learning import Topic
+from app.models.learning import Chapter, Subject, Topic
 from app.repositories.user_repository import UserRepository
 from app.schemas.onboarding import (
     Step1BoardClass,
@@ -27,6 +27,20 @@ from app.schemas.onboarding import (
 from app.services.onboarding_service import OnboardingService
 
 settings = get_settings()
+
+
+def get_isc_topic(db: Session) -> Topic:
+    topic = (
+        db.query(Topic)
+        .join(Chapter, Topic.chapter_id == Chapter.id)
+        .join(Subject, Chapter.subject_id == Subject.id)
+        .filter(Subject.code == "isc-11-hist")
+        .first()
+    )
+    if not topic:
+        topic = db.query(Topic).filter(Topic.id == 44).first()
+    assert topic is not None
+    return topic
 
 
 @pytest.fixture(scope="module")
@@ -118,7 +132,7 @@ def test_tutor_chat_missing_api_key(client: TestClient, db_session: Session):
     student = create_test_student(
         client, db_session, "tutor_key_test@example.com", "Key Test Student"
     )
-    topic = db_session.query(Topic).first()
+    topic = get_isc_topic(db_session)
     assert topic is not None
 
     with patch.object(settings, "GEMINI_API_KEY", None):
@@ -137,7 +151,7 @@ def test_tutor_chat_successful_grounded_text(client: TestClient, db_session: Ses
     student = create_test_student(
         client, db_session, "tutor_success@example.com", "Rohan Mehta", board="ISC", grade="Class 11"
     )
-    topic = db_session.query(Topic).first()
+    topic = get_isc_topic(db_session)
 
     mock_gemini_resp = {
         "candidates": [
@@ -200,7 +214,7 @@ def test_tutor_chat_multimodal_image_doubt(client: TestClient, db_session: Sessi
     student = create_test_student(
         client, db_session, "tutor_image@example.com", "Priya Das"
     )
-    topic = db_session.query(Topic).first()
+    topic = get_isc_topic(db_session)
 
     # Create dummy 1x1 png image base64
     fake_png_bytes = b"\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x01\x00\x00\x00\x01\x08\x06\x00\x00\x00\x1f\x15c4\x00\x00\x00\nIDATx\x9cc\x00\x01\x00\x00\x05\x00\x01\r\n-\xb4\x00\x00\x00\x00IEND\xaeB`\x82"
@@ -256,7 +270,7 @@ def test_tutor_chat_quota_handling(client: TestClient, db_session: Session):
     student = create_test_student(
         client, db_session, "tutor_quota@example.com", "Quota Student"
     )
-    topic = db_session.query(Topic).first()
+    topic = get_isc_topic(db_session)
 
     mock_client_instance = MagicMock()
     mock_client_instance.__enter__.return_value = mock_client_instance
@@ -283,7 +297,7 @@ def test_tutor_chat_out_of_scope_handling(client: TestClient, db_session: Sessio
     student = create_test_student(
         client, db_session, "tutor_scope@example.com", "Scope Student"
     )
-    topic = db_session.query(Topic).first()
+    topic = get_isc_topic(db_session)
 
     mock_gemini_resp = {
         "candidates": [
@@ -349,7 +363,7 @@ def test_create_voice_session_success_and_auth(client: TestClient, db_session: S
     student = create_test_student(
         client, db_session, "voice_session_test@example.com", "Voice Student"
     )
-    topic = db_session.query(Topic).first()
+    topic = get_isc_topic(db_session)
 
     # Success with auth
     resp = client.post(
@@ -374,7 +388,7 @@ def test_voice_websocket_lifecycle_and_interruption(client: TestClient, db_sessi
     student = create_test_student(
         client, db_session, "voice_ws_test@example.com", "Voice WS Student"
     )
-    topic = db_session.query(Topic).first()
+    topic = get_isc_topic(db_session)
 
     # 1. Create session to get ephemeral token
     resp_session = client.post(
@@ -449,7 +463,7 @@ def test_tutor_chat_model_prefix_normalization(client: TestClient, db_session: S
     student = create_test_student(
         client, db_session, "model_norm@example.com", "Norm Student"
     )
-    topic = db_session.query(Topic).first()
+    topic = get_isc_topic(db_session)
 
     mock_gemini_resp = {
         "candidates": [{"content": {"parts": [{"text": "Model normalization works."}]}}]
@@ -483,7 +497,7 @@ def test_tutor_chat_upstream_model_not_found_404(client: TestClient, db_session:
     student = create_test_student(
         client, db_session, "model_404@example.com", "Model 404 Student"
     )
-    topic = db_session.query(Topic).first()
+    topic = get_isc_topic(db_session)
 
     mock_client_instance = MagicMock()
     mock_client_instance.__enter__.return_value = mock_client_instance
@@ -510,7 +524,7 @@ def test_tutor_chat_upstream_high_demand_503(client: TestClient, db_session: Ses
     student = create_test_student(
         client, db_session, "model_503@example.com", "Model 503 Student"
     )
-    topic = db_session.query(Topic).first()
+    topic = get_isc_topic(db_session)
 
     mock_client_instance = MagicMock()
     mock_client_instance.__enter__.return_value = mock_client_instance
@@ -537,7 +551,7 @@ def test_tutor_chat_invalid_api_key_503(client: TestClient, db_session: Session)
     student = create_test_student(
         client, db_session, "model_invalid_key@example.com", "Invalid Key Student"
     )
-    topic = db_session.query(Topic).first()
+    topic = get_isc_topic(db_session)
 
     mock_client_instance = MagicMock()
     mock_client_instance.__enter__.return_value = mock_client_instance

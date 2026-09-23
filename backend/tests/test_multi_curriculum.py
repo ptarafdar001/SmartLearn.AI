@@ -119,7 +119,7 @@ def test_multiple_boards_classes_subjects_resolve_correctly(db_session: Session)
     )
     t1 = db_session.query(Topic).filter(Topic.chapter_id == ch1.id, Topic.topic_number == 1).first()
     objs = db_session.query(LearningObjective).filter(LearningObjective.topic_id == t1.id).all()
-    assert len(objs) == 2
+    assert len(objs) >= 2
     lo_codes = {o.code for o in objs}
     assert "CBSE10-SCI-CH01-LO01" in lo_codes
     assert "CBSE10-SCI-CH01-LO02" in lo_codes

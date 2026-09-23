@@ -1,0 +1,635 @@
+{
+  "subject_code": "cbse-class-10-sci",
+  "board": "CBSE",
+  "grade": "Class 10",
+  "academic_stream": null,
+  "subject_name": "Science",
+  "category": "core",
+  "curriculum_status": "content_available",
+  "source_provenance": {
+    "source_authority": "CBSE / NCERT",
+    "source_name": "CBSE Secondary School Curriculum (Code 086) 2026-27 & NCERT Class X Science",
+    "source_url": "https://cbseacademic.nic.in/curriculum_2026.html",
+    "syllabus_version": "Academic Year 2026-27",
+    "document_ref": "CBSE-Acad-Sec-2026-Science-086.pdf",
+    "retrieval_date": "2026-09-23",
+    "verification_status": "verified_published",
+    "license_or_terms": "Official Public NCERT/CBSE Syllabus - Permitted Educational Use"
+  },
+  "chapters": [
+    {
+      "chapter_number": 1,
+      "title": "Chemical Reactions and Equations",
+      "section": "Theme: Materials - Unit I: Chemical Substances - Nature and Behaviour",
+      "description": "Chemical equations, balanced chemical equations, implication of a balanced chemical equation, types of chemical reactions: combination, decomposition, displacement, double displacement, precipitation, neutralization, oxidation and reduction, corrosion, and rancidity.",
+      "topics": [
+        {
+          "topic_number": 1,
+          "title": "Chemical Equations and Balancing",
+          "description": "Writing word and formula equations, law of conservation of mass, and systematic hit-and-trial balancing method.",
+          "estimated_minutes": 25,
+          "learning_objectives": [
+            {
+              "code": "CBSE10-SCI-CH01-LO01",
+              "description": "Write word equations and skeletal chemical equations for observable chemical changes.",
+              "taxonomy_level": "understand",
+              "is_core": true,
+              "is_verified": true
+            },
+            {
+              "code": "CBSE10-SCI-CH01-LO02",
+              "description": "Apply the law of conservation of mass to balance chemical equations using stoichiometric coefficients.",
+              "taxonomy_level": "apply",
+              "is_core": true,
+              "is_verified": true
+            },
+            {
+              "code": "CBSE10-SCI-CH01-LO03",
+              "description": "Distinguish between physical state notations (s, l, g, aq) and reaction condition symbols (heat, catalyst, pressure).",
+              "taxonomy_level": "analyze",
+              "is_core": false,
+              "is_verified": true
+            }
+          ],
+          "resources": [
+            {
+              "title": "NCERT Textbook Lesson: Chemical Reactions and Balancing",
+              "resource_type": "notes",
+              "provider": "ncert",
+              "source_name": "NCERT Class X Science Textbook Chapter 1",
+              "source_url": "https://ncert.nic.in/textbook.php?jesc1=1-13",
+              "text_content": "# Chemical Reactions and Equations\n\n## 1. Defining Chemical Reactions\nA chemical reaction occurs when chemical bonds are formed or broken, resulting in new substances with distinct physical and chemical properties. Evidence of reaction includes: evolution of gas, change in colour, temperature variation, or formation of a precipitate.\n\n## 2. The Law of Conservation of Mass\nIn a closed system, matter is neither created nor destroyed during a chemical reaction. Therefore, the total number of atoms of each element must remain identical on both reactant and product sides.\n\n$$\\text{Total Mass of Reactants} = \\text{Total Mass of Products}$$\n\n## 3. Systematic Balancing Example\nConsider the oxidation of iron by steam:\n\n1. Skeletal Equation: $\\text{Fe} + \\text{H}_2\\text{O} \\rightarrow \\text{Fe}_3\\text{O}_4 + \\text{H}_2$\n2. Balance Oxygen: $\\text{Fe} + 4\\text{H}_2\\text{O} \\rightarrow \\text{Fe}_3\\text{O}_4 + \\text{H}_2$\n3. Balance Iron: $3\\text{Fe} + 4\\text{H}_2\\text{O} \\rightarrow \\text{Fe}_3\\text{O}_4 + \\text{H}_2$\n4. Balance Hydrogen: $3\\text{Fe} + 4\\text{H}_2\\text{O} \\rightarrow \\text{Fe}_3\\text{O}_4 + 4\\text{H}_2$\n5. Final balanced equation with states: $3\\text{Fe}(s) + 4\\text{H}_2\\text{O}(g) \\rightarrow \\text{Fe}_3\\text{O}_4(s) + 4\\text{H}_2(g)$",
+              "order_index": 1,
+              "is_verified": true
+            },
+            {
+              "title": "Educational Video: Visualizing Step-by-Step Equation Balancing",
+              "resource_type": "video",
+              "provider": "youtube",
+              "source_name": "NCERT / National Repository of Open Educational Resources",
+              "source_url": "https://www.youtube.com/watch?v=gT8wNl27r-E",
+              "external_id": "gT8wNl27r-E",
+              "content_url": "https://www.youtube-nocookie.com/embed/gT8wNl27r-E",
+              "duration_seconds": 640,
+              "order_index": 2,
+              "is_verified": true
+            }
+          ],
+          "study_notes": {
+            "notes_type": "comprehensive",
+            "title": "Chemical Reactions, Balancing Equations & Stoichiometry",
+            "overview": "Mastering the fundamentals of chemical transformations, state notations, mass conservation, and algebraic balancing techniques aligned with the CBSE 2026-27 Board syllabus.",
+            "learning_objectives": [
+              "Identify observable macroscopic signatures of chemical reactions",
+              "Balance chemical equations according to the law of conservation of mass",
+              "Apply state symbols (s, l, g, aq) and catalyst indicators correctly"
+            ],
+            "explanation_markdown": "# Chemical Equations and Stoichiometric Balancing\n\n### 1. Fundamental Principle\nA chemical reaction represents the rearrangement of atoms. Since mass is conserved, every atom entering as a reactant must exit within a product molecule.\n\n### 2. Four Signs of a Chemical Change\n- **Precipitate Formation**: Mixing aqueous lead nitrate $\\text{Pb(NO}_3)_2$ with potassium iodide $\\text{KI}$ yields a brilliant yellow precipitate of lead iodide $\\text{PbI}_2$.\n- **Gas Evolution**: Granulated zinc reacting with dilute sulphuric acid liberates hydrogen gas with effervescence.\n- **Temperature Shift**: Calcium oxide reacting with water to form slaked lime releases intense thermal energy (exothermic).\n- **Colour Alteration**: Heating blue copper sulphate crystals releases water of crystallization, leaving anhydrous white $\\text{CuSO}_4$.\n\n### 3. Step-by-Step Balancing Protocol\nAlways begin by balancing the element appearing in the least number of chemical formulas, and reserve elemental hydrogen and oxygen for final adjustment.",
+            "key_terms": [
+              {
+                "term": "Skeletal Equation",
+                "definition": "An unbalanced chemical equation that shows only the chemical formulas of reactants and products."
+              },
+              {
+                "term": "Law of Conservation of Mass",
+                "definition": "Mass can neither be created nor destroyed in a chemical reaction; reactant mass equals product mass."
+              },
+              {
+                "term": "Precipitate",
+                "definition": "An insoluble solid that emerges from a liquid solution following a double displacement reaction."
+              }
+            ],
+            "formulas_and_dates": [
+              {
+                "name": "Rusting / Iron Oxidation",
+                "formula": "3Fe(s) + 4H2O(g) -> Fe3O4(s) + 4H2(g)"
+              },
+              {
+                "name": "Slaked Lime Formation",
+                "formula": "CaO(s) + H2O(l) -> Ca(OH)2(aq) + Heat"
+              },
+              {
+                "name": "Limewater Turbidity Test",
+                "formula": "Ca(OH)2(aq) + CO2(g) -> CaCO3(s) + H2O(l)"
+              }
+            ],
+            "diagrams": [
+              {
+                "caption": "Classification of Chemical Reactions",
+                "mermaid_code": "graph TD\n    A[Chemical Reactions] --> B[Combination]\n    A --> C[Decomposition]\n    A --> D[Displacement]\n    A --> E[Double Displacement]\n    A --> F[Redox Reactions]\n    C --> C1[Thermal Decomposition]\n    C --> C2[Electrolytic Decomposition]\n    C --> C3[Photolytic Decomposition]"
+              }
+            ],
+            "common_misconceptions": [
+              {
+                "misconception": "Changing subscripts is an acceptable way to balance an equation.",
+                "correction": "Never alter chemical formula subscripts (e.g. H2O to H2O2) because this changes the chemical identity of the substance. Only adjust stoichiometric prefixes."
+              }
+            ],
+            "exam_points": [
+              "Always indicate physical states: (s) for solid, (l) for liquid, (g) for gas, (aq) for aqueous solution.",
+              "Slaked lime reacting with carbon dioxide to form calcium carbonate is frequently tested in 2-mark CBSE questions.",
+              "Respiration is exothermic because glucose oxidizes to liberate energy: C6H12O6 + 6O2 -> 6CO2 + 6H2O + Energy."
+            ],
+            "source_references": [
+              {
+                "title": "NCERT Class X Science Textbook Chapter 1",
+                "url": "https://ncert.nic.in/textbook.php?jesc1=1-13"
+              },
+              {
+                "title": "CBSE Curriculum Document 2026-27 (Code 086)",
+                "url": "https://cbseacademic.nic.in/curriculum_2026.html"
+              }
+            ],
+            "version": 1,
+            "is_verified": true
+          },
+          "pyqs": [
+            {
+              "board": "CBSE",
+              "grade": "Class 10",
+              "exam_year": 2023,
+              "paper_code": "CBSE-31/1/1-2023",
+              "question_number": "Question 3",
+              "marks": 2,
+              "question_text": "A clear solution of slaked lime is made by dissolving calcium hydroxide in excess water. Write the balanced chemical equation and state what is observed when carbon dioxide gas is passed through this solution for a short duration.",
+              "marking_scheme": "1. Observation: The clear solution turns milky/turbid due to the formation of an insoluble white precipitate of calcium carbonate (1 mark).\n2. Chemical Equation: Ca(OH)2 (aq) + CO2 (g) -> CaCO3 (s) + H2O (l) (1 mark).",
+              "source_name": "CBSE Official Class 10 Board Examination Paper 2023",
+              "source_url": "https://cbseacademic.nic.in/curriculum_2026.html",
+              "is_verified": true
+            },
+            {
+              "board": "CBSE",
+              "grade": "Class 10",
+              "exam_year": 2022,
+              "paper_code": "CBSE-31/2/1-2022",
+              "question_number": "Question 5(a)",
+              "marks": 3,
+              "question_text": "State the law of conservation of mass. Write the balanced chemical equation for the reaction of heated iron metal with steam, and identify the substance that is oxidized.",
+              "marking_scheme": "1. Law: Mass can neither be created nor destroyed in a chemical reaction; total mass of reactants equals total mass of products (1 mark).\n2. Balanced Equation: 3Fe (s) + 4H2O (g) -> Fe3O4 (s) + 4H2 (g) (1 mark).\n3. Oxidized Substance: Iron (Fe) is oxidized to Fe3O4 because it gains oxygen (1 mark).",
+              "source_name": "CBSE Official Class 10 Board Examination Paper 2022",
+              "source_url": "https://cbseacademic.nic.in/curriculum_2026.html",
+              "is_verified": true
+            },
+            {
+              "board": "CBSE",
+              "grade": "Class 10",
+              "exam_year": 2020,
+              "paper_code": "CBSE-31/1/2-2020",
+              "question_number": "Question 1",
+              "marks": 1,
+              "question_text": "Why is respiration considered an exothermic process? State the balanced equation.",
+              "marking_scheme": "During respiration, glucose combines with oxygen in the cells of our body and releases energy: C6H12O6 (aq) + 6O2 (g) -> 6CO2 (g) + 6H2O (l) + Energy. Since energy is evolved, it is exothermic (1 mark).",
+              "source_name": "CBSE Official Class 10 Board Examination Paper 2020",
+              "source_url": "https://cbseacademic.nic.in/curriculum_2026.html",
+              "is_verified": true
+            }
+          ],
+          "practice_questions": [
+            {
+              "question_text": "When the chemical equation aAl + bHCl -> cAlCl3 + dH2 is balanced with the smallest whole-number coefficients, what are the values of (a, b, c, d)?",
+              "question_type": "mcq",
+              "options": [
+                {"id": "A", "text": "a=1, b=3, c=1, d=2"},
+                {"id": "B", "text": "a=2, b=6, c=2, d=3"},
+                {"id": "C", "text": "a=2, b=3, c=2, d=3"},
+                {"id": "D", "text": "a=1, b=6, c=1, d=3"}
+              ],
+              "correct_answer": "B",
+              "explanation": "Balancing aluminum and chlorine gives 2Al + 6HCl -> 2AlCl3 + 3H2. Reactants have 2 Al, 6 H, 6 Cl; products have 2 Al, 6 Cl, 6 H.",
+              "difficulty": "medium",
+              "marks": 1,
+              "is_ai_generated": true,
+              "generation_provenance": {
+                "model": "smartlearn-curator-v1",
+                "template": "stoichiometry-balancing-v1",
+                "verified_by": "SmartLearn Academic Review"
+              }
+            },
+            {
+              "question_text": "Which of the following observations conclusively proves that a chemical reaction has occurred when zinc granules are mixed with dilute sulphuric acid?",
+              "question_type": "mcq",
+              "options": [
+                {"id": "A", "text": "A colorless precipitate is formed at the bottom."},
+                {"id": "B", "text": "The temperature of the flask rises and effervescence of hydrogen gas is observed."},
+                {"id": "C", "text": "The liquid undergoes immediate solidification."},
+                {"id": "D", "text": "The mass of the open flask increases."}
+              ],
+              "correct_answer": "B",
+              "explanation": "Reaction Zn + H2SO4 -> ZnSO4 + H2 is accompanied by the evolution of hydrogen gas and an increase in temperature (exothermic).",
+              "difficulty": "easy",
+              "marks": 1,
+              "is_ai_generated": true,
+              "generation_provenance": {
+                "model": "smartlearn-curator-v1",
+                "template": "reaction-observation-v1",
+                "verified_by": "SmartLearn Academic Review"
+              }
+            }
+          ]
+        },
+        {
+          "topic_number": 2,
+          "title": "Types of Chemical Reactions",
+          "description": "Combination, decomposition (thermal, electrolytic, photolytic), displacement, double displacement, and precipitation reactions.",
+          "estimated_minutes": 30,
+          "learning_objectives": [
+            {
+              "code": "CBSE10-SCI-CH01-LO04",
+              "description": "Classify chemical reactions into combination, decomposition, displacement, and double displacement types based on reactants and products.",
+              "taxonomy_level": "understand",
+              "is_core": true,
+              "is_verified": true
+            },
+            {
+              "code": "CBSE10-SCI-CH01-LO05",
+              "description": "Contrast thermal decomposition, electrolytic decomposition, and photolytic decomposition with representative balanced equations.",
+              "taxonomy_level": "analyze",
+              "is_core": true,
+              "is_verified": true
+            }
+          ],
+          "resources": [
+            {
+              "title": "NCERT Class X Lesson: Classification of Chemical Reactions",
+              "resource_type": "notes",
+              "provider": "ncert",
+              "source_name": "NCERT Class X Science Textbook Chapter 1",
+              "source_url": "https://ncert.nic.in/textbook.php?jesc1=1-13",
+              "text_content": "# Types of Chemical Reactions\n\n### 1. Combination Reaction\nTwo or more reactants combine to form a single product: $\\text{CaO}(s) + \\text{H}_2\\text{O}(l) \\rightarrow \\text{Ca(OH)}_2(aq) + \\text{Heat}$.\n\n### 2. Decomposition Reaction\nA single reactant breaks down to yield multiple simpler products.\n- **Thermal**: $2\\text{FeSO}_4(s) \\xrightarrow{\\Delta} \\text{Fe}_2\\text{O}_3(s) + \\text{SO}_2(g) + \\text{SO}_3(g)$\n- **Electrolytic**: $2\\text{H}_2\\text{O}(l) \\xrightarrow{\\text{Electric Current}} 2\\text{H}_2(g) + \\text{O}_2(g)$\n- **Photolytic**: $2\\text{AgCl}(s) \\xrightarrow{\\text{Sunlight}} 2\\text{Ag}(s) + \\text{Cl}_2(g)$\n\n### 3. Displacement Reaction\nA more reactive element displaces a less reactive element from its aqueous salt solution: $\\text{Fe}(s) + \\text{CuSO}_4(aq) \\rightarrow \\text{FeSO}_4(aq) + \\text{Cu}(s)$.",
+              "order_index": 1,
+              "is_verified": true
+            }
+          ],
+          "pyqs": [
+            {
+              "board": "CBSE",
+              "grade": "Class 10",
+              "exam_year": 2023,
+              "paper_code": "CBSE-31/1/3-2023",
+              "question_number": "Question 14",
+              "marks": 3,
+              "question_text": "2 g of ferrous sulphate crystals are heated in a dry boiling tube: (a) List any two observations. (b) Name the type of chemical reaction taking place. (c) Write the balanced chemical equation for the reaction.",
+              "marking_scheme": "(a) Observations: Green colour of ferrous sulphate crystals changes to brownish/reddish solid (Fe2O3); a characteristic burning sulphur smell is evolved due to SO2/SO3 gas (1 mark).\n(b) Type: Thermal decomposition reaction (1 mark).\n(c) Equation: 2FeSO4 (s) -> Fe2O3 (s) + SO2 (g) + SO3 (g) (1 mark).",
+              "source_name": "CBSE Official Class 10 Board Examination Paper 2023",
+              "source_url": "https://cbseacademic.nic.in/curriculum_2026.html",
+              "is_verified": true
+            }
+          ],
+          "practice_questions": [
+            {
+              "question_text": "What type of chemical reaction occurs when white silver chloride crystals turn grey upon exposure to sunlight?",
+              "question_type": "mcq",
+              "options": [
+                {"id": "A", "text": "Thermal decomposition"},
+                {"id": "B", "text": "Photolytic decomposition"},
+                {"id": "C", "text": "Displacement reaction"},
+                {"id": "D", "text": "Combination reaction"}
+              ],
+              "correct_answer": "B",
+              "explanation": "Exposure to light decomposes 2AgCl (s) into silver metal (grey) and chlorine gas (2AgCl -> 2Ag + Cl2), an example of photolytic decomposition.",
+              "difficulty": "easy",
+              "marks": 1,
+              "is_ai_generated": true,
+              "generation_provenance": {
+                "model": "smartlearn-curator-v1",
+                "template": "photolysis-v1",
+                "verified_by": "SmartLearn Academic Review"
+              }
+            }
+          ]
+        },
+        {
+          "topic_number": 3,
+          "title": "Oxidation, Reduction, Corrosion and Rancidity",
+          "description": "Redox reactions, oxidizing and reducing agents, economic impact and prevention of corrosion, antioxidants and inert packaging against rancidity.",
+          "estimated_minutes": 20,
+          "learning_objectives": [
+            {
+              "code": "CBSE10-SCI-CH01-LO06",
+              "description": "Identify oxidation, reduction, oxidizing agents, and reducing agents in redox reactions.",
+              "taxonomy_level": "apply",
+              "is_core": true,
+              "is_verified": true
+            },
+            {
+              "code": "CBSE10-SCI-CH01-LO07",
+              "description": "Explain the practical mechanisms and prevention methods for corrosion of metals and rancidity of fat-containing foods.",
+              "taxonomy_level": "understand",
+              "is_core": true,
+              "is_verified": true
+            }
+          ],
+          "resources": [
+            {
+              "title": "NCERT Notes: Redox Processes in Everyday Life",
+              "resource_type": "notes",
+              "provider": "ncert",
+              "source_name": "NCERT Class X Science Textbook Chapter 1",
+              "source_url": "https://ncert.nic.in/textbook.php?jesc1=1-13",
+              "text_content": "# Oxidation, Reduction, Corrosion and Rancidity\n\n### 1. Redox Reactions\n- **Oxidation**: Gain of oxygen or loss of hydrogen/electrons.\n- **Reduction**: Loss of oxygen or gain of hydrogen/electrons.\n- In $\\text{CuO} + \\text{H}_2 \\rightarrow \\text{Cu} + \\text{H}_2\\text{O}$, $\\text{CuO}$ is reduced to $\\text{Cu}$ (acts as oxidizing agent), and $\\text{H}_2$ is oxidized to $\\text{H}_2\\text{O}$ (acts as reducing agent).\n\n### 2. Corrosion\nSlow deterioration of metals by moisture and airborne gases: Iron forms reddish-brown hydrated ferric oxide $\\text{Fe}_2\\text{O}_3 \\cdot x\\text{H}_2\\text{O}$; Copper forms green basic copper carbonate $\\text{CuCO}_3 \\cdot \\text{Cu(OH)}_2$; Silver blackens due to silver sulphide $\\text{Ag}_2\\text{S}$.\n\n### 3. Rancidity\nOxidation of fats and oils leading to foul odor and bad taste. Prevented by flushing packets with nitrogen gas, refrigeration, or adding antioxidants like BHA.",
+              "order_index": 1,
+              "is_verified": true
+            }
+          ],
+          "pyqs": [
+            {
+              "board": "CBSE",
+              "grade": "Class 10",
+              "exam_year": 2020,
+              "paper_code": "CBSE-31/3/1-2020",
+              "question_number": "Question 8",
+              "marks": 2,
+              "question_text": "In the reaction: MnO2 + 4HCl -> MnCl2 + 2H2O + Cl2, identify the substance oxidized and the substance reduced.",
+              "marking_scheme": "1. Substance oxidized: HCl is oxidized to Cl2 (loss of hydrogen) (1 mark).\n2. Substance reduced: MnO2 is reduced to MnCl2 (loss of oxygen) (1 mark).",
+              "source_name": "CBSE Official Class 10 Board Examination Paper 2020",
+              "source_url": "https://cbseacademic.nic.in/curriculum_2026.html",
+              "is_verified": true
+            }
+          ],
+          "practice_questions": [
+            {
+              "question_text": "Why do manufacturers of potato chips flush bags of chips with nitrogen gas?",
+              "question_type": "mcq",
+              "options": [
+                {"id": "A", "text": "To accelerate the cooking process after packaging"},
+                {"id": "B", "text": "To prevent oxidation of oils and keep the chips crisp without rancidity"},
+                {"id": "C", "text": "To maintain a specific humidity level inside the bag"},
+                {"id": "D", "text": "To neutralize acidic food additives"}
+              ],
+              "correct_answer": "B",
+              "explanation": "Nitrogen is an unreactive inert gas that displaces oxygen, preventing oxidation of unsaturated oils and fats (rancidity).",
+              "difficulty": "easy",
+              "marks": 1,
+              "is_ai_generated": true,
+              "generation_provenance": {
+                "model": "smartlearn-curator-v1",
+                "template": "rancidity-nitrogen-v1",
+                "verified_by": "SmartLearn Academic Review"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "chapter_number": 2,
+      "title": "Acids, Bases and Salts",
+      "section": "Theme: Materials - Unit I: Chemical Substances - Nature and Behaviour",
+      "description": "Their definitions in terms of furnishing of H+ and OH- ions, general properties, examples and uses, neutralization, concept of pH scale, importance of pH in everyday life; preparation and uses of Sodium Hydroxide, Bleaching powder, Baking soda, Washing soda, and Plaster of Paris.",
+      "topics": [
+        {
+          "topic_number": 1,
+          "title": "Properties of Acids and Bases",
+          "description": "Indicators (natural, synthetic, olfactory), reactions with metals, metal carbonates, hydrogen carbonates, and neutralization.",
+          "estimated_minutes": 25,
+          "learning_objectives": [
+            {
+              "code": "CBSE10-SCI-CH02-LO01",
+              "description": "Describe the chemical reactions of acids and bases with metals, carbonates, and oxides.",
+              "taxonomy_level": "understand",
+              "is_core": true,
+              "is_verified": true
+            }
+          ],
+          "resources": [
+            {
+              "title": "NCERT Notes: Indicators and Acid-Base Chemical Reactions",
+              "resource_type": "notes",
+              "provider": "ncert",
+              "source_name": "NCERT Class X Science Textbook Chapter 2",
+              "source_url": "https://ncert.nic.in/textbook.php?jesc1=1-13",
+              "text_content": "# Properties of Acids and Bases\n\n### 1. Indicators\n- **Litmus**: Acid turns blue litmus red; Base turns red litmus blue.\n- **Phenolphthalein**: Colorless in acid, deep pink in base.\n- **Methyl Orange**: Red in acid, yellow in base.\n\n### 2. Characteristic Reactions\n$$\\text{Acid} + \\text{Metal Carbonate} \\rightarrow \\text{Salt} + \\text{Water} + \\text{CO}_2$$\n$$\\text{Acid} + \\text{Base} \\rightarrow \\text{Salt} + \\text{Water (Neutralization)}$$",
+              "order_index": 1,
+              "is_verified": true
+            }
+          ],
+          "pyqs": [
+            {
+              "board": "CBSE",
+              "grade": "Class 10",
+              "exam_year": 2023,
+              "paper_code": "CBSE-31/2/2-2023",
+              "question_number": "Question 9",
+              "marks": 2,
+              "question_text": "Write the chemical name and formula of the gas evolved when dilute hydrochloric acid reacts with sodium hydrogen carbonate. How is the presence of this gas tested?",
+              "marking_scheme": "1. Gas: Carbon dioxide, CO2 (1 mark).\n2. Test: Pass the gas through freshly prepared limewater; it turns milky due to insoluble calcium carbonate formation (1 mark).",
+              "source_name": "CBSE Official Class 10 Board Examination Paper 2023",
+              "source_url": "https://cbseacademic.nic.in/curriculum_2026.html",
+              "is_verified": true
+            }
+          ],
+          "practice_questions": [
+            {
+              "question_text": "Which salt is formed when zinc metal reacts with aqueous sodium hydroxide solution?",
+              "question_type": "mcq",
+              "options": [
+                {"id": "A", "text": "Zinc hydroxide"},
+                {"id": "B", "text": "Sodium zincate"},
+                {"id": "C", "text": "Zinc oxide"},
+                {"id": "D", "text": "Sodium zinc oxide"}
+              ],
+              "correct_answer": "B",
+              "explanation": "Zn (s) + 2NaOH (aq) -> Na2ZnO2 (aq) + H2 (g). The salt formed is sodium zincate.",
+              "difficulty": "medium",
+              "marks": 1,
+              "is_ai_generated": true,
+              "generation_provenance": {
+                "model": "smartlearn-curator-v1",
+                "template": "amphoteric-zinc-v1",
+                "verified_by": "SmartLearn Academic Review"
+              }
+            }
+          ]
+        },
+        {
+          "topic_number": 2,
+          "title": "The pH Scale and Importance in Daily Life",
+          "description": "Definition of pH, universal indicator, pH in human digestive system, tooth decay threshold (pH < 5.5), self-defense in plants and animals.",
+          "estimated_minutes": 25,
+          "learning_objectives": [
+            {
+              "code": "CBSE10-SCI-CH02-LO02",
+              "description": "Interpret pH values and explain the biological significance of pH in digestion, dental health, and soil fertility.",
+              "taxonomy_level": "apply",
+              "is_core": true,
+              "is_verified": true
+            }
+          ],
+          "resources": [],
+          "pyqs": [],
+          "practice_questions": []
+        },
+        {
+          "topic_number": 3,
+          "title": "Common Salts and Their Industrial Applications",
+          "description": "Chlor-alkali process, bleaching powder (CaOCl2), baking soda (NaHCO3), washing soda (Na2CO3.10H2O), and plaster of Paris (CaSO4.1/2H2O).",
+          "estimated_minutes": 30,
+          "learning_objectives": [
+            {
+              "code": "CBSE10-SCI-CH02-LO03",
+              "description": "State the preparation equations and industrial uses of bleaching powder, baking soda, washing soda, and plaster of Paris.",
+              "taxonomy_level": "understand",
+              "is_core": true,
+              "is_verified": true
+            }
+          ],
+          "resources": [],
+          "pyqs": [],
+          "practice_questions": []
+        }
+      ]
+    },
+    {
+      "chapter_number": 3,
+      "title": "Metals and Non-metals",
+      "section": "Theme: Materials - Unit I: Chemical Substances - Nature and Behaviour",
+      "description": "Properties of metals and non-metals; Reactivity series; Formation and properties of ionic compounds; Basic metallurgical processes; Corrosion and its prevention.",
+      "topics": [
+        {"topic_number": 1, "title": "Physical and Chemical Properties of Metals and Non-metals", "estimated_minutes": 25, "learning_objectives": [], "resources": [], "pyqs": [], "practice_questions": []},
+        {"topic_number": 2, "title": "Formation and Properties of Ionic Compounds", "estimated_minutes": 25, "learning_objectives": [], "resources": [], "pyqs": [], "practice_questions": []},
+        {"topic_number": 3, "title": "Basic Metallurgical Processes and Corrosion Prevention", "estimated_minutes": 25, "learning_objectives": [], "resources": [], "pyqs": [], "practice_questions": []}
+      ]
+    },
+    {
+      "chapter_number": 4,
+      "title": "Carbon and its Compounds",
+      "section": "Theme: Materials - Unit I: Chemical Substances - Nature and Behaviour",
+      "description": "Covalent bonding in carbon compounds. Versatile nature of carbon. Homologous series. Nomenclature of carbon compounds containing functional groups. Difference between saturated and unsaturated hydrocarbons. Chemical properties of carbon compounds. Ethanol and Ethanoic acid. Soaps and detergents.",
+      "topics": [
+        {"topic_number": 1, "title": "Covalent Bonding and Versatile Nature of Carbon", "estimated_minutes": 25, "learning_objectives": [], "resources": [], "pyqs": [], "practice_questions": []},
+        {"topic_number": 2, "title": "Functional Groups, Homologous Series and Nomenclature", "estimated_minutes": 30, "learning_objectives": [], "resources": [], "pyqs": [], "practice_questions": []},
+        {"topic_number": 3, "title": "Chemical Properties of Carbon Compounds, Ethanol, Soaps", "estimated_minutes": 30, "learning_objectives": [], "resources": [], "pyqs": [], "practice_questions": []}
+      ]
+    },
+    {
+      "chapter_number": 5,
+      "title": "Life Processes",
+      "section": "Theme: The World of the Living - Unit II: World of Living",
+      "description": "'Living Being'. Basic concept of nutrition, respiration, transport and excretion in plants and animals.",
+      "topics": [
+        {
+          "topic_number": 1,
+          "title": "Autotrophic and Heterotrophic Nutrition",
+          "description": "Photosynthesis stages, light and dark reactions, stomata function, human alimentary canal, and digestive enzymes.",
+          "estimated_minutes": 30,
+          "learning_objectives": [
+            {
+              "code": "CBSE10-SCI-CH05-LO01",
+              "description": "Explain the stages of photosynthesis and the roles of chlorophyll, light, and stomata.",
+              "taxonomy_level": "understand",
+              "is_core": true,
+              "is_verified": true
+            }
+          ],
+          "resources": [],
+          "pyqs": [
+            {
+              "board": "CBSE",
+              "grade": "Class 10",
+              "exam_year": 2023,
+              "paper_code": "CBSE-31/1/1-2023",
+              "question_number": "Question 11",
+              "marks": 3,
+              "question_text": "Write the three events that occur during the process of photosynthesis. State the role of stomata.",
+              "marking_scheme": "Events: 1. Absorption of light energy by chlorophyll. 2. Conversion of light energy to chemical energy and splitting of water molecules into hydrogen and oxygen. 3. Reduction of carbon dioxide to carbohydrates (2 marks).\nRole of stomata: Massive gas exchange (CO2 and O2) and transpiration (1 mark).",
+              "source_name": "CBSE Official Class 10 Board Examination Paper 2023",
+              "source_url": "https://cbseacademic.nic.in/curriculum_2026.html",
+              "is_verified": true
+            }
+          ],
+          "practice_questions": []
+        },
+        {"topic_number": 2, "title": "Respiration in Plants and Animals", "estimated_minutes": 25, "learning_objectives": [], "resources": [], "pyqs": [], "practice_questions": []},
+        {"topic_number": 3, "title": "Circulation and Transportation in Humans and Plants", "estimated_minutes": 30, "learning_objectives": [], "resources": [], "pyqs": [], "practice_questions": []},
+        {"topic_number": 4, "title": "Excretion in Human Beings and Plants", "estimated_minutes": 20, "learning_objectives": [], "resources": [], "pyqs": [], "practice_questions": []}
+      ]
+    },
+    {
+      "chapter_number": 6,
+      "title": "Control and Coordination",
+      "section": "Theme: The World of the Living - Unit II: World of Living",
+      "description": "Tropic movements in plants; Introduction of plant hormones; Control and co-ordination in animals: Nervous system; Voluntary, involuntary and reflex action; Chemical co-ordination: animal hormones.",
+      "topics": [
+        {"topic_number": 1, "title": "Nervous System, Reflex Arc, and Human Brain", "estimated_minutes": 30, "learning_objectives": [], "resources": [], "pyqs": [], "practice_questions": []},
+        {"topic_number": 2, "title": "Plant Hormones and Tropic Movements", "estimated_minutes": 20, "learning_objectives": [], "resources": [], "pyqs": [], "practice_questions": []},
+        {"topic_number": 3, "title": "Endocrine System and Hormones in Animals", "estimated_minutes": 25, "learning_objectives": [], "resources": [], "pyqs": [], "practice_questions": []}
+      ]
+    },
+    {
+      "chapter_number": 7,
+      "title": "How do Organisms Reproduce?",
+      "section": "Theme: The World of the Living - Unit II: World of Living",
+      "description": "Reproduction in animals and plants (asexual and sexual) reproductive health - need and methods of family planning. Safe sex vs HIV/AIDS. Child bearing and women's health.",
+      "topics": [
+        {"topic_number": 1, "title": "Asexual Reproduction Modes in Lower Organisms", "estimated_minutes": 20, "learning_objectives": [], "resources": [], "pyqs": [], "practice_questions": []},
+        {"topic_number": 2, "title": "Sexual Reproduction in Flowering Plants", "estimated_minutes": 25, "learning_objectives": [], "resources": [], "pyqs": [], "practice_questions": []},
+        {"topic_number": 3, "title": "Human Reproductive System and Reproductive Health", "estimated_minutes": 30, "learning_objectives": [], "resources": [], "pyqs": [], "practice_questions": []}
+      ]
+    },
+    {
+      "chapter_number": 8,
+      "title": "Heredity",
+      "section": "Theme: The World of the Living - Unit II: World of Living",
+      "description": "Heredity; Mendel's contribution - Laws for inheritance of traits: Sex determination: brief introduction.",
+      "topics": [
+        {"topic_number": 1, "title": "Mendel's Laws of Inheritance and Monohybrid/Dihybrid Crosses", "estimated_minutes": 30, "learning_objectives": [], "resources": [], "pyqs": [], "practice_questions": []},
+        {"topic_number": 2, "title": "Sex Determination in Human Beings", "estimated_minutes": 20, "learning_objectives": [], "resources": [], "pyqs": [], "practice_questions": []}
+      ]
+    },
+    {
+      "chapter_number": 9,
+      "title": "Light – Reflection and Refraction",
+      "section": "Theme: Natural Phenomena - Unit III: Natural Phenomena",
+      "description": "Reflection of light by curved surfaces; Images formed by spherical mirrors, centre of curvature, principal axis, principal focus, focal length, mirror formula, magnification. Refraction; Laws of refraction, refractive index. Refraction of light by spherical lens; Image formed by spherical lenses; Lens formula; Magnification. Power of a lens.",
+      "topics": [
+        {"topic_number": 1, "title": "Reflection of Light by Spherical Mirrors and Mirror Formula", "estimated_minutes": 30, "learning_objectives": [], "resources": [], "pyqs": [], "practice_questions": []},
+        {"topic_number": 2, "title": "Refraction of Light and Snell's Law", "estimated_minutes": 25, "learning_objectives": [], "resources": [], "pyqs": [], "practice_questions": []},
+        {"topic_number": 3, "title": "Refraction by Spherical Lenses, Lens Formula, and Power", "estimated_minutes": 30, "learning_objectives": [], "resources": [], "pyqs": [], "practice_questions": []}
+      ]
+    },
+    {
+      "chapter_number": 10,
+      "title": "The Human Eye and the Colorful World",
+      "section": "Theme: Natural Phenomena - Unit III: Natural Phenomena",
+      "description": "Functioning of a lens in human eye, defects of vision and their corrections, applications of spherical mirrors and lenses. Refraction of light through a prism, dispersion of light, scattering of light, applications in daily life.",
+      "topics": [
+        {"topic_number": 1, "title": "Structure of Human Eye and Defects of Vision", "estimated_minutes": 30, "learning_objectives": [], "resources": [], "pyqs": [], "practice_questions": []},
+        {"topic_number": 2, "title": "Refraction of Light Through a Prism, Dispersion, and Atmospheric Refraction", "estimated_minutes": 25, "learning_objectives": [], "resources": [], "pyqs": [], "practice_questions": []}
+      ]
+    },
+    {
+      "chapter_number": 11,
+      "title": "Electricity",
+      "section": "Theme: How Things Work - Unit IV: Effects of Current",
+      "description": "Electric current, potential difference and electric current. Ohm's law; Resistance, Resistivity, Factors on which the resistance of a conductor depends. Series combination of resistors, parallel combination of resistors and its applications in daily life. Heating effect of electric current and its applications in daily life. Electric power, Interrelation between P, V, I and R.",
+      "topics": [
+        {"topic_number": 1, "title": "Electric Current, Potential Difference, and Ohm's Law", "estimated_minutes": 30, "learning_objectives": [], "resources": [], "pyqs": [], "practice_questions": []},
+        {"topic_number": 2, "title": "Resistance, Factors Affecting Resistance, and Resistivity", "estimated_minutes": 25, "learning_objectives": [], "resources": [], "pyqs": [], "practice_questions": []},
+        {"topic_number": 3, "title": "Series and Parallel Combination of Resistors", "estimated_minutes": 30, "learning_objectives": [], "resources": [], "pyqs": [], "practice_questions": []},
+        {"topic_number": 4, "title": "Heating Effect of Electric Current, Joule's Law, and Electric Power", "estimated_minutes": 25, "learning_objectives": [], "resources": [], "pyqs": [], "practice_questions": []}
+      ]
+    },
+    {
+      "chapter_number": 12,
+      "title": "Magnetic Effects of Electric Current",
+      "section": "Theme: How Things Work - Unit IV: Effects of Current",
+      "description": "Magnetic field, field lines, field due to a current carrying conductor, field due to current carrying coil or solenoid; Force on current carrying conductor, Fleming's Left Hand Rule, Direct current. Alternating current: frequency of AC. Advantage of AC over DC. Domestic electric circuits.",
+      "topics": [
+        {"topic_number": 1, "title": "Magnetic Field, Field Lines, and Right-Hand Thumb Rule", "estimated_minutes": 25, "learning_objectives": [], "resources": [], "pyqs": [], "practice_questions": []},
+        {"topic_number": 2, "title": "Force on a Current-Carrying Conductor and Fleming's Left-Hand Rule", "estimated_minutes": 25, "learning_objectives": [], "resources": [], "pyqs": [], "practice_questions": []},
+        {"topic_number": 3, "title": "Electromagnetic Induction and Domestic Electric Circuits", "estimated_minutes": 25, "learning_objectives": [], "resources": [], "pyqs": [], "practice_questions": []}
+      ]
+    },
+    {
+      "chapter_number": 13,
+      "title": "Our Environment",
+      "section": "Theme: Natural Resources - Unit V: Natural Resources",
+      "description": "Eco-system, Environmental problems, Ozone depletion, waste production and their solutions. Biodegradable and non-biodegradable substances.",
+      "topics": [
+        {"topic_number": 1, "title": "Ecosystem Components, Food Chains, and Trophic Levels", "estimated_minutes": 20, "learning_objectives": [], "resources": [], "pyqs": [], "practice_questions": []},
+        {"topic_number": 2, "title": "Ozone Layer Depletion and Waste Management Strategies", "estimated_minutes": 20, "learning_objectives": [], "resources": [], "pyqs": [], "practice_questions": []}
+      ]
+    }
+  ],
+  "subject_pyqs": []
+}
