@@ -889,7 +889,8 @@ def seed_exemplar_syllabi(db: Session) -> None:
             logger.warning(f"Exemplar subject record not found for code={ex.get('code')}")
             continue
 
-        subject.curriculum_status = "curriculum_verified"
+        if subject.curriculum_status != "content_available":
+            subject.curriculum_status = "curriculum_verified"
         subject.last_verified_at = datetime.now(timezone.utc)
         db.flush()
 

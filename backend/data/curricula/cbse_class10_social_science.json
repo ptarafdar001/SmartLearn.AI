@@ -1,0 +1,1241 @@
+{
+  "subject_code": "cbse-class-10-soc",
+  "board": "CBSE",
+  "grade": "Class 10",
+  "academic_stream": null,
+  "subject_name": "Social Science",
+  "category": "core",
+  "curriculum_status": "content_available",
+  "source_provenance": {
+    "source_authority": "CBSE / NCERT",
+    "source_name": "CBSE Secondary School Curriculum (Code 087) 2026-27 & NCERT Class X Social Science",
+    "source_url": "https://cbseacademic.nic.in/curriculum_2026.html",
+    "syllabus_version": "Academic Year 2026-27",
+    "document_ref": "CBSE-Acad-Sec-2026-SocialScience-087.pdf",
+    "retrieval_date": "2026-09-23",
+    "verification_status": "verified_published",
+    "license_or_terms": "Official Public NCERT/CBSE Syllabus - Permitted Educational Use"
+  },
+  "chapters": [
+    {
+      "chapter_number": 1,
+      "title": "The Rise of Nationalism in Europe",
+      "section": "Unit 1: India and the Contemporary World - II (History)",
+      "description": "The French Revolution and the idea of the nation; the making of nationalism in Europe; the age of revolutions (1830-1848); the making of Germany and Italy; visualising the nation; nationalism and imperialism.",
+      "topics": [
+        {
+          "topic_number": 1,
+          "title": "The French Revolution and the Idea of the Nation",
+          "description": "Creation of a collective identity, French revolutionary measures, Napoleonic Civil Code of 1804, and its administrative impacts across conquered territories.",
+          "estimated_minutes": 25,
+          "learning_objectives": [
+            {
+              "code": "CBSE10-SOC-CH01-LO01",
+              "description": "Analyze the administrative, linguistic, and cultural measures introduced by French revolutionaries to forge collective national identity.",
+              "taxonomy_level": "analyze",
+              "is_core": true,
+              "is_verified": true
+            },
+            {
+              "code": "CBSE10-SOC-CH01-LO02",
+              "description": "Evaluate the key provisions of the Civil Code of 1804 (Napoleonic Code) and explain local reactions in Switzerland, Holland, and Italy.",
+              "taxonomy_level": "evaluate",
+              "is_core": true,
+              "is_verified": true
+            }
+          ],
+          "resources": [
+            {
+              "title": "NCERT Class X History Chapter 1: The French Revolution and the Nation",
+              "resource_type": "notes",
+              "provider": "ncert",
+              "source_name": "NCERT Class X India and the Contemporary World-II",
+              "source_url": "https://ncert.nic.in/textbook.php?jess3=1-5",
+              "text_content": "# The French Revolution and the Idea of the Nation\n\nIn 1789, France was under the absolute rule of a Bourbon monarch. The French Revolution transferred sovereignty from the monarch to a body of French citizens.\n\n### Measures Creating Collective Identity (la patrie and le citoyen):\n1. **The Tricolour Flag**: Replaced the royal standard.\n2. **Estates General**: Renamed the National Assembly and elected by active citizens.\n3. **Hymns and Oaths**: New patriotic hymns composed and martyrs commemorated in the name of the nation.\n4. **Centralised Administration**: Formulated uniform laws for all citizens within its territory.\n5. **Standardised Weights and Measures**: Internal customs duties and dues were abolished.\n6. **French Language**: Regional dialects were discouraged and Parisian French became the common national tongue.\n\n### The Napoleonic Civil Code of 1804:\nNapoleon destroyed political democracy in France but introduced rational administrative reforms:\n- Abolished all privileges based on birth.\n- Established equality before the law.\n- Secured the right to private property.\n- Abolished feudal dues and serfdom in Dutch Republic, Switzerland, Germany, and Italy.\n- Freed peasants from manorial dues and removed guild restrictions in towns.\n- Standardized weights, measures, and a single national currency.",
+              "order_index": 1,
+              "is_verified": true
+            },
+            {
+              "title": "Educational Video: Visualising French Revolution and Napoleonic Era",
+              "resource_type": "video",
+              "provider": "youtube",
+              "source_name": "NCERT / National Repository of Open Educational Resources",
+              "source_url": "https://www.youtube.com/watch?v=F3fD5Pz9B3Q",
+              "external_id": "F3fD5Pz9B3Q",
+              "content_url": "https://www.youtube-nocookie.com/embed/F3fD5Pz9B3Q",
+              "duration_seconds": 720,
+              "order_index": 2,
+              "is_verified": true
+            }
+          ],
+          "study_notes": {
+            "notes_type": "comprehensive",
+            "title": "The French Revolution, Collective Identity & Napoleonic Code (1804)",
+            "overview": "Comprehensive examination of the emergence of modern nationalism in 18th-century Europe, focusing on revolutionary transformations in France and administrative restructuring under Napoleon Bonaparte.",
+            "learning_objectives": [
+              "Identify the steps taken by French revolutionaries to create a sense of collective identity among citizens.",
+              "Explain the merits and drawbacks of the Napoleonic Code of 1804 across annexed European territories.",
+              "Understand why initial European enthusiasm for French armies turned into hostility."
+            ],
+            "explanation_markdown": "# The French Revolution & The Emergence of Nationalism\n\n### 1. The Genesis of Modern Nationalism (1789)\nThe French Revolution of 1789 marked the first clear expression of nationalism. It proclaimed that it was the people who would henceforth constitute the nation and shape its destiny.\n\n### 2. Instruments of Collective Identity\n- **La Patrie (The Fatherland) and Le Citoyen (The Citizen)**: Emphasized the notion of a united community enjoying equal constitutional rights.\n- **Abolition of Internal Tolls**: Created an integrated internal market.\n- **Adoption of Parisian French**: Cemented linguistic unification.\n\n### 3. The Civil Code of 1804 (Napoleonic Code)\nNapoleon exported his administrative reforms to the regions under French control:\n1. **Privileges by Birth Removed**: Feudal privileges enjoyed by clergy and nobility were terminated.\n2. **Equality Before Law**: Universal legal status was instituted for all propertied males.\n3. **Property Rights**: Guarantee of private ownership.\n4. **Agrarian Liberation**: Peasants were freed from feudal serfdom and manorial tithes.\n5. **Guilds Dissolved**: Urban trade and artisan guild restrictions were lifted.\n\n### 4. Turning Point: Why Local Enthusiasm Turned Hostile\nWhile administrative reforms simplified governance, political freedom was severely curbed. The local populations soon realized that administrative improvements were outweighed by:\n- Increased taxation to finance Napoleon's military campaigns.\n- Strict censorship on press and speech.\n- Forced conscription into the French armies to conquer the rest of Europe.",
+            "key_terms": [
+              {
+                "term": "La Patrie",
+                "definition": "The Fatherland; revolutionary concept emphasizing communal allegiance to the homeland rather than a monarch."
+              },
+              {
+                "term": "Le Citoyen",
+                "definition": "The Citizen; denoting equal civic and legal standing in the republic."
+              },
+              {
+                "term": "Civil Code of 1804",
+                "definition": "A comprehensive legal code established by Napoleon Bonaparte that abolished feudal privileges, secured property rights, and established legal equality."
+              },
+              {
+                "term": "Conscription",
+                "definition": "Compulsory enlistment of civilians into state military service."
+              }
+            ],
+            "formulas_and_dates": [
+              {
+                "name": "French Revolution Outbreak",
+                "formula": "1789"
+              },
+              {
+                "name": "Enactment of Napoleonic Civil Code",
+                "formula": "1804"
+              },
+              {
+                "name": "Battle of Waterloo & Fall of Napoleon",
+                "formula": "1815"
+              }
+            ],
+            "diagrams": [
+              {
+                "caption": "Transition from Monarchy to Nation-State in Revolutionary France",
+                "mermaid_code": "graph TD\n    A[Absolute Bourbon Monarchy 1789] --> B[French Revolution & Citizen Sovereignty]\n    B --> C[Collective Identity: La Patrie & Le Citoyen]\n    B --> D[Standardized Laws, Currency & Measures]\n    B --> E[Napoleonic Civil Code 1804]\n    E --> F[Abolition of Feudal Privileges]\n    E --> G[Equality Before Law & Property Rights]"
+              }
+            ],
+            "common_misconceptions": [
+              {
+                "misconception": "The Napoleonic Code extended universal voting rights to all men and women equally.",
+                "correction": "The Code actually lowered the civic status of women to that of minors, subject to the authority of fathers and husbands, and restricted political voting rights only to propertied men."
+              }
+            ],
+            "exam_points": [
+              "Five-mark CBSE question frequently asks: 'Analyze any five measures introduced by French revolutionaries to create a sense of collective identity.' Mention la patrie, le citoyen, the new tricolour, National Assembly, abolition of internal custom duties, and common French language.",
+              "Three-mark question often examines: 'Why did the initial enthusiasm of European populations towards French rule turn into hostility?' Answer with: increased taxation, censorship, and forced military conscription."
+            ],
+            "source_references": [
+              {
+                "title": "NCERT Class X India and the Contemporary World - II (Chapter 1)",
+                "url": "https://ncert.nic.in/textbook.php?jess3=1-5"
+              },
+              {
+                "title": "CBSE Official Curriculum for Social Science (087)",
+                "url": "https://cbseacademic.nic.in/curriculum_2026.html"
+              }
+            ],
+            "version": 1,
+            "is_verified": true
+          },
+          "pyqs": [
+            {
+              "board": "CBSE",
+              "grade": "Class 10",
+              "exam_year": 2023,
+              "paper_code": "CBSE-32/1/1-2023",
+              "question_number": "Question 21",
+              "marks": 5,
+              "question_text": "Examine the measures and practices introduced by the French revolutionaries to create a sense of collective identity among the French people.",
+              "marking_scheme": "Award 1 mark for each valid point up to a maximum of 5 marks:\n1. The ideas of 'la patrie' (the fatherland) and 'le citoyen' (the citizen) emphasized a united community with equal rights under a constitution.\n2. A new French flag, the tricolour, was chosen to replace the former royal standard.\n3. The Estates General was elected by the body of active citizens and renamed the National Assembly.\n4. New hymns were composed, oaths taken, and martyrs commemorated, all in the name of the nation.\n5. A centralized administrative system was put in place and it formulated uniform laws for all citizens.\n6. Internal customs duties and dues were abolished and a uniform system of weights and measures was adopted.\n7. Regional dialects were discouraged and French, as spoken and written in Paris, became the common national language.",
+              "source_name": "CBSE Official Class 10 Board Examination Paper 2023",
+              "source_url": "https://cbseacademic.nic.in/curriculum_2026.html",
+              "is_verified": true
+            },
+            {
+              "board": "CBSE",
+              "grade": "Class 10",
+              "exam_year": 2022,
+              "paper_code": "CBSE-32/2/1-2022",
+              "question_number": "Question 14",
+              "marks": 3,
+              "question_text": "Explain any three administrative features introduced by Napoleon through the Civil Code of 1804 in the regions under his control.",
+              "marking_scheme": "Award 1 mark for each valid administrative feature (any three):\n1. It did away with all privileges based on birth and established equality before the law.\n2. It secured the right to property for French citizens.\n3. In the Dutch Republic, Switzerland, Italy, and Germany, Napoleon simplified administrative divisions, abolished the feudal system, and freed peasants from serfdom and manorial dues.\n4. In towns, guild restrictions were removed.\n5. Transport and communication systems were modernized.",
+              "source_name": "CBSE Official Class 10 Board Examination Paper 2022",
+              "source_url": "https://cbseacademic.nic.in/curriculum_2026.html",
+              "is_verified": true
+            },
+            {
+              "board": "CBSE",
+              "grade": "Class 10",
+              "exam_year": 2020,
+              "paper_code": "CBSE-32/1/2-2020",
+              "question_number": "Question 3",
+              "marks": 1,
+              "question_text": "Why was the Civil Code of 1804 usually known as the Napoleonic Code?",
+              "marking_scheme": "Because it was conceptualized, enacted, and propagated by Napoleon Bonaparte across France and its conquered territories (1 mark).",
+              "source_name": "CBSE Official Class 10 Board Examination Paper 2020",
+              "source_url": "https://cbseacademic.nic.in/curriculum_2026.html",
+              "is_verified": true
+            }
+          ],
+          "practice_questions": [
+            {
+              "question_text": "Which of the following was NOT an administrative reform introduced by Napoleon in the Civil Code of 1804?",
+              "question_type": "mcq",
+              "options": [
+                {
+                  "id": "A",
+                  "text": "Abolition of privileges based on birth"
+                },
+                {
+                  "id": "B",
+                  "text": "Securing the right to private property"
+                },
+                {
+                  "id": "C",
+                  "text": "Granting universal adult suffrage to women"
+                },
+                {
+                  "id": "D",
+                  "text": "Removal of guild restrictions in towns"
+                }
+              ],
+              "correct_answer": "C",
+              "explanation": "Napoleon reduced women to the status of a minor, subject to the authority of fathers and husbands, and did not grant them voting rights.",
+              "difficulty": "medium",
+              "marks": 1,
+              "is_ai_generated": true,
+              "generation_provenance": {
+                "model": "smartlearn-curator-v1",
+                "template": "history-napoleonic-code-v1",
+                "verified_by": "SmartLearn Academic Review"
+              }
+            },
+            {
+              "question_text": "What did the term 'la patrie' signify during the French Revolution?",
+              "question_type": "mcq",
+              "options": [
+                {
+                  "id": "A",
+                  "text": "The absolute divine authority of the monarch"
+                },
+                {
+                  "id": "B",
+                  "text": "The concept of Fatherland emphasizing a united community"
+                },
+                {
+                  "id": "C",
+                  "text": "The assembly of military generals"
+                },
+                {
+                  "id": "D",
+                  "text": "The peasant class paying agricultural tithes"
+                }
+              ],
+              "correct_answer": "B",
+              "explanation": "'La patrie' (the fatherland) and 'le citoyen' (the citizen) emphasized the notion of a united community enjoying equal rights under a constitution.",
+              "difficulty": "easy",
+              "marks": 1,
+              "is_ai_generated": true,
+              "generation_provenance": {
+                "model": "smartlearn-curator-v1",
+                "template": "history-revolutionary-terms-v1",
+                "verified_by": "SmartLearn Academic Review"
+              }
+            }
+          ]
+        },
+        {
+          "topic_number": 2,
+          "title": "Liberal Nationalism, Zollverein and the Treaty of Vienna (1815)",
+          "description": "Concept of liberal nationalism in economic and political spheres, formation of Zollverein customs union in 1834, and the conservative settlement of the Congress of Vienna (1815).",
+          "estimated_minutes": 25,
+          "learning_objectives": [
+            {
+              "code": "CBSE10-SOC-CH01-LO03",
+              "description": "Distinguish between political and economic dimensions of 19th-century European liberal nationalism.",
+              "taxonomy_level": "analyze",
+              "is_core": true,
+              "is_verified": true
+            },
+            {
+              "code": "CBSE10-SOC-CH01-LO04",
+              "description": "Explain how the Zollverein customs union helped bind German states economically into a national unit.",
+              "taxonomy_level": "understand",
+              "is_core": true,
+              "is_verified": true
+            }
+          ],
+          "resources": [
+            {
+              "title": "NCERT Class X Notes: Liberalism, Zollverein and Vienna Settlement",
+              "resource_type": "notes",
+              "provider": "ncert",
+              "source_name": "NCERT Class X India and the Contemporary World-II",
+              "source_url": "https://ncert.nic.in/textbook.php?jess3=1-5",
+              "text_content": "# The Making of Nationalism in Europe\n\n### 1. Liberalism in 19th Century Europe\nDerived from Latin 'liber' meaning free.\n- **Political Liberalism**: Government by consent, end of autocracy and clerical privileges, a constitution and representative government through parliament, and inviolability of private property.\n- **Economic Liberalism**: Freedom of markets and abolition of state-imposed restrictions on movement of goods and capital.\n\n### 2. The Zollverein (1834)\nIn 1834, a customs union or Zollverein was formed at the initiative of Prussia and joined by most German states:\n- Abolished tariff barriers.\n- Reduced the number of currencies from over thirty to two.\n- Created a unified economic territory, strengthening nationalist sentiments through economic solidarity.\n\n### 3. The Treaty of Vienna (1815)\nFollowing Napoleon's defeat at Waterloo, the European powers (Britain, Russia, Prussia, Austria) met at Vienna under Austrian Chancellor Duke Metternich:\n- Restored the Bourbon dynasty in France.\n- Set up a series of buffer states around France (Kingdom of the Netherlands including Belgium in north, Genoa added to Piedmont in south, Prussia given western frontiers, Austria given northern Italy).\n- Left the German Confederation of 39 states untouched.\n- Maintained autocracy and repressed dissent and free press.",
+              "order_index": 1,
+              "is_verified": true
+            }
+          ],
+          "study_notes": {
+            "notes_type": "comprehensive",
+            "title": "Liberalism, Zollverein & The Vienna Congress of 1815",
+            "overview": "Detailed study of political and economic liberalism, how customs integration preceded political unification, and how the Conservative order attempted to suppress liberal nationalist aspirations post-1815.",
+            "learning_objectives": [
+              "Explain what liberalism meant to the new middle class in the 19th century.",
+              "Detail the significance of Zollverein in German economic unification.",
+              "Analyze the geopolitical objectives of the European powers at the Congress of Vienna."
+            ],
+            "explanation_markdown": "# Liberalism and Conservative Reaction (1815-1848)\n\n### 1. The Dual Faces of Liberalism\n- **Political Sphere**: Government by constitutional consent, parliamentary representation, and legal equality.\n- **Economic Sphere**: Unfettered trade across provincial borders.\n\n### 2. Economic Fragmentation and Zollverein (1834)\nIn the first half of the 19th century, German-speaking regions comprised 39 separate principalities, each maintaining distinct currencies and customs barriers. A merchant traveling from Hamburg to Nuremberg had to pass 11 customs barriers and pay a 5% duty at each.\n\nIn 1834, Prussia launched **Zollverein**, a customs union:\n1. Abolished internal tariff hurdles.\n2. Slashed currency variations from 30+ down to two.\n3. Mobilized railway connectivity to accelerate commerce and awaken national unity.\n\n### 3. Congress of Vienna (1815)\nChaired by Austrian Chancellor Duke Metternich, the Congress aimed to undo Napoleonic changes and restore monarchical legitimacy:\n- France was surrounded by barrier states.\n- Autocratic regimes were established that tolerated no criticism or censorship-free press.\n- Secret societies (e.g. Young Italy, Young Europe founded by Giuseppe Mazzini) emerged to counter conservative repression.",
+            "key_terms": [
+              {
+                "term": "Liberalism",
+                "definition": "Political and economic ideology advocating individual liberty, representative government, and free trade."
+              },
+              {
+                "term": "Zollverein",
+                "definition": "A customs union formed in 1834 under Prussian leadership to create a unified economic zone across German states."
+              },
+              {
+                "term": "Treaty of Vienna (1815)",
+                "definition": "The diplomatic settlement negotiated by Britain, Russia, Prussia, and Austria that restored conservative monarchies in Europe after Napoleon's defeat."
+              }
+            ],
+            "formulas_and_dates": [
+              {
+                "name": "Treaty of Vienna",
+                "formula": "1815"
+              },
+              {
+                "name": "Foundation of Zollverein",
+                "formula": "1834"
+              },
+              {
+                "name": "Founding of Young Italy by Mazzini",
+                "formula": "1831"
+              }
+            ],
+            "diagrams": [
+              {
+                "caption": "Conservative Order vs Liberal Nationalism (1815-1848)",
+                "mermaid_code": "graph LR\n    A[Defeat of Napoleon 1815] --> B[Congress of Vienna]\n    B --> C[Conservative Restoration]\n    C --> D[Censorship & Autocracy]\n    D --> E[Rise of Secret Societies: Mazzini]\n    E --> F[1848 Revolutions of Liberals]"
+              }
+            ],
+            "common_misconceptions": [
+              {
+                "misconception": "The German Confederation of 39 states was dismantled at the Congress of Vienna.",
+                "correction": "The 39-state German Confederation created by Napoleon was left completely intact by the Congress of Vienna."
+              }
+            ],
+            "exam_points": [
+              "CBSE frequently asks: 'What was Zollverein? How did it foster national sentiment?' Highlight its Prussian leadership, tariff elimination, reduction of currencies from 30 to 2, and economic integration.",
+              "Identify Duke Metternich's famous quote: 'When France sneezes, the rest of Europe catches cold.'"
+            ],
+            "source_references": [
+              {
+                "title": "NCERT Class X History Chapter 1",
+                "url": "https://ncert.nic.in/textbook.php?jess3=1-5"
+              }
+            ],
+            "version": 1,
+            "is_verified": true
+          },
+          "pyqs": [
+            {
+              "board": "CBSE",
+              "grade": "Class 10",
+              "exam_year": 2023,
+              "paper_code": "CBSE-32/3/1-2023",
+              "question_number": "Question 5",
+              "marks": 3,
+              "question_text": "How did the formation of the Zollverein in 1834 contribute to German national unity? Explain.",
+              "marking_scheme": "Award 1 mark each for three valid points:\n1. The Zollverein abolished tariff barriers between member German states.\n2. It drastically reduced the number of currencies from over thirty to only two.\n3. The creation of a network of railways stimulated mobility, harnessing economic interests to national unification (1 mark each).",
+              "source_name": "CBSE Official Class 10 Board Examination Paper 2023",
+              "source_url": "https://cbseacademic.nic.in/curriculum_2026.html",
+              "is_verified": true
+            },
+            {
+              "board": "CBSE",
+              "grade": "Class 10",
+              "exam_year": 2022,
+              "paper_code": "CBSE-32/1/1-2022",
+              "question_number": "Question 8",
+              "marks": 3,
+              "question_text": "Describe the main clauses of the Treaty of Vienna of 1815.",
+              "marking_scheme": "Award 1 mark each for any three main clauses:\n1. The Bourbon dynasty which had been deposed during the French Revolution was restored to power.\n2. France lost the territories it had annexed under Napoleon.\n3. A series of states were set up on the boundaries of France to prevent future French expansion (e.g. Kingdom of Netherlands, Genoa added to Piedmont).\n4. Prussia was given important new territories on its western frontiers, while Austria was given control of northern Italy.\n5. The German Confederation of 39 states set up by Napoleon was left untouched.",
+              "source_name": "CBSE Official Class 10 Board Examination Paper 2022",
+              "source_url": "https://cbseacademic.nic.in/curriculum_2026.html",
+              "is_verified": true
+            }
+          ],
+          "practice_questions": [
+            {
+              "question_text": "Which state took the leading initiative in the formation of the German customs union 'Zollverein' in 1834?",
+              "question_type": "mcq",
+              "options": [
+                {
+                  "id": "A",
+                  "text": "Austria"
+                },
+                {
+                  "id": "B",
+                  "text": "Prussia"
+                },
+                {
+                  "id": "C",
+                  "text": "Bavaria"
+                },
+                {
+                  "id": "D",
+                  "text": "Saxony"
+                }
+              ],
+              "correct_answer": "B",
+              "explanation": "Zollverein was formed in 1834 at the initiative of Prussia and was joined by most of the German states.",
+              "difficulty": "easy",
+              "marks": 1,
+              "is_ai_generated": true,
+              "generation_provenance": {
+                "model": "smartlearn-curator-v1",
+                "template": "history-zollverein-v1",
+                "verified_by": "SmartLearn Academic Review"
+              }
+            }
+          ]
+        },
+        {
+          "topic_number": 3,
+          "title": "The Unification of Germany and Italy",
+          "description": "Process of German unification under Otto von Bismarck and Prussian army; Italian unification led by Cavour, Mazzini, Garibaldi, and King Victor Emmanuel II.",
+          "estimated_minutes": 30,
+          "learning_objectives": [
+            {
+              "code": "CBSE10-SOC-CH01-LO05",
+              "description": "Chronicle the stages of German unification engineered by Otto von Bismarck between 1864 and 1871.",
+              "taxonomy_level": "understand",
+              "is_core": true,
+              "is_verified": true
+            },
+            {
+              "code": "CBSE10-SOC-CH01-LO06",
+              "description": "Compare the distinct roles played by Cavour, Garibaldi, and Mazzini in achieving the unification of Italy.",
+              "taxonomy_level": "analyze",
+              "is_core": true,
+              "is_verified": true
+            }
+          ],
+          "resources": [
+            {
+              "title": "NCERT Class X Notes: Unification of Germany and Italy",
+              "resource_type": "notes",
+              "provider": "ncert",
+              "source_name": "NCERT Class X India and the Contemporary World-II",
+              "source_url": "https://ncert.nic.in/textbook.php?jess3=1-5",
+              "text_content": "# Unification of Germany and Italy\n\n### 1. German Unification (1866-1871)\n- Nationalist feelings were widespread among middle-class Germans who in 1848 tried to unite the different regions at Frankfurt Parliament, but were suppressed by the monarchy and military.\n- Prussia took on the leadership of the movement under Chief Minister Otto von Bismarck (the architect).\n- Three wars over seven years with Austria, Denmark, and France ended in Prussian victory.\n- In January 1871, Prussian King William I was proclaimed German Emperor in the Hall of Mirrors at Versailles.\n\n### 2. Italian Unification (1859-1861)\n- Italy was divided into seven states; only Sardinia-Piedmont was ruled by an Italian princely house.\n- **Giuseppe Mazzini**: Ideological foundation through 'Young Italy'.\n- **Count Camillo de Cavour**: Chief Minister of Sardinia-Piedmont who engineered diplomatic alliance with France to defeat Austrian forces in 1859.\n- **Giuseppe Garibaldi**: Led armed volunteers (Red Shirts) into Southern Italy and Kingdom of the Two Sicilies, winning peasant support.\n- In 1861, Victor Emmanuel II was proclaimed King of United Italy.",
+              "order_index": 1,
+              "is_verified": true
+            }
+          ],
+          "study_notes": {
+            "notes_type": "comprehensive",
+            "title": "Unification of Germany and Italy: Statesmen, Diplomacy & Warfare",
+            "overview": "Examines the transition from popular revolutionary uprisings to state-led military unification in Central and Southern Europe during the mid-to-late 19th century.",
+            "learning_objectives": [
+              "Explain the policy of 'Blood and Iron' pursued by Otto von Bismarck.",
+              "Assess the contribution of Cavour's diplomacy and Garibaldi's Red Shirts in uniting Italy.",
+              "Understand how nation-states were forged through top-down military leadership."
+            ],
+            "explanation_markdown": "# Nation-State Formation: Germany and Italy\n\n### 1. German Unification: Otto von Bismarck's Architecture\nFollowing the collapse of the liberal 1848 Frankfurt Parliament, Prussian Chief Minister **Otto von Bismarck** spearheaded unification:\n- Employed Prussian military power and bureaucracy.\n- Fought three decisive wars over seven years:\n  1. **War with Denmark (1864)**: Secured Schleswig and Holstein.\n  2. **Austro-Prussian War (1866)**: Excluded Austria from German affairs.\n  3. **Franco-Prussian War (1870-71)**: Defeated France.\n- On **18 January 1871**, in the Hall of Mirrors at Versailles, Kaiser William I was proclaimed Emperor of the newly unified German Empire.\n\n### 2. Italian Unification: The Triad of Leaders\nPrior to unification, Italy was politically fragmented:\n- North was under Austrian Habsburgs.\n- Centre was ruled by the Pope.\n- South was dominated by the Bourbon kings of Spain.\n\n**Three Pillars of Unification**:\n1. **Giuseppe Mazzini (The Soul)**: Propagated unitary republican ideals via Young Italy.\n2. **Count Cavour (The Brain)**: Engineered a secret diplomatic pact with France (1859), driving Austrian forces out of Lombardy.\n3. **Giuseppe Garibaldi (The Sword)**: Marched with his Red Shirts in the Expedition of the Thousand (1860) to liberate Sicily and Naples.\n\nIn **1861**, Victor Emmanuel II was officially crowned King of unified Italy.",
+            "key_terms": [
+              {
+                "term": "Otto von Bismarck",
+                "definition": "Chief Minister of Prussia known as the architect of German unification through his policy of blood and iron."
+              },
+              {
+                "term": "Count Cavour",
+                "definition": "Chief Minister of Sardinia-Piedmont whose diplomatic acumen secured Italian independence from Austrian hegemony."
+              },
+              {
+                "term": "Red Shirts",
+                "definition": "Garibaldi's armed volunteers who drove the Bourbon dynasty from southern Italy."
+              }
+            ],
+            "formulas_and_dates": [
+              {
+                "name": "Proclamation of United Italy",
+                "formula": "1861"
+              },
+              {
+                "name": "Franco-Prussian War & German Proclamation",
+                "formula": "January 1871"
+              }
+            ],
+            "diagrams": [
+              {
+                "caption": "The Architects of Italian Unification",
+                "mermaid_code": "graph TD\n    A[Italian Unification 1861] --> B[Mazzini: Ideological Foundation]\n    A --> C[Cavour: Diplomatic Strategy]\n    A --> D[Garibaldi: Armed Popular Campaign]\n    A --> E[Victor Emmanuel II: Sovereign Monarch]"
+              }
+            ],
+            "common_misconceptions": [
+              {
+                "misconception": "Cavour was a passionate democrat who believed in revolutionary peasant uprisings.",
+                "correction": "Cavour was a wealthy aristocrat who spoke French better than Italian and favored a moderate constitutional monarchy, distrusting mass peasant revolution."
+              }
+            ],
+            "exam_points": [
+              "Five-mark CBSE question: 'Describe the process of German unification.' Must mention Bismarck, three wars over seven years, and January 1871 Versailles ceremony.",
+              "Contrast Bismarck's top-down state militarism with Garibaldi's popular volunteer campaigns in Italy."
+            ],
+            "source_references": [
+              {
+                "title": "NCERT Class X History Chapter 1",
+                "url": "https://ncert.nic.in/textbook.php?jess3=1-5"
+              }
+            ],
+            "version": 1,
+            "is_verified": true
+          },
+          "pyqs": [
+            {
+              "board": "CBSE",
+              "grade": "Class 10",
+              "exam_year": 2023,
+              "paper_code": "CBSE-32/2/1-2023",
+              "question_number": "Question 23",
+              "marks": 5,
+              "question_text": "Describe the process of unification of Germany.",
+              "marking_scheme": "Award 1 mark each for the following key points (max 5 marks):\n1. In 1848, middle-class Germans attempted to unite Germany through the Frankfurt Parliament, but it was suppressed by monarchical and military alliance.\n2. Prussia took on leadership under Chief Minister Otto von Bismarck, the architect of the unification.\n3. Bismarck carried out the process with the help of the Prussian army and bureaucracy.\n4. Three wars over seven years against Austria, Denmark, and France ended in Prussian victory and completed the unification process.\n5. In January 1871, the Prussian King William I was proclaimed German Emperor in an assembly at the Hall of Mirrors in Versailles.",
+              "source_name": "CBSE Official Class 10 Board Examination Paper 2023",
+              "source_url": "https://cbseacademic.nic.in/curriculum_2026.html",
+              "is_verified": true
+            },
+            {
+              "board": "CBSE",
+              "grade": "Class 10",
+              "exam_year": 2020,
+              "paper_code": "CBSE-32/1/1-2020",
+              "question_number": "Question 18",
+              "marks": 3,
+              "question_text": "Examine the role of Giuseppe Garibaldi in the unification of Italy.",
+              "marking_scheme": "Award 1 mark for each valid point:\n1. Garibaldi was a celebrated volunteer fighter who organized the 'Red Shirts' armed volunteer movement.\n2. In 1860, he led the Expedition of the Thousand into South Italy and the Kingdom of the Two Sicilies.\n3. He succeeded in winning the support of local peasants to drive out the Spanish Bourbon rulers, handing the territory over to Victor Emmanuel II (1 mark each).",
+              "source_name": "CBSE Official Class 10 Board Examination Paper 2020",
+              "source_url": "https://cbseacademic.nic.in/curriculum_2026.html",
+              "is_verified": true
+            }
+          ],
+          "practice_questions": [
+            {
+              "question_text": "Who was proclaimed the Emperor of unified Germany in the Hall of Mirrors at Versailles in January 1871?",
+              "question_type": "mcq",
+              "options": [
+                {
+                  "id": "A",
+                  "text": "Otto von Bismarck"
+                },
+                {
+                  "id": "B",
+                  "text": "Kaiser William I"
+                },
+                {
+                  "id": "C",
+                  "text": "Victor Emmanuel II"
+                },
+                {
+                  "id": "D",
+                  "text": "Frederick William IV"
+                }
+              ],
+              "correct_answer": "B",
+              "explanation": "On 18 January 1871, Prussian King William I was proclaimed German Emperor in the Hall of Mirrors at Versailles.",
+              "difficulty": "easy",
+              "marks": 1,
+              "is_ai_generated": true,
+              "generation_provenance": {
+                "model": "smartlearn-curator-v1",
+                "template": "history-german-unification-v1",
+                "verified_by": "SmartLearn Academic Review"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "chapter_number": 2,
+      "title": "Nationalism in India",
+      "section": "Unit 1: India and the Contemporary World - II (History)",
+      "description": "First World War, Khilafat and Non-Cooperation; differing strands within the movement; towards Civil Disobedience; salt march and collective belonging.",
+      "topics": [
+        {
+          "topic_number": 1,
+          "title": "The First World War, Khilafat and Non-Cooperation",
+          "description": "Economic and political impact of WWI in India, Rowlatt Act, Jallianwala Bagh massacre, and Khilafat-Non-Cooperation movement.",
+          "estimated_minutes": 25,
+          "learning_objectives": [
+            {
+              "code": "CBSE10-SOC-CH02-LO01",
+              "description": "Analyze how World War I fostered conditions for national resistance across Indian peasantry and urban centers.",
+              "taxonomy_level": "analyze",
+              "is_core": true,
+              "is_verified": true
+            }
+          ],
+          "resources": [],
+          "pyqs": [],
+          "practice_questions": []
+        }
+      ]
+    },
+    {
+      "chapter_number": 3,
+      "title": "The Making of a Global World",
+      "section": "Unit 1: India and the Contemporary World - II (History)",
+      "description": "The pre-modern world, silk routes, conquest, disease and trade; 19th-century global economy (1815-1914); inter-war economic crisis.",
+      "topics": [
+        {
+          "topic_number": 1,
+          "title": "Pre-Modern Trade Networks and Biological Conquest",
+          "description": "The silk routes, food travel (potato, maize), and the devastating role of smallpox in Spanish conquest of America.",
+          "estimated_minutes": 20,
+          "learning_objectives": [],
+          "resources": [],
+          "pyqs": [],
+          "practice_questions": []
+        }
+      ]
+    },
+    {
+      "chapter_number": 4,
+      "title": "The Age of Industrialisation",
+      "section": "Unit 1: India and the Contemporary World - II (History)",
+      "description": "Before the industrial revolution, hand labour and steam power, industrialisation in the colonies, factories come up, and market for goods.",
+      "topics": [
+        {
+          "topic_number": 1,
+          "title": "Proto-Industrialisation and Factory Production",
+          "description": "Decentralized rural manufacturing networks and transition to mechanized factory systems.",
+          "estimated_minutes": 20,
+          "learning_objectives": [],
+          "resources": [],
+          "pyqs": [],
+          "practice_questions": []
+        }
+      ]
+    },
+    {
+      "chapter_number": 5,
+      "title": "Print Culture and the Modern World",
+      "section": "Unit 1: India and the Contemporary World - II (History)",
+      "description": "The first printed books, print comes to Europe, the print revolution and its impact, reading mania, and 19th-century print in India.",
+      "topics": [
+        {
+          "topic_number": 1,
+          "title": "The Print Revolution in Europe",
+          "description": "Gutenberg press, transformation of oral culture into reading public, and Martin Luther's Protestant Reformation.",
+          "estimated_minutes": 20,
+          "learning_objectives": [],
+          "resources": [],
+          "pyqs": [],
+          "practice_questions": []
+        }
+      ]
+    },
+    {
+      "chapter_number": 6,
+      "title": "Resources and Development",
+      "section": "Unit 2: Contemporary India - II (Geography)",
+      "description": "Types of resources, development of resources, resource planning in India, land resources, land utilization, land degradation and conservation measures, soil as a resource.",
+      "topics": [
+        {
+          "topic_number": 1,
+          "title": "Resource Planning and Soil Classification",
+          "description": "Resource conservation principles, sustainable development, and major soil categories in India (Alluvial, Black, Red, Laterite).",
+          "estimated_minutes": 25,
+          "learning_objectives": [],
+          "resources": [],
+          "pyqs": [],
+          "practice_questions": []
+        }
+      ]
+    },
+    {
+      "chapter_number": 7,
+      "title": "Forest and Wildlife Resources",
+      "section": "Unit 2: Contemporary India - II (Geography)",
+      "description": "Flora and fauna in India, categories of species, conservation of forest and wildlife in India, types and distribution of forests, community and conservation.",
+      "topics": [
+        {
+          "topic_number": 1,
+          "title": "Conservation of Biodiversity and Community Stewardship",
+          "description": "IUCN endangered categories, Project Tiger, Chipko movement, and Joint Forest Management (JFM).",
+          "estimated_minutes": 20,
+          "learning_objectives": [],
+          "resources": [],
+          "pyqs": [],
+          "practice_questions": []
+        }
+      ]
+    },
+    {
+      "chapter_number": 8,
+      "title": "Water Resources",
+      "section": "Unit 2: Contemporary India - II (Geography)",
+      "description": "Water scarcity and the need for water conservation and management, multi-purpose river projects and integrated water resources management, rainwater harvesting.",
+      "topics": [
+        {
+          "topic_number": 1,
+          "title": "Multipurpose River Projects and Rainwater Harvesting",
+          "description": "Debates on big dams (Narmada Bachao Andolan) and traditional rainwater harvesting techniques (Khadins, Johads, Rooftop).",
+          "estimated_minutes": 20,
+          "learning_objectives": [],
+          "resources": [],
+          "pyqs": [],
+          "practice_questions": []
+        }
+      ]
+    },
+    {
+      "chapter_number": 9,
+      "title": "Agriculture",
+      "section": "Unit 2: Contemporary India - II (Geography)",
+      "description": "Types of farming: primitive subsistence, intensive subsistence, commercial; cropping pattern: rabi, kharif, zaid; major crops: food grains, plantation; institutional and technological reforms.",
+      "topics": [
+        {
+          "topic_number": 1,
+          "title": "Cropping Seasons and Major Food Crops",
+          "description": "Climatic conditions, rainfall, and spatial distribution of Rice, Wheat, Millets, Sugarcane, Tea, and Cotton.",
+          "estimated_minutes": 25,
+          "learning_objectives": [],
+          "resources": [],
+          "pyqs": [],
+          "practice_questions": []
+        }
+      ]
+    },
+    {
+      "chapter_number": 10,
+      "title": "Minerals and Energy Resources",
+      "section": "Unit 2: Contemporary India - II (Geography)",
+      "description": "What is a mineral, mode of occurrence, ferrous and non-ferrous minerals, non-metallic minerals, conventional and non-conventional sources of energy.",
+      "topics": [
+        {
+          "topic_number": 1,
+          "title": "Conventional and Renewable Energy Resources",
+          "description": "Coal, Petroleum, Natural Gas, Solar, Wind, and Nuclear energy distribution and conservation.",
+          "estimated_minutes": 20,
+          "learning_objectives": [],
+          "resources": [],
+          "pyqs": [],
+          "practice_questions": []
+        }
+      ]
+    },
+    {
+      "chapter_number": 11,
+      "title": "Manufacturing Industries",
+      "section": "Unit 2: Contemporary India - II (Geography)",
+      "description": "Importance of manufacturing, contribution of industry to national economy, industrial location, classification of industries, agro-based, mineral-based, industrial pollution and environmental degradation.",
+      "topics": [
+        {
+          "topic_number": 1,
+          "title": "Industrial Classification and Environmental Control",
+          "description": "Iron and Steel, Textile, and Chemical industries, alongside effluent treatment mechanisms.",
+          "estimated_minutes": 20,
+          "learning_objectives": [],
+          "resources": [],
+          "pyqs": [],
+          "practice_questions": []
+        }
+      ]
+    },
+    {
+      "chapter_number": 12,
+      "title": "Lifelines of National Economy",
+      "section": "Unit 2: Contemporary India - II (Geography)",
+      "description": "Transport: roadways, railways, pipelines, waterways, major ports, airways; communication; international trade; tourism as a trade.",
+      "topics": [
+        {
+          "topic_number": 1,
+          "title": "Transport Infrastructure and International Trade",
+          "description": "Golden Quadrilateral, inland waterways, coastal ports, and balance of trade.",
+          "estimated_minutes": 20,
+          "learning_objectives": [],
+          "resources": [],
+          "pyqs": [],
+          "practice_questions": []
+        }
+      ]
+    },
+    {
+      "chapter_number": 13,
+      "title": "Power Sharing",
+      "section": "Unit 3: Democratic Politics - II (Political Science)",
+      "description": "Case studies of Belgium and Sri Lanka; why power sharing is desirable: prudential and moral reasons; forms of power sharing: horizontal, vertical, social groups, and coalition.",
+      "topics": [
+        {
+          "topic_number": 1,
+          "title": "Case Studies of Belgium and Sri Lanka",
+          "description": "Ethnic composition, contrasting strategies: majoritarianism in Sri Lanka vs constitutional accommodation in Belgium.",
+          "estimated_minutes": 25,
+          "learning_objectives": [
+            {
+              "code": "CBSE10-SOC-CH13-LO01",
+              "description": "Compare the ethnic demographics of Belgium and Sri Lanka and contrast their policy responses.",
+              "taxonomy_level": "analyze",
+              "is_core": true,
+              "is_verified": true
+            },
+            {
+              "code": "CBSE10-SOC-CH13-LO02",
+              "description": "Explain the majoritarian measures enacted in Sri Lanka under the 1956 Act and their societal repercussions.",
+              "taxonomy_level": "evaluate",
+              "is_core": true,
+              "is_verified": true
+            }
+          ],
+          "resources": [
+            {
+              "title": "NCERT Class X Notes: Belgium and Sri Lanka Power Sharing Models",
+              "resource_type": "notes",
+              "provider": "ncert",
+              "source_name": "NCERT Class X Democratic Politics - II",
+              "source_url": "https://ncert.nic.in/textbook.php?jess4=1-8",
+              "text_content": "# Power Sharing: Belgium and Sri Lanka\n\n### 1. Ethnic Composition\n- **Belgium**: 59% Dutch-speakers in Flemish region, 40% French-speakers in Wallonia, 1% German-speakers. In capital Brussels, 80% French and 20% Dutch.\n- **Sri Lanka**: 74% Sinhala-speakers (mainly Buddhist), 18% Tamil-speakers (13% Sri Lankan Tamils, 5% Indian Tamils - Hindus and Muslims).\n\n### 2. Majoritarianism in Sri Lanka\nSri Lanka adopted majoritarian policies favoring the Sinhala majority:\n- **1956 Official Language Act**: Recognized Sinhala as the sole official language, disregarding Tamil.\n- Preferential policies for Sinhala applicants in universities and government jobs.\n- State pledged to foster and protect Buddhism.\n- Result: Alienation of Sri Lankan Tamils, rise of LTTE, and a prolonged civil war.\n\n### 3. Accommodation in Belgium\nBetween 1970 and 1993, the Belgian Constitution was amended four times:\n- Equal number of Dutch and French ministers in the central government.\n- Many powers transferred to regional state governments (not subordinate to central government).\n- Brussels established an equal 50:50 representation government.\n- **Community Government**: Elected by people belonging to one language group, handling cultural, educational, and linguistic matters.",
+              "order_index": 1,
+              "is_verified": true
+            }
+          ],
+          "study_notes": {
+            "notes_type": "comprehensive",
+            "title": "Ethnic Dynamics & Governance: Belgium vs Sri Lanka",
+            "overview": "Detailed political analysis comparing how majoritarianism leads to civil strife, whereas inclusive constitutional accommodation preserves national unity.",
+            "learning_objectives": [
+              "Contrast the linguistic demographics of Belgium and Sri Lanka.",
+              "Explain the provisions of the 1956 Sri Lankan Official Language Act.",
+              "Detail the four constitutional amendments defining the Belgian accommodation model."
+            ],
+            "explanation_markdown": "# Accommodation vs Majoritarianism\n\n### 1. The Demographic Mosaic\nIn Belgium, the Dutch formed a national majority (59%) but a minority in Brussels (20%). In Sri Lanka, the Sinhala majority constituted 74%.\n\n### 2. The Path of Majoritarianism: Sri Lanka\nBelieving that the majority community should rule, the Sri Lankan leadership passed the **1956 Act**:\n- Imposed Sinhala as sole official language.\n- Institutionalized affirmative quotas for Sinhala candidates.\n- Alienated Tamils, sparking ethnic civil conflict.\n\n### 3. The Path of Accommodation: Belgium\nBelgian leaders recognized cultural diversity through unique power-sharing:\n1. Equal Dutch and French cabinet ministers.\n2. Autonomous regional governments.\n3. Equal representation in Brussels.\n4. **Community Government** managing cultural and educational domains.",
+            "key_terms": [
+              {
+                "term": "Majoritarianism",
+                "definition": "A belief that the majority community should be able to rule a country in whichever way it pleases, disregarding the wishes of the minority."
+              },
+              {
+                "term": "Community Government",
+                "definition": "A third tier of government in Belgium elected by members of one language community (Dutch, French, German) to manage cultural, educational, and language issues."
+              }
+            ],
+            "formulas_and_dates": [
+              {
+                "name": "Sri Lankan Official Language Act",
+                "formula": "1956"
+              },
+              {
+                "name": "Belgian Constitutional Amendments Window",
+                "formula": "1970 - 1993"
+              }
+            ],
+            "diagrams": [
+              {
+                "caption": "Contrasting Governance Models",
+                "mermaid_code": "graph TD\n    A[Ethnic Pluralism] --> B[Sri Lanka: Majoritarianism 1956 Act]\n    A --> C[Belgium: Constitutional Accommodation]\n    B --> D[Alienation & Civil Conflict]\n    C --> E[Peaceful Federation & EU Headquarters in Brussels]"
+              }
+            ],
+            "common_misconceptions": [
+              {
+                "misconception": "In Brussels, Dutch speakers constituted the demographic majority.",
+                "correction": "Nationally Dutch speakers were 59%, but in Brussels French speakers were 80% while Dutch speakers were only 20%."
+              }
+            ],
+            "exam_points": [
+              "Analyze any three elements of the Belgian model of power sharing.",
+              "What were the consequences of majoritarian policies in Sri Lanka? Highlight mistrust, civil war, and economic disruption."
+            ],
+            "source_references": [
+              {
+                "title": "NCERT Class X Democratic Politics - II (Chapter 1)",
+                "url": "https://ncert.nic.in/textbook.php?jess4=1-8"
+              }
+            ],
+            "version": 1,
+            "is_verified": true
+          },
+          "pyqs": [
+            {
+              "board": "CBSE",
+              "grade": "Class 10",
+              "exam_year": 2023,
+              "paper_code": "CBSE-32/1/1-2023",
+              "question_number": "Question 25",
+              "marks": 3,
+              "question_text": "Explain any three majoritarian measures adopted by the Sri Lankan Government to establish Sinhala supremacy.",
+              "marking_scheme": "Award 1 mark each for three valid points:\n1. In 1956, an Act was passed to recognize Sinhala as the only official language, thus disregarding Tamil.\n2. The governments followed preferential policies that favored Sinhala applicants for university positions and government jobs.\n3. A new constitution stipulated that the state shall protect and foster Buddhism.",
+              "source_name": "CBSE Official Class 10 Board Examination Paper 2023",
+              "source_url": "https://cbseacademic.nic.in/curriculum_2026.html",
+              "is_verified": true
+            }
+          ],
+          "practice_questions": [
+            {
+              "question_text": "Which year saw the passage of the Act recognizing Sinhala as the sole official language of Sri Lanka?",
+              "question_type": "mcq",
+              "options": [
+                {
+                  "id": "A",
+                  "text": "1948"
+                },
+                {
+                  "id": "B",
+                  "text": "1956"
+                },
+                {
+                  "id": "C",
+                  "text": "1962"
+                },
+                {
+                  "id": "D",
+                  "text": "1971"
+                }
+              ],
+              "correct_answer": "B",
+              "explanation": "In 1956, the Sri Lankan Parliament enacted the Official Language Act establishing Sinhala as the only official language.",
+              "difficulty": "easy",
+              "marks": 1,
+              "is_ai_generated": true,
+              "generation_provenance": {
+                "model": "smartlearn-curator-v1",
+                "template": "polity-power-sharing-v1",
+                "verified_by": "SmartLearn Academic Review"
+              }
+            }
+          ]
+        },
+        {
+          "topic_number": 2,
+          "title": "Forms of Power Sharing and Prudential vs Moral Reasons",
+          "description": "Horizontal and vertical power sharing, sharing among social groups and political parties, prudential vs moral arguments.",
+          "estimated_minutes": 25,
+          "learning_objectives": [
+            {
+              "code": "CBSE10-SOC-CH13-LO03",
+              "description": "Differentiate between prudential and moral arguments for power sharing in modern democracies.",
+              "taxonomy_level": "understand",
+              "is_core": true,
+              "is_verified": true
+            }
+          ],
+          "resources": [],
+          "pyqs": [],
+          "practice_questions": []
+        }
+      ]
+    },
+    {
+      "chapter_number": 14,
+      "title": "Federalism",
+      "section": "Unit 3: Democratic Politics - II (Political Science)",
+      "description": "What is federalism, what makes India a federal country, how is federalism practiced, and decentralisation in India (1992 73rd and 74th Amendments).",
+      "topics": [
+        {
+          "topic_number": 1,
+          "title": "Federal Principles and 1992 Decentralisation in India",
+          "description": "Union, State, and Concurrent lists, alongside rural and urban local self-government institutions.",
+          "estimated_minutes": 25,
+          "learning_objectives": [],
+          "resources": [],
+          "pyqs": [],
+          "practice_questions": []
+        }
+      ]
+    },
+    {
+      "chapter_number": 15,
+      "title": "Gender, Religion and Caste",
+      "section": "Unit 3: Democratic Politics - II (Political Science)",
+      "description": "Gender and politics: public/private division, women's political representation; religion, communalism and politics; caste and politics.",
+      "topics": [
+        {
+          "topic_number": 1,
+          "title": "Communalism and Caste Dynamics in Indian Politics",
+          "description": "Secular state constitutional principles and caste mobilization in democratic politics.",
+          "estimated_minutes": 20,
+          "learning_objectives": [],
+          "resources": [],
+          "pyqs": [],
+          "practice_questions": []
+        }
+      ]
+    },
+    {
+      "chapter_number": 16,
+      "title": "Political Parties",
+      "section": "Unit 3: Democratic Politics - II (Political Science)",
+      "description": "Why do we need political parties, meaning, functions, necessity, party systems (one, two, multi-party), national and regional parties, challenges and reform.",
+      "topics": [
+        {
+          "topic_number": 1,
+          "title": "Functions and Challenges of Political Parties",
+          "description": "Dynastic succession, money and muscle power, lack of internal democracy, and Election Commission reforms.",
+          "estimated_minutes": 20,
+          "learning_objectives": [],
+          "resources": [],
+          "pyqs": [],
+          "practice_questions": []
+        }
+      ]
+    },
+    {
+      "chapter_number": 17,
+      "title": "Outcomes of Democracy",
+      "section": "Unit 3: Democratic Politics - II (Political Science)",
+      "description": "How do we assess democracy's outcomes: accountable, responsive and legitimate government, economic growth and development, reduction of inequality and poverty, accommodation of social diversity, dignity and freedom of the citizens.",
+      "topics": [
+        {
+          "topic_number": 1,
+          "title": "Democratic Accountability and Social Accommodation",
+          "description": "Comparing democratic legitimacy with non-democratic regimes in transparency and resolving social divisions.",
+          "estimated_minutes": 20,
+          "learning_objectives": [],
+          "resources": [],
+          "pyqs": [],
+          "practice_questions": []
+        }
+      ]
+    },
+    {
+      "chapter_number": 18,
+      "title": "Development",
+      "section": "Unit 4: Understanding Economic Development (Economics)",
+      "description": "What development promises: different people, different goals; income and other goals; national development; how to compare different countries or states; public facilities; sustainability of development.",
+      "topics": [
+        {
+          "topic_number": 1,
+          "title": "Developmental Goals, Per Capita Income and World Bank Criteria",
+          "description": "Conflicting developmental goals, average income limitations, and World Bank criteria for categorizing rich and low-income countries.",
+          "estimated_minutes": 25,
+          "learning_objectives": [
+            {
+              "code": "CBSE10-SOC-CH18-LO01",
+              "description": "Explain why developmental goals can be distinct and at times mutually conflicting for different social groups.",
+              "taxonomy_level": "understand",
+              "is_core": true,
+              "is_verified": true
+            },
+            {
+              "code": "CBSE10-SOC-CH18-LO02",
+              "description": "Evaluate the merits and limitations of using Per Capita Income (PCI) as the sole indicator of national development.",
+              "taxonomy_level": "evaluate",
+              "is_core": true,
+              "is_verified": true
+            }
+          ],
+          "resources": [
+            {
+              "title": "NCERT Class X Notes: Development Criteria & Income Disparities",
+              "resource_type": "notes",
+              "provider": "ncert",
+              "source_name": "NCERT Class X Understanding Economic Development",
+              "source_url": "https://ncert.nic.in/textbook.php?jess2=1-5",
+              "text_content": "# Development: Goals and Metrics\n\n### 1. Conflicting and Diverse Goals\nWhat may be development for one person may not be development for another; it may even be destructive for the other:\n- An industrialist wants dams to generate hydroelectric power.\n- A tribal community is displaced and loses land and livelihood.\n\n### 2. National Income vs Per Capita Income\nTo compare nations with different population sizes, economists use **Average Income** (Per Capita Income):\n$$\\text{Per Capita Income} = \\frac{\\text{Total National Income}}{\\text{Total Population}}$$\n\n### 3. World Bank Development Criterion\nPublished in World Development Reports:\n- High-income countries: PCI above USD 49,300 per annum (2019).\n- Low-income countries: PCI below USD 2,500 per annum.\n- India belongs to the low-middle income category because its per capita income in 2019 was about USD 6,700 per annum.\n\n### 4. Limitations of Average Income\nWhile averages are useful for comparison, they **hide disparities**. A country with 5 citizens where 1 earns Rs 48,000 and 4 earn Rs 500 has the same average income (Rs 10,000) as an equitable country where each earns Rs 10,000, yet social welfare is radically unequal.",
+              "order_index": 1,
+              "is_verified": true
+            }
+          ],
+          "study_notes": {
+            "notes_type": "comprehensive",
+            "title": "Developmental Goals, Per Capita Income & Distributional Equity",
+            "overview": "Comprehensive exploration of developmental economics concepts, contrasting pure monetary averages with multidimensional well-being metrics.",
+            "learning_objectives": [
+              "Explain why different individuals possess varying and contradictory developmental aspirations.",
+              "Calculate and analyze the significance of per capita income.",
+              "Identify the key limitation of average income in reflecting wealth distribution."
+            ],
+            "explanation_markdown": "# Understanding Development\n\n### 1. The Multi-Faceted Nature of Development\nPeople look for a mix of goals: income, freedom, security, respect, and non-discrimination.\n\n### 2. World Bank Metric\nThe World Bank classifies countries solely on the basis of **Per Capita Income (Average Income)** in US dollars.\n\n### 3. The Major Flaw of Per Capita Income\nAverages obscure equitable distribution. If extreme wealth is concentrated in a tiny fraction of the population, per capita income remains high despite widespread impoverishment.",
+            "key_terms": [
+              {
+                "term": "Per Capita Income",
+                "definition": "Total national income divided by total population; also known as average income."
+              },
+              {
+                "term": "Conflicting Goals",
+                "definition": "A developmental pursuit beneficial to one demographic that simultaneously harms or displaces another."
+              }
+            ],
+            "formulas_and_dates": [
+              {
+                "name": "Per Capita Income Formula",
+                "formula": "Total National Income / Total Population"
+              }
+            ],
+            "diagrams": [
+              {
+                "caption": "Income Metric vs Multidimensional Well-Being",
+                "mermaid_code": "graph LR\n    A[National Development] --> B[World Bank: Per Capita Income Only]\n    A --> C[UNDP: Health, Education & PCI]\n    B --> D[Hides Disparities]\n    C --> E[Human Development Index HDI]"
+              }
+            ],
+            "common_misconceptions": [
+              {
+                "misconception": "If two countries have the exact same per capita income, their citizens enjoy identical qualities of life.",
+                "correction": "One country may have equitable wealth distribution and universal public health, while the other concentrates wealth among an elite with zero public healthcare."
+              }
+            ],
+            "exam_points": [
+              "Explain with examples why development for one may be destruction for another (e.g., construction of mega dams displacing indigenous communities).",
+              "State the main limitation of using per capita income for international comparison."
+            ],
+            "source_references": [
+              {
+                "title": "NCERT Class X Understanding Economic Development (Chapter 1)",
+                "url": "https://ncert.nic.in/textbook.php?jess2=1-5"
+              }
+            ],
+            "version": 1,
+            "is_verified": true
+          },
+          "pyqs": [
+            {
+              "board": "CBSE",
+              "grade": "Class 10",
+              "exam_year": 2023,
+              "paper_code": "CBSE-32/2/1-2023",
+              "question_number": "Question 2",
+              "marks": 3,
+              "question_text": "Why do people's development goals vary? Explain with two suitable examples.",
+              "marking_scheme": "People have different developmental goals because their life situations differ. What is development for one may not be development for another; it may even be destructive for the other (1 mark).\nExamples (1 mark each):\n1. A landless rural laborer desires more days of work and better wages, whereas a prosperous farmer seeks higher support prices for crops and cheap labor.\n2. An industrialist desires mega-dams for generating electricity, but local tribal communities lose their ancestral lands and homes due to submersion.",
+              "source_name": "CBSE Official Class 10 Board Examination Paper 2023",
+              "source_url": "https://cbseacademic.nic.in/curriculum_2026.html",
+              "is_verified": true
+            }
+          ],
+          "practice_questions": [
+            {
+              "question_text": "Which criterion is primarily used by the World Bank in its World Development Report to classify different countries?",
+              "question_type": "mcq",
+              "options": [
+                {
+                  "id": "A",
+                  "text": "Gross Domestic Savings"
+                },
+                {
+                  "id": "B",
+                  "text": "Per Capita Income (Average Income)"
+                },
+                {
+                  "id": "C",
+                  "text": "Infant Mortality Rate"
+                },
+                {
+                  "id": "D",
+                  "text": "Gross Enrollment Ratio"
+                }
+              ],
+              "correct_answer": "B",
+              "explanation": "The World Bank classifies countries into high, middle, and low income categories based solely on per capita income.",
+              "difficulty": "easy",
+              "marks": 1,
+              "is_ai_generated": true,
+              "generation_provenance": {
+                "model": "smartlearn-curator-v1",
+                "template": "economics-world-bank-v1",
+                "verified_by": "SmartLearn Academic Review"
+              }
+            }
+          ]
+        },
+        {
+          "topic_number": 2,
+          "title": "Human Development Index (HDI) and Sustainability of Development",
+          "description": "UNDP Human Development Report criteria: life expectancy, literacy, infant mortality rate; sustainability: groundwater depletion and crude oil reserves.",
+          "estimated_minutes": 25,
+          "learning_objectives": [
+            {
+              "code": "CBSE10-SOC-CH18-LO03",
+              "description": "Compare UNDP's Human Development Index methodology with the World Bank's economic metric.",
+              "taxonomy_level": "analyze",
+              "is_core": true,
+              "is_verified": true
+            }
+          ],
+          "resources": [],
+          "pyqs": [],
+          "practice_questions": []
+        }
+      ]
+    },
+    {
+      "chapter_number": 19,
+      "title": "Sectors of the Indian Economy",
+      "section": "Unit 4: Understanding Economic Development (Economics)",
+      "description": "Primary, secondary and tertiary sectors; comparing the three sectors; historical changes in sectors; rising importance of tertiary sector; employment trends and disguised unemployment; organised vs unorganised sectors.",
+      "topics": [
+        {
+          "topic_number": 1,
+          "title": "Economic Sectors and Underemployment",
+          "description": "GDP contribution of services vs employment share of agriculture; disguised unemployment and MGNREGA 2005.",
+          "estimated_minutes": 25,
+          "learning_objectives": [],
+          "resources": [],
+          "pyqs": [],
+          "practice_questions": []
+        }
+      ]
+    },
+    {
+      "chapter_number": 20,
+      "title": "Money and Credit",
+      "section": "Unit 4: Understanding Economic Development (Economics)",
+      "description": "Money as a medium of exchange; modern forms of money: currency, bank deposits; loan activities of banks; two different credit situations; terms of credit; formal and informal sector credit in India; Self-Help Groups (SHGs).",
+      "topics": [
+        {
+          "topic_number": 1,
+          "title": "Formal vs Informal Credit and Self-Help Groups (SHGs)",
+          "description": "Role of Reserve Bank of India, collateral requirements, moneylenders' debt traps, and micro-finance SHGs for rural women.",
+          "estimated_minutes": 25,
+          "learning_objectives": [],
+          "resources": [],
+          "pyqs": [],
+          "practice_questions": []
+        }
+      ]
+    },
+    {
+      "chapter_number": 21,
+      "title": "Globalisation and the Indian Economy",
+      "section": "Unit 4: Understanding Economic Development (Economics)",
+      "description": "Production across countries; foreign trade and integration of markets; what is globalisation; factors enabling globalisation: technology, liberalisation; World Trade Organisation (WTO); impact in India and struggle for fair globalisation.",
+      "topics": [
+        {
+          "topic_number": 1,
+          "title": "MNC Operations, Trade Liberalisation and WTO",
+          "description": "Foreign direct investment, removal of trade barriers in 1991, and unequal terms at WTO.",
+          "estimated_minutes": 25,
+          "learning_objectives": [],
+          "resources": [],
+          "pyqs": [],
+          "practice_questions": []
+        }
+      ]
+    },
+    {
+      "chapter_number": 22,
+      "title": "Consumer Rights",
+      "section": "Unit 4: Understanding Economic Development (Economics)",
+      "description": "The consumer movement, Consumer Protection Act (COPRA 1986 / 2019), consumer rights: right to safety, information, choice, seek redressal; consumer forums and courts.",
+      "topics": [
+        {
+          "topic_number": 1,
+          "title": "Consumer Rights and Redressal Mechanisms",
+          "description": "Six statutory consumer rights, three-tier quasi-judicial machinery (District, State, National commissions).",
+          "estimated_minutes": 20,
+          "learning_objectives": [],
+          "resources": [],
+          "pyqs": [],
+          "practice_questions": []
+        }
+      ]
+    }
+  ]
+}

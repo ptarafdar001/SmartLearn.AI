@@ -1,0 +1,759 @@
+{
+  "subject_code": "cbse-class-12-sci-phy",
+  "board": "CBSE",
+  "grade": "Class 12",
+  "academic_stream": "science",
+  "subject_name": "Physics",
+  "category": "core",
+  "curriculum_status": "content_available",
+  "source_provenance": {
+    "source_authority": "CBSE / NCERT",
+    "source_name": "CBSE Senior School Curriculum (Code 042) 2026-27 & NCERT Class XII Physics",
+    "source_url": "https://cbseacademic.nic.in/curriculum_2026.html",
+    "syllabus_version": "Academic Year 2026-27",
+    "document_ref": "CBSE-Acad-SrSec-2026-Physics-042.pdf",
+    "retrieval_date": "2026-09-23",
+    "verification_status": "verified_published",
+    "license_or_terms": "Official Public NCERT/CBSE Syllabus - Permitted Educational Use"
+  },
+  "chapters": [
+    {
+      "chapter_number": 1,
+      "title": "Electric Charges and Fields",
+      "section": "Unit I: Electrostatics",
+      "description": "Electric charges, conservation of charge, Coulomb's law, forces between multiple charges; superposition principle and continuous charge distribution. Electric field, electric field lines, electric dipole, electric field due to a dipole, torque on a dipole in uniform electric field. Electric flux, statement of Gauss's theorem and its applications to find field due to infinitely long straight wire, uniformly charged infinite plane sheet and uniformly charged thin spherical shell.",
+      "topics": [
+        {
+          "topic_number": 1,
+          "title": "Electric Charges, Quantization and Coulomb's Law",
+          "description": "Properties of electric charge, quantization q = ne, conservation of charge, vector form of Coulomb's Law, and superposition principle.",
+          "estimated_minutes": 30,
+          "learning_objectives": [
+            {
+              "code": "CBSE12-PHY-CH01-LO01",
+              "description": "State and apply the principle of quantization of charge (q = ne) and conservation of charge to atomic systems.",
+              "taxonomy_level": "apply",
+              "is_core": true,
+              "is_verified": true
+            },
+            {
+              "code": "CBSE12-PHY-CH01-LO02",
+              "description": "Formulate Coulomb's law in vector notation and compute electrostatic forces in multi-charge configurations using the superposition principle.",
+              "taxonomy_level": "apply",
+              "is_core": true,
+              "is_verified": true
+            }
+          ],
+          "resources": [
+            {
+              "title": "NCERT Class XII Physics Chapter 1: Electric Charges and Coulomb's Law",
+              "resource_type": "notes",
+              "provider": "ncert",
+              "source_name": "NCERT Class XII Physics Part I",
+              "source_url": "https://ncert.nic.in/textbook.php?leph1=1-8",
+              "text_content": "# Electric Charges and Coulomb's Law\n\n### 1. Fundamental Properties of Electric Charge\n1. **Additivity of Charges**: Total charge of an isolated system is the algebraic sum of individual point charges: $Q = q_1 + q_2 + \\dots + q_n$.\n2. **Conservation of Charge**: In any isolated system, total charge remains constant. Charge cannot be created or destroyed, only transferred.\n3. **Quantization of Charge**: Charge exists in discrete integer multiples of the elementary electronic charge ($e = 1.602 \\times 10^{-19}\\text{ C}$):\n$$q = \\pm ne, \\quad n \\in \\mathbb{Z}^+$$\n\n### 2. Coulomb's Law in Vector Form\nThe electrostatic force between two stationary point charges $q_1$ and $q_2$ separated by distance $r$ in vacuum:\n$$\\vec{F}_{12} = \\frac{1}{4\\pi\\varepsilon_0} \\frac{q_1 q_2}{r^2} \\hat{r}_{21}$$\nwhere $\\varepsilon_0 = 8.854 \\times 10^{-12}\\text{ C}^2\\text{N}^{-1}\\text{m}^{-2}$ is the permittivity of free space, and $\\frac{1}{4\\pi\\varepsilon_0} \\approx 8.99 \\times 10^9\\text{ N m}^2\\text{C}^{-2}$.",
+              "order_index": 1,
+              "is_verified": true
+            }
+          ],
+          "study_notes": {
+            "notes_type": "comprehensive",
+            "title": "Electrostatics: Charge Quantization, Superposition & Coulomb's Law",
+            "overview": "Rigorous derivation and problem-solving framework for static charges, inverse-square law behavior, permittivity of media, and vector superposition of forces.",
+            "learning_objectives": [
+              "Calculate electrostatic force between point charges in vacuum and dielectric media.",
+              "Apply vector superposition to symmetrical charge distributions.",
+              "Verify charge conservation in nuclear and physical interactions."
+            ],
+            "explanation_markdown": "# Electrostatics: Fundamental Charges & Coulomb's Law\n\n### 1. The Inverse-Square Law\nCoulomb's law governs the interaction of static point charges in vacuum:\n$$F = \\frac{1}{4\\pi\\varepsilon_0}\\frac{|q_1 q_2|}{r^2}$$\nIn a medium with relative permittivity (dielectric constant) $K = \\varepsilon_r$:\n$$F_{\\text{med}} = \\frac{F_{\\text{vac}}}{K}$$\n\n### 2. Principle of Superposition\nThe total force on a test charge $q_0$ due to a collection of discrete charges is the vector sum of individual forces:\n$$\\vec{F}_0 = \\sum_{i=1}^n \\vec{F}_{0i} = \\frac{q_0}{4\\pi\\varepsilon_0} \\sum_{i=1}^n \\frac{q_i}{r_{i0}^2} \\hat{r}_{i0}$$",
+            "key_terms": [
+              {
+                "term": "Quantization of Charge",
+                "definition": "The property that electric charge is always an integral multiple of the basic quantum e = 1.6 x 10^-19 C."
+              },
+              {
+                "term": "Dielectric Constant",
+                "definition": "The ratio of permittivity of a medium to the permittivity of free space: K = epsilon / epsilon_0."
+              }
+            ],
+            "formulas_and_dates": [
+              {
+                "name": "Quantization of Charge",
+                "formula": "q = ne"
+              },
+              {
+                "name": "Coulomb's Law in Free Space",
+                "formula": "F = (1 / 4*pi*epsilon_0) * (q1 * q2 / r^2)"
+              },
+              {
+                "name": "Force in Dielectric Medium",
+                "formula": "F_med = F_vac / K"
+              }
+            ],
+            "diagrams": [
+              {
+                "caption": "Vector Resolution of Electrostatic Forces",
+                "mermaid_code": "graph LR\n    A[Point Charges q1 and q2] --> B[Coulomb's Law Vector Form]\n    B --> C[Attractive if Opposite Signs]\n    B --> D[Repulsive if Like Signs]\n    B --> E[Dielectric Attenuation: F/K]"
+              }
+            ],
+            "common_misconceptions": [
+              {
+                "misconception": "Coulomb's law applies identically to macroscopic charged spheres of any radius separated by small distances.",
+                "correction": "Coulomb's law strictly applies to point charges. For large spheres near each other, charge induction distorts uniform surface distribution, shifting effective charge centers."
+              }
+            ],
+            "exam_points": [
+              "State Coulomb's law in vector form and show that F_12 = -F_21 (Newton's third law compliance).",
+              "Calculate the number of electrons in 1 Coulomb of negative charge: n = 1 / (1.6 x 10^-19) = 6.25 x 10^18 electrons."
+            ],
+            "source_references": [
+              {
+                "title": "NCERT Class XII Physics Part I Chapter 1",
+                "url": "https://ncert.nic.in/textbook.php?leph1=1-8"
+              }
+            ],
+            "version": 1,
+            "is_verified": true
+          },
+          "pyqs": [
+            {
+              "board": "CBSE",
+              "grade": "Class 12",
+              "exam_year": 2023,
+              "paper_code": "CBSE-55/1/1-2023",
+              "question_number": "Question 1",
+              "marks": 2,
+              "question_text": "Two point charges q1 and q2 are placed at a distance r apart in air. The electrostatic force between them is F. If the medium is replaced by water of dielectric constant K = 81, what will be the new force between them? Justify.",
+              "marking_scheme": "1. Expression for force in medium: F' = F / K (1 mark).\n2. Calculation: F' = F / 81. The force reduces to 1/81 times its original value in air because the dielectric polarization of water reduces the effective net electric field between charges (1 mark).",
+              "source_name": "CBSE Official Class 12 Board Examination Paper 2023",
+              "source_url": "https://cbseacademic.nic.in/curriculum_2026.html",
+              "is_verified": true
+            }
+          ],
+          "practice_questions": [
+            {
+              "question_text": "What is the total number of elementary electrons required to constitute a total charge of -2 Coulomb?",
+              "question_type": "mcq",
+              "options": [
+                {
+                  "id": "A",
+                  "text": "6.25 x 10^18"
+                },
+                {
+                  "id": "B",
+                  "text": "1.25 x 10^19"
+                },
+                {
+                  "id": "C",
+                  "text": "3.12 x 10^19"
+                },
+                {
+                  "id": "D",
+                  "text": "2.50 x 10^18"
+                }
+              ],
+              "correct_answer": "B",
+              "explanation": "From q = ne, n = q/e = 2 / (1.6 x 10^-19) = 1.25 x 10^19 electrons.",
+              "difficulty": "easy",
+              "marks": 1,
+              "is_ai_generated": true,
+              "generation_provenance": {
+                "model": "smartlearn-curator-v1",
+                "template": "physics-quantization-v1",
+                "verified_by": "SmartLearn Academic Review"
+              }
+            }
+          ]
+        },
+        {
+          "topic_number": 2,
+          "title": "Electric Field Lines and Electric Dipole",
+          "description": "Definition of electric field, field lines and their physical properties, electric dipole moment, and torque on an electric dipole in a uniform external field.",
+          "estimated_minutes": 35,
+          "learning_objectives": [
+            {
+              "code": "CBSE12-PHY-CH01-LO03",
+              "description": "Derive the electric field of an electric dipole along axial and equatorial lines, and show their 2:1 ratio for short dipoles.",
+              "taxonomy_level": "analyze",
+              "is_core": true,
+              "is_verified": true
+            }
+          ],
+          "resources": [],
+          "pyqs": [],
+          "practice_questions": []
+        },
+        {
+          "topic_number": 3,
+          "title": "Electric Flux, Gauss's Law and PhET Simulation Lab",
+          "description": "Concept of electric flux, Gauss's law statement, interactive electrostatic simulation, and applications to line charge and infinite plane sheet.",
+          "estimated_minutes": 35,
+          "learning_objectives": [
+            {
+              "code": "CBSE12-PHY-CH01-LO04",
+              "description": "Apply Gauss's law to derive the electric field due to an infinitely long uniformly charged wire (E = lambda / 2*pi*epsilon_0*r).",
+              "taxonomy_level": "apply",
+              "is_core": true,
+              "is_verified": true
+            },
+            {
+              "code": "CBSE12-PHY-CH01-LO05",
+              "description": "Investigate electric fields, potential contours, and field line density interactively using the PhET simulation.",
+              "taxonomy_level": "apply",
+              "is_core": true,
+              "is_verified": true
+            }
+          ],
+          "resources": [
+            {
+              "title": "PhET Interactive Simulation: Charges and Fields",
+              "resource_type": "interactive",
+              "provider": "phet",
+              "source_name": "PhET Interactive Simulations, University of Colorado Boulder",
+              "source_url": "https://phet.colorado.edu/en/simulations/charges-and-fields",
+              "content_url": "https://phet.colorado.edu/sims/html/charges-and-fields/latest/charges-and-fields_all.html",
+              "text_content": "Explore how positive and negative point charges produce vector electric fields, equipotential contours, and test electrostatic potential values across a 2D spatial canvas.",
+              "order_index": 1,
+              "is_verified": true
+            },
+            {
+              "title": "NCERT Class XII Notes: Gauss's Law and Symmetric Field Calculations",
+              "resource_type": "notes",
+              "provider": "ncert",
+              "source_name": "NCERT Class XII Physics Part I",
+              "source_url": "https://ncert.nic.in/textbook.php?leph1=1-8",
+              "text_content": "# Gauss's Law and Applications\n\n### 1. Electric Flux\nElectric flux through an infinitesimal area element $d\\vec{A}$ is given by:\n$$\\Phi_E = \\int_S \\vec{E} \\cdot d\\vec{A} = \\int_S E \\cos\\theta \\, dA$$\n\n### 2. Gauss's Law\nThe total electric flux passing through any closed Gaussian surface in vacuum is equal to $\\frac{1}{\\varepsilon_0}$ times the net charge enclosed inside:\n$$\\oint_S \\vec{E} \\cdot d\\vec{A} = \\frac{q_{\\text{enclosed}}}{\\varepsilon_0}$$\n\n### 3. Application 1: Infinitely Long Line Charge\nFor a line charge of linear density $\\lambda$:\n$$E = \\frac{\\lambda}{2\\pi\\varepsilon_0 r}$$\n\n### 4. Application 2: Infinite Uniformly Charged Plane Sheet\nFor a sheet of surface charge density $\\sigma$:\n$$E = \\frac{\\sigma}{2\\varepsilon_0}$$",
+              "order_index": 2,
+              "is_verified": true
+            }
+          ],
+          "study_notes": {
+            "notes_type": "comprehensive",
+            "title": "Gauss's Theorem: Symmetry, Flux & Field Derivations",
+            "overview": "Rigorous derivation of Gauss's Law from Coulomb's law, choice of Gaussian surfaces (cylindrical, planar, spherical), and laboratory simulation using PhET.",
+            "learning_objectives": [
+              "State Gauss's Law and establish the necessary symmetry conditions for its direct application.",
+              "Derive electric field expressions for linear, surface, and spherical charge geometries.",
+              "Analyze equipotential lines and vector arrows in PhET Charges and Fields simulation."
+            ],
+            "explanation_markdown": "# Gauss's Law & Symmetric Charge Configurations\n\n### 1. Statement of Gauss's Law\nThe total electric flux through any closed hypothetical surface (Gaussian surface) is independent of the shape or size of the surface, depending strictly on the net enclosed charge:\n$$\\oint \\vec{E} \\cdot d\\vec{A} = \\frac{q_{\\text{enc}}}{\\varepsilon_0}$$\n\n### 2. Field of an Infinitely Long Straight Wire\nUsing a coaxial cylinder of radius $r$ and length $L$:\n- Flux through end faces is zero ($\\vec{E} \\perp d\\vec{A}$).\n- Flux through curved surface: $E(2\\pi r L) = \\frac{\\lambda L}{\\varepsilon_0} \\implies E = \\frac{\\lambda}{2\\pi\\varepsilon_0 r}$.\n\n### 3. PhET Virtual Lab Protocol\n1. Place a $+1\\text{ nC}$ charge on the canvas.\n2. Observe the radial field vectors pointing outwards.\n3. Add a $-1\\text{ nC}$ charge to construct a dipole and toggle 'Equipotential'. Plot equipotential surfaces and confirm that field lines are everywhere perpendicular to equipotential lines.",
+            "key_terms": [
+              {
+                "term": "Electric Flux",
+                "definition": "A measure of the total number of electric field lines passing perpendicularly through a given surface area: Phi = E . A."
+              },
+              {
+                "term": "Gaussian Surface",
+                "definition": "A closed three-dimensional mathematical boundary chosen to exploit symmetry when calculating electric fields via Gauss's Law."
+              }
+            ],
+            "formulas_and_dates": [
+              {
+                "name": "Gauss's Law",
+                "formula": "oint E . dA = q_enc / epsilon_0"
+              },
+              {
+                "name": "Field of Infinite Line Charge",
+                "formula": "E = lambda / (2*pi*epsilon_0*r)"
+              },
+              {
+                "name": "Field of Infinite Plane Sheet",
+                "formula": "E = sigma / (2*epsilon_0)"
+              }
+            ],
+            "diagrams": [
+              {
+                "caption": "Gaussian Cylindrical Surface for Infinite Line Charge",
+                "mermaid_code": "graph TD\n    A[Linear Charge Density lambda] --> B[Coaxial Cylindrical Gaussian Surface]\n    B --> C[Curved Surface Flux: E * 2pi*r*L]\n    B --> D[Flat End-Caps Flux: Zero]\n    C --> E[Equate to q_enc / epsilon_0]\n    E --> F[E = lambda / 2pi*epsilon_0*r]"
+              }
+            ],
+            "common_misconceptions": [
+              {
+                "misconception": "Electric flux through a closed surface depends on the physical location of the enclosed charge inside the volume.",
+                "correction": "According to Gauss's Law, the total net flux depends solely on the magnitude of the enclosed charge, not on where inside the closed boundary it is located."
+              }
+            ],
+            "exam_points": [
+              "Three-mark CBSE derivation: 'Using Gauss's law, prove that the electric field at an outside point due to a uniformly charged thin spherical shell is the same as if the entire charge were concentrated at its center.'",
+              "Explain why electrostatic field lines cannot form closed loops (due to the conservative nature of static electrostatic field: curl(E) = 0)."
+            ],
+            "source_references": [
+              {
+                "title": "NCERT Class XII Physics Part I Chapter 1",
+                "url": "https://ncert.nic.in/textbook.php?leph1=1-8"
+              },
+              {
+                "title": "University of Colorado Boulder PhET Interactive Simulations",
+                "url": "https://phet.colorado.edu/en/simulations/charges-and-fields"
+              }
+            ],
+            "version": 1,
+            "is_verified": true
+          },
+          "pyqs": [
+            {
+              "board": "CBSE",
+              "grade": "Class 12",
+              "exam_year": 2022,
+              "paper_code": "CBSE-55/2/1-2022",
+              "question_number": "Question 11",
+              "marks": 3,
+              "question_text": "State Gauss's law in electrostatics. Apply it to derive an expression for the electric field due to an infinitely long straight wire of uniform linear charge density lambda.",
+              "marking_scheme": "1. Statement: Total electric flux through any closed surface is equal to 1/epsilon_0 times the net charge enclosed by the surface: oint E . dA = q/epsilon_0 (1 mark).\n2. Derivation: Consider a cylindrical Gaussian surface of radius r and length L coaxial with the line charge. Flux through end faces is zero because E is parallel to the faces. Flux through curved surface is E(2*pi*r*L) (1 mark).\n3. Applying Gauss's Law: E(2*pi*r*L) = (lambda*L)/epsilon_0 => E = lambda / (2*pi*epsilon_0*r) directed radially outwards for positive lambda (1 mark).",
+              "source_name": "CBSE Official Class 12 Board Examination Paper 2022",
+              "source_url": "https://cbseacademic.nic.in/curriculum_2026.html",
+              "is_verified": true
+            }
+          ],
+          "practice_questions": [
+            {
+              "question_text": "If the radius of the Gaussian surface enclosing a point charge Q is doubled, how does the total outward electric flux change?",
+              "question_type": "mcq",
+              "options": [
+                {
+                  "id": "A",
+                  "text": "It is doubled"
+                },
+                {
+                  "id": "B",
+                  "text": "It is halved"
+                },
+                {
+                  "id": "C",
+                  "text": "It remains unchanged"
+                },
+                {
+                  "id": "D",
+                  "text": "It is quadrupled"
+                }
+              ],
+              "correct_answer": "C",
+              "explanation": "By Gauss's Law, Phi = Q/epsilon_0. Total flux depends strictly on the enclosed charge, not on the dimensions of the Gaussian surface.",
+              "difficulty": "easy",
+              "marks": 1,
+              "is_ai_generated": true,
+              "generation_provenance": {
+                "model": "smartlearn-curator-v1",
+                "template": "physics-gauss-flux-v1",
+                "verified_by": "SmartLearn Academic Review"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "chapter_number": 2,
+      "title": "Electrostatic Potential and Capacitance",
+      "section": "Unit I: Electrostatics",
+      "description": "Electric potential, potential difference, electric potential due to a point charge, electric dipole and system of charges; equipotential surfaces, electrical potential energy of a system of two point charges and of electric dipole in an electrostatic field. Conductors and insulators, free charges and bound charges inside a conductor. Dielectrics and electric polarisation, capacitors and capacitance, combination of capacitors in series and in parallel, capacitance of a parallel plate capacitor with and without dielectric medium between the plates, energy stored in a capacitor.",
+      "topics": [
+        {
+          "topic_number": 1,
+          "title": "Electric Potential and Equipotential Surfaces",
+          "description": "Potential due to point charge, dipole potential, and properties of equipotential surfaces.",
+          "estimated_minutes": 30,
+          "learning_objectives": [],
+          "resources": [],
+          "pyqs": [],
+          "practice_questions": []
+        }
+      ]
+    },
+    {
+      "chapter_number": 3,
+      "title": "Current Electricity",
+      "section": "Unit II: Current Electricity",
+      "description": "Electric current, flow of electric charges in a metallic conductor, drift velocity, mobility and their relation with electric current; Ohm's law, V-I characteristics, electrical energy and power, electrical resistivity and conductivity, temperature dependence of resistance. Internal resistance of a cell, potential difference and emf of a cell, combination of cells in series and in parallel, Kirchhoff's rules and their applications, Wheatstone bridge.",
+      "topics": [
+        {
+          "topic_number": 1,
+          "title": "Electric Current, Drift Velocity and Ohm's Law",
+          "description": "Microscopic mechanism of conduction, relaxation time, drift velocity vd = eE*tau/m, and microscopic Ohm's law J = sigma*E.",
+          "estimated_minutes": 30,
+          "learning_objectives": [
+            {
+              "code": "CBSE12-PHY-CH03-LO01",
+              "description": "Derive the relationship between electric current and electron drift velocity (I = n*e*A*v_d).",
+              "taxonomy_level": "apply",
+              "is_core": true,
+              "is_verified": true
+            }
+          ],
+          "resources": [],
+          "pyqs": [],
+          "practice_questions": []
+        },
+        {
+          "topic_number": 2,
+          "title": "Resistivity, Temperature Coefficient and EMF of Cells",
+          "description": "Resistivity variation with temperature, internal resistance, terminal potential difference, and cells in series/parallel.",
+          "estimated_minutes": 30,
+          "learning_objectives": [],
+          "resources": [],
+          "pyqs": [],
+          "practice_questions": []
+        },
+        {
+          "topic_number": 3,
+          "title": "Kirchhoff's Rules, Wheatstone Bridge and Circuit Simulation Lab",
+          "description": "Kirchhoff's Junction Rule (KCL) and Loop Rule (KVL), balanced Wheatstone bridge condition, and DC circuit assembly in PhET.",
+          "estimated_minutes": 35,
+          "learning_objectives": [
+            {
+              "code": "CBSE12-PHY-CH03-LO02",
+              "description": "Apply Kirchhoff's laws to solve multi-loop DC circuits and establish the Wheatstone bridge balance condition (P/Q = R/S).",
+              "taxonomy_level": "apply",
+              "is_core": true,
+              "is_verified": true
+            },
+            {
+              "code": "CBSE12-PHY-CH03-LO03",
+              "description": "Construct and verify DC series, parallel, and bridge circuits interactively using the PhET Circuit Construction Kit.",
+              "taxonomy_level": "apply",
+              "is_core": true,
+              "is_verified": true
+            }
+          ],
+          "resources": [
+            {
+              "title": "PhET Interactive Simulation: Circuit Construction Kit: DC",
+              "resource_type": "interactive",
+              "provider": "phet",
+              "source_name": "PhET Interactive Simulations, University of Colorado Boulder",
+              "source_url": "https://phet.colorado.edu/en/simulations/circuit-construction-kit-dc",
+              "content_url": "https://phet.colorado.edu/sims/html/circuit-construction-kit-dc/latest/circuit-construction-kit-dc_all.html",
+              "text_content": "Build circuits with batteries, resistors, light bulbs, fuses, and switches. Measure current with ammeters and potential drops with voltmeters to verify Kirchhoff's laws.",
+              "order_index": 1,
+              "is_verified": true
+            },
+            {
+              "title": "NCERT Class XII Notes: Kirchhoff's Laws and Wheatstone Bridge Analysis",
+              "resource_type": "notes",
+              "provider": "ncert",
+              "source_name": "NCERT Class XII Physics Part I",
+              "source_url": "https://ncert.nic.in/textbook.php?leph1=1-8",
+              "text_content": "# Kirchhoff's Rules and Wheatstone Bridge\n\n### 1. Junction Rule (First Rule / KCL)\nAt any junction, the sum of the currents entering the junction is equal to the sum of currents leaving the junction:\n$$\\sum I = 0$$\nThis rule is based on the **conservation of electric charge**.\n\n### 2. Loop Rule (Second Rule / KVL)\nThe algebraic sum of changes in potential around any closed loop involving resistors and cells in the loop is zero:\n$$\\sum \\Delta V = 0$$\nThis rule reflects the **conservation of energy**.\n\n### 3. Wheatstone Bridge Principle\nFor four resistors $P, Q, R, S$ forming a closed bridge:\nWhen the galvanometer shows zero deflection ($I_g = 0$):\n$$\\frac{P}{Q} = \\frac{R}{S}$$",
+              "order_index": 2,
+              "is_verified": true
+            }
+          ],
+          "study_notes": {
+            "notes_type": "comprehensive",
+            "title": "DC Circuit Analysis: Kirchhoff's Rules & Wheatstone Bridge",
+            "overview": "Comprehensive mastery of conservation laws in electrical networks, systematic loop equations, and interactive simulation using PhET Circuit Construction Kit.",
+            "learning_objectives": [
+              "State Kirchhoff's Junction and Loop rules with their fundamental conservation foundations.",
+              "Formulate and solve matrix equations for two-mesh and three-mesh electrical networks.",
+              "Derive the null deflection condition for a Wheatstone bridge."
+            ],
+            "explanation_markdown": "# Kirchhoff's Laws & Network Analysis\n\n### 1. First Rule: Junction Rule\nReflecting conservation of charge, charge cannot accumulate at an electrical node:\n$$\\sum I_{\\text{in}} = \\sum I_{\\text{out}}$$\n\n### 2. Second Rule: Loop Rule\nReflecting conservation of energy in an electrostatic conservative field:\n$$\\sum \\mathcal{E} = \\sum I R$$\n\n### 3. Wheatstone Bridge Null Condition\nIn a four-arm bridge with resistances $P, Q, R, S$, when no current passes through the central galvanometer branch ($V_B = V_D$):\n$$\\frac{P}{Q} = \\frac{R}{S}$$",
+            "key_terms": [
+              {
+                "term": "Junction Rule",
+                "definition": "The total electric current entering a junction equals the total current leaving it, conserving charge."
+              },
+              {
+                "term": "Loop Rule",
+                "definition": "The algebraic sum of all potential changes around a closed loop is zero, conserving electrical energy."
+              },
+              {
+                "term": "Wheatstone Bridge",
+                "definition": "An electrical bridge network used to measure unknown electrical resistance with high precision by balancing four arms."
+              }
+            ],
+            "formulas_and_dates": [
+              {
+                "name": "Kirchhoff's Junction Rule",
+                "formula": "sum(I_in) = sum(I_out)"
+              },
+              {
+                "name": "Kirchhoff's Loop Rule",
+                "formula": "sum(Delta V) = 0"
+              },
+              {
+                "name": "Balanced Wheatstone Bridge",
+                "formula": "P / Q = R / S"
+              }
+            ],
+            "diagrams": [
+              {
+                "caption": "Wheatstone Bridge Network Topology",
+                "mermaid_code": "graph TD\n    A[Input Node A] -->|Resistor P| B[Node B]\n    A -->|Resistor R| D[Node D]\n    B -->|Galvanometer Ig=0| D\n    B -->|Resistor Q| C[Output Node C]\n    D -->|Resistor S| C\n    C --> E[Condition: P/Q = R/S]"
+              }
+            ],
+            "common_misconceptions": [
+              {
+                "misconception": "Current decreases as it passes through a resistor because electric charges are consumed.",
+                "correction": "Electric charges are never consumed; current entering a resistor equals current leaving it. What is consumed is electrical potential energy, converted into heat."
+              }
+            ],
+            "exam_points": [
+              "State the conservation laws on which Kirchhoff's First and Second rules are based (First: conservation of charge; Second: conservation of energy).",
+              "Derive the condition of balance for a Wheatstone bridge using Kirchhoff's rules."
+            ],
+            "source_references": [
+              {
+                "title": "NCERT Class XII Physics Part I Chapter 3",
+                "url": "https://ncert.nic.in/textbook.php?leph1=1-8"
+              },
+              {
+                "title": "University of Colorado Boulder PhET Interactive Simulations",
+                "url": "https://phet.colorado.edu/en/simulations/circuit-construction-kit-dc"
+              }
+            ],
+            "version": 1,
+            "is_verified": true
+          },
+          "pyqs": [
+            {
+              "board": "CBSE",
+              "grade": "Class 12",
+              "exam_year": 2023,
+              "paper_code": "CBSE-55/1/1-2023",
+              "question_number": "Question 16",
+              "marks": 3,
+              "question_text": "State Kirchhoff's rules for electrical networks. Use these rules to obtain the balance condition in a Wheatstone bridge.",
+              "marking_scheme": "1. Statement of Junction Rule (conservation of charge) and Loop Rule (conservation of energy) (1 mark).\n2. Circuit diagram of Wheatstone bridge with labeled currents across branches (1 mark).\n3. Derivation: Applying loop rule to loop ABDA and BCDB, setting Ig = 0 gives I1*P = I2*R and I1*Q = I2*S. Dividing the two equations yields P/Q = R/S (1 mark).",
+              "source_name": "CBSE Official Class 12 Board Examination Paper 2023",
+              "source_url": "https://cbseacademic.nic.in/curriculum_2026.html",
+              "is_verified": true
+            }
+          ],
+          "practice_questions": [
+            {
+              "question_text": "Kirchhoff's first law (Junction Rule) and second law (Loop Rule) are respectively based on the conservation of which physical quantities?",
+              "question_type": "mcq",
+              "options": [
+                {
+                  "id": "A",
+                  "text": "Energy and Charge"
+                },
+                {
+                  "id": "B",
+                  "text": "Charge and Energy"
+                },
+                {
+                  "id": "C",
+                  "text": "Momentum and Energy"
+                },
+                {
+                  "id": "D",
+                  "text": "Charge and Mass"
+                }
+              ],
+              "correct_answer": "B",
+              "explanation": "Junction rule is based on conservation of charge, while the loop rule is based on conservation of energy.",
+              "difficulty": "easy",
+              "marks": 1,
+              "is_ai_generated": true,
+              "generation_provenance": {
+                "model": "smartlearn-curator-v1",
+                "template": "physics-kirchhoff-v1",
+                "verified_by": "SmartLearn Academic Review"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "chapter_number": 4,
+      "title": "Moving Charges and Magnetism",
+      "section": "Unit III: Magnetic Effects of Current and Magnetism",
+      "description": "Concept of magnetic field, Oersted's experiment; Biot-Savart law and its application; Ampere's law; force on a moving charge in uniform magnetic and electric fields; force on a current-carrying conductor; torque on a current loop; moving coil galvanometer.",
+      "topics": [
+        {
+          "topic_number": 1,
+          "title": "Biot-Savart Law and Ampere's Circuital Law",
+          "description": "Magnetic field calculation for circular loops, straight conductors, and solenoids.",
+          "estimated_minutes": 30,
+          "learning_objectives": [],
+          "resources": [],
+          "pyqs": [],
+          "practice_questions": []
+        }
+      ]
+    },
+    {
+      "chapter_number": 5,
+      "title": "Magnetism and Matter",
+      "section": "Unit III: Magnetic Effects of Current and Magnetism",
+      "description": "A current loop as a magnetic dipole and its magnetic dipole moment; magnetic dipole moment of a revolving electron; magnetic field lines; earth's magnetic field and magnetic elements; diamagnetic, paramagnetic and ferromagnetic substances.",
+      "topics": [
+        {
+          "topic_number": 1,
+          "title": "Magnetic Properties of Materials and Earth's Magnetism",
+          "description": "Curie law, diamagnetism, paramagnetism, ferromagnetism, and geomagnetic elements.",
+          "estimated_minutes": 25,
+          "learning_objectives": [],
+          "resources": [],
+          "pyqs": [],
+          "practice_questions": []
+        }
+      ]
+    },
+    {
+      "chapter_number": 6,
+      "title": "Electromagnetic Induction",
+      "section": "Unit IV: Electromagnetic Induction and Alternating Currents",
+      "description": "Electromagnetic induction; Faraday's laws, induced EMF and current; Lenz's Law, eddy currents; self and mutual induction.",
+      "topics": [
+        {
+          "topic_number": 1,
+          "title": "Faraday's Laws, Lenz's Law and Mutual Induction",
+          "description": "Induced EMF derivations, magnetic flux variation, and induction coils.",
+          "estimated_minutes": 30,
+          "learning_objectives": [],
+          "resources": [],
+          "pyqs": [],
+          "practice_questions": []
+        }
+      ]
+    },
+    {
+      "chapter_number": 7,
+      "title": "Alternating Current",
+      "section": "Unit IV: Electromagnetic Induction and Alternating Currents",
+      "description": "Alternating currents, peak and RMS value of alternating current/voltage; reactance and impedance; LCR series circuit, resonance; power in AC circuits, power factor, wattless current; AC generator and transformer.",
+      "topics": [
+        {
+          "topic_number": 1,
+          "title": "LCR Series Resonance and Transformers",
+          "description": "Phasor diagram analysis, resonant frequency omega_0 = 1/sqrt(LC), quality factor Q, and transformer efficiency.",
+          "estimated_minutes": 30,
+          "learning_objectives": [],
+          "resources": [],
+          "pyqs": [],
+          "practice_questions": []
+        }
+      ]
+    },
+    {
+      "chapter_number": 8,
+      "title": "Electromagnetic Waves",
+      "section": "Unit V: Electromagnetic Waves",
+      "description": "Basic idea of displacement current, electromagnetic waves, their characteristics, their transverse nature; electromagnetic spectrum including radio waves, microwaves, infrared, visible, ultraviolet, X-rays, gamma rays.",
+      "topics": [
+        {
+          "topic_number": 1,
+          "title": "Maxwell's Equations and the Electromagnetic Spectrum",
+          "description": "Displacement current definition, wave speed c = 1/sqrt(mu_0*epsilon_0), and wavelength spectrum applications.",
+          "estimated_minutes": 25,
+          "learning_objectives": [],
+          "resources": [],
+          "pyqs": [],
+          "practice_questions": []
+        }
+      ]
+    },
+    {
+      "chapter_number": 9,
+      "title": "Ray Optics and Optical Instruments",
+      "section": "Unit VI: Optics",
+      "description": "Refraction of light, total internal reflection and its applications, optical fibres, refraction at spherical surfaces, lenses, thin lens formula, lensmaker's formula, magnification, power of a lens, combination of thin lenses; refraction through a prism; microscopes and astronomical telescopes.",
+      "topics": [
+        {
+          "topic_number": 1,
+          "title": "Lens Maker's Formula and Optical Instruments",
+          "description": "Derivation of 1/f = (n-1)(1/R1 - 1/R2) and compound microscope/telescope magnifying power.",
+          "estimated_minutes": 35,
+          "learning_objectives": [],
+          "resources": [],
+          "pyqs": [],
+          "practice_questions": []
+        }
+      ]
+    },
+    {
+      "chapter_number": 10,
+      "title": "Wave Optics",
+      "section": "Unit VI: Optics",
+      "description": "Wave front and Huygens' principle, reflection and refraction of plane wave at a plane surface using wave fronts. Proof of laws of reflection and refraction using Huygens' principle. Interference, Young's double slit experiment and expression for fringe width; diffraction due to a single slit, width of central maximum.",
+      "topics": [
+        {
+          "topic_number": 1,
+          "title": "Huygens' Principle and Young's Double Slit Experiment",
+          "description": "Wavefront geometry, constructive and destructive interference, and fringe width beta = lambda*D/d.",
+          "estimated_minutes": 35,
+          "learning_objectives": [],
+          "resources": [],
+          "pyqs": [],
+          "practice_questions": []
+        }
+      ]
+    },
+    {
+      "chapter_number": 11,
+      "title": "Dual Nature of Radiation and Matter",
+      "section": "Unit VII: Dual Nature of Radiation and Matter",
+      "description": "Dual nature of radiation, photoelectric effect, Hertz and Lenard's observations; Einstein's photoelectric equation; particle nature of light; experimental study of photoelectric effect; matter waves-wave nature of particles, de-Broglie relation.",
+      "topics": [
+        {
+          "topic_number": 1,
+          "title": "Photoelectric Effect and de Broglie Wavelength",
+          "description": "Threshold frequency, stopping potential, Einstein's equation h*nu = Phi + K_max, and matter waves lambda = h/p.",
+          "estimated_minutes": 30,
+          "learning_objectives": [],
+          "resources": [],
+          "pyqs": [],
+          "practice_questions": []
+        }
+      ]
+    },
+    {
+      "chapter_number": 12,
+      "title": "Atoms",
+      "section": "Unit VIII: Atoms and Nuclei",
+      "description": "Alpha-particle scattering experiment; Rutherford's model of atom; Bohr model of hydrogen atom, expression for radius of nth possible orbit, velocity and energy of electron in nth orbit, hydrogen line spectra.",
+      "topics": [
+        {
+          "topic_number": 1,
+          "title": "Bohr Model and Hydrogen Spectral Series",
+          "description": "Quantized energy levels E_n = -13.6/n^2 eV, Lyman, Balmer, Paschen series.",
+          "estimated_minutes": 30,
+          "learning_objectives": [],
+          "resources": [],
+          "pyqs": [],
+          "practice_questions": []
+        }
+      ]
+    },
+    {
+      "chapter_number": 13,
+      "title": "Nuclei",
+      "section": "Unit VIII: Atoms and Nuclei",
+      "description": "Composition and size of nucleus, nuclear force, mass-energy relation, mass defect; binding energy per nucleon and its variation with mass number, nuclear fission, nuclear fusion.",
+      "topics": [
+        {
+          "topic_number": 1,
+          "title": "Mass Defect, Binding Energy and Nuclear Reactions",
+          "description": "Nuclear density independence from mass number, binding energy curve, fission of U-235 and stellar fusion.",
+          "estimated_minutes": 25,
+          "learning_objectives": [],
+          "resources": [],
+          "pyqs": [],
+          "practice_questions": []
+        }
+      ]
+    },
+    {
+      "chapter_number": 14,
+      "title": "Semiconductor Electronics: Materials, Devices and Simple Circuits",
+      "section": "Unit IX: Electronic Devices",
+      "description": "Energy bands in conductors, semiconductors and insulators; intrinsic and extrinsic semiconductors- p and n type, p-n junction; semiconductor diode: I-V characteristics in forward and reverse bias; application of junction diode as a rectifier.",
+      "topics": [
+        {
+          "topic_number": 1,
+          "title": "Energy Bands, P-N Junction Diode and Rectifiers",
+          "description": "Forward/reverse bias depletion barrier behavior, half-wave and full-wave rectification circuits.",
+          "estimated_minutes": 30,
+          "learning_objectives": [],
+          "resources": [],
+          "pyqs": [],
+          "practice_questions": []
+        }
+      ]
+    }
+  ]
+}

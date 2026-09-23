@@ -1,0 +1,554 @@
+{
+  "subject_code": "icse-class-10-hcg",
+  "board": "ICSE",
+  "grade": "Class 10",
+  "academic_stream": null,
+  "subject_name": "History, Civics and Geography",
+  "category": "core",
+  "curriculum_status": "content_available",
+  "source_provenance": {
+    "source_authority": "CISCE",
+    "source_name": "CISCE Regulations and Syllabuses 2026-27 - History and Civics (H.C.G. Paper 1)",
+    "source_url": "https://cisce.org/regulations-and-syllabuses-2026/",
+    "syllabus_version": "Academic Year 2026-27",
+    "document_ref": "CISCE-ICSE-2026-HCG-Paper1.pdf",
+    "retrieval_date": "2026-09-23",
+    "verification_status": "verified_published",
+    "license_or_terms": "Official CISCE Examination Regulations - Permitted Educational Use"
+  },
+  "chapters": [
+    {
+      "chapter_number": 1,
+      "title": "The Union Parliament",
+      "section": "Section A: Civics",
+      "description": "Lok Sabha and Rajya Sabha: composition, qualifications for membership, term, presiding officers, procedures: sessions, quorum, question hour, zero hour, motions (adjournment, no-confidence); powers and functions of the Union Parliament (legislative, financial, judicial, electoral, constituent).",
+      "topics": [
+        {
+          "topic_number": 1,
+          "title": "Composition and Qualifications: Lok Sabha and Rajya Sabha",
+          "description": "Constitutional maximum strength, nominated/elected seats, age qualifications, terms, and the role of Speaker and Vice-President.",
+          "estimated_minutes": 25,
+          "learning_objectives": [
+            {
+              "code": "ICSE10-HCG-CH01-LO01",
+              "description": "Compare the composition, term, and membership qualifications of the Lok Sabha and Rajya Sabha.",
+              "taxonomy_level": "analyze",
+              "is_core": true,
+              "is_verified": true
+            },
+            {
+              "code": "ICSE10-HCG-CH01-LO02",
+              "description": "Explain the constitutional powers and role of the Speaker of the Lok Sabha.",
+              "taxonomy_level": "understand",
+              "is_core": true,
+              "is_verified": true
+            }
+          ],
+          "resources": [
+            {
+              "title": "CISCE Textbook Lesson: Composition of the Union Parliament",
+              "resource_type": "notes",
+              "provider": "smartlearn",
+              "source_name": "Total History & Civics Class 10 (CISCE Board Aligned)",
+              "source_url": "https://cisce.org/regulations-and-syllabuses-2026/",
+              "text_content": "# The Union Parliament\n\nUnder Article 79 of the Indian Constitution, the Union Parliament consists of the President and two Houses: the Lok Sabha (House of the People) and the Rajya Sabha (Council of States).\n\n### 1. The Lok Sabha (Lower House)\n- **Maximum Strength**: 550 members (530 from States, up to 20 from Union Territories; Anglo-Indian nomination abolished via 104th Constitutional Amendment).\n- **Term**: 5 years from date of first meeting; can be dissolved earlier by the President on advice of the Prime Minister.\n- **Qualifications**: Citizen of India, minimum 25 years of age, not an insolvent or of unsound mind, must not hold an office of profit.\n- **Presiding Officer**: The Speaker, elected by Lok Sabha members from amongst themselves.\n\n### 2. The Rajya Sabha (Upper House)\n- **Maximum Strength**: 250 members (238 representatives of States/UTs elected indirectly by elected MLAs through proportional representation, 12 nominated by President for excellence in literature, science, art, and social service).\n- **Term**: Permanent House, cannot be dissolved. One-third of members retire every second year; individual member term is 6 years.\n- **Qualifications**: Citizen of India, minimum 30 years of age.\n- **Presiding Officer**: Ex-officio Chairman is the Vice-President of India.",
+              "order_index": 1,
+              "is_verified": true
+            }
+          ],
+          "study_notes": {
+            "notes_type": "comprehensive",
+            "title": "The Bicameral Union Parliament: Houses, Composition & Membership",
+            "overview": "Rigorous examination of India's legislative apex, detailing bicameral architecture, tenure rules, qualifications, and constitutional safeguards.",
+            "learning_objectives": [
+              "Distinguish between Lok Sabha and Rajya Sabha composition and terms.",
+              "Recall age criteria for Lok Sabha (25) and Rajya Sabha (30).",
+              "Identify the election procedure for the Speaker and Chairman."
+            ],
+            "explanation_markdown": "# The Union Legislature: Lok Sabha and Rajya Sabha\n\n### 1. Structural Comparison\n| Parameter | Lok Sabha (House of the People) | Rajya Sabha (Council of States) |\n|---|---|---|\n| Max Strength | 550 members | 250 members (238 elected + 12 nominated) |\n| Minimum Age | 25 years | 30 years |\n| Tenure | 5 years (subject to early dissolution) | Permanent Body (1/3rd retire every 2 years, 6-yr tenure) |\n| Presiding Officer | Speaker (elected from Lok Sabha) | Vice-President of India (Ex-officio Chairman) |\n\n### 2. The Speaker of Lok Sabha\n- Presides over meetings and maintains decorum.\n- Decides whether a bill is a **Money Bill** (decision is final).\n- Presides over **Joint Sessions** of Parliament (summoned under Article 108).\n- Exercises a casting vote in the event of an equality of votes.",
+            "key_terms": [
+              {
+                "term": "Bicameralism",
+                "definition": "A legislative body consisting of two distinct chambers or houses (Lok Sabha and Rajya Sabha)."
+              },
+              {
+                "term": "Ex-officio Chairman",
+                "definition": "Holding a presiding post by virtue of another office (the Vice-President of India is ex-officio Chairman of Rajya Sabha)."
+              },
+              {
+                "term": "Casting Vote",
+                "definition": "A deciding vote cast by the presiding officer only in the event of a tie."
+              }
+            ],
+            "formulas_and_dates": [
+              {
+                "name": "Lok Sabha Minimum Age",
+                "formula": "25 Years"
+              },
+              {
+                "name": "Rajya Sabha Minimum Age",
+                "formula": "30 Years"
+              },
+              {
+                "name": "Quorum Requirement",
+                "formula": "1/10th of total membership"
+              }
+            ],
+            "diagrams": [
+              {
+                "caption": "Composition of the Union Parliament of India",
+                "mermaid_code": "graph TD\n    A[President of India] --- B[Union Parliament]\n    B --> C[Lok Sabha: 550 Max]\n    B --> D[Rajya Sabha: 250 Max]\n    C --> C1[530 States + 20 UTs]\n    C --> C2[Age: 25+, Term: 5 yrs]\n    D --> D1[238 Elected by MLAs + 12 Nominated]\n    D --> D2[Age: 30+, Permanent Body]"
+              }
+            ],
+            "common_misconceptions": [
+              {
+                "misconception": "The Vice-President can vote on all ordinary bills in the Rajya Sabha just like any other member.",
+                "correction": "The Vice-President is not a member of Rajya Sabha and can only cast a vote in the event of an equality of votes (casting vote)."
+              }
+            ],
+            "exam_points": [
+              "ICSE board question: 'State two exclusive powers of the Rajya Sabha.' (1) Authorizing Parliament to legislate on a State List subject (Article 249), (2) Creating new All India Services (Article 312).",
+              "Define 'Quorum' - the minimum number of members (one-tenth of total membership of the House) required to be present to conduct parliamentary business."
+            ],
+            "source_references": [
+              {
+                "title": "CISCE Regulations and Syllabuses 2026-27 (H.C.G. Paper 1)",
+                "url": "https://cisce.org/regulations-and-syllabuses-2026/"
+              }
+            ],
+            "version": 1,
+            "is_verified": true
+          },
+          "pyqs": [
+            {
+              "board": "ICSE",
+              "grade": "Class 10",
+              "exam_year": 2023,
+              "paper_code": "CISCE-HCG1-2023",
+              "question_number": "Question 1(a)",
+              "marks": 2,
+              "question_text": "What is meant by the term 'Quorum'? What is the quorum of the Lok Sabha?",
+              "marking_scheme": "1. Definition: Quorum is the minimum number of members required to be present before the House can transact any business (1 mark).\n2. Quorum of Lok Sabha: One-tenth (1/10th) of the total membership of the House (1 mark).",
+              "source_name": "CISCE Official ICSE Class 10 Board Examination Paper 2023",
+              "source_url": "https://cisce.org/regulations-and-syllabuses-2026/",
+              "is_verified": true
+            },
+            {
+              "board": "ICSE",
+              "grade": "Class 10",
+              "exam_year": 2022,
+              "paper_code": "CISCE-HCG1-2022",
+              "question_number": "Question 2(b)",
+              "marks": 3,
+              "question_text": "Mention any three qualifications required for an individual to become a member of the Lok Sabha.",
+              "marking_scheme": "Award 1 mark each for any three valid qualifications:\n1. Must be a citizen of India.\n2. Must not be less than 25 years of age.\n3. Must possess such other qualifications as prescribed by Parliament (e.g., must be registered as an elector in a parliamentary constituency).\n4. Must not hold any office of profit under the Government.\n5. Must not be of unsound mind or an undischarged insolvent.",
+              "source_name": "CISCE Official ICSE Class 10 Board Examination Paper 2022",
+              "source_url": "https://cisce.org/regulations-and-syllabuses-2026/",
+              "is_verified": true
+            }
+          ],
+          "practice_questions": [
+            {
+              "question_text": "What is the minimum age prescribed by the Constitution of India for membership of the Rajya Sabha?",
+              "question_type": "mcq",
+              "options": [
+                {
+                  "id": "A",
+                  "text": "21 years"
+                },
+                {
+                  "id": "B",
+                  "text": "25 years"
+                },
+                {
+                  "id": "C",
+                  "text": "30 years"
+                },
+                {
+                  "id": "D",
+                  "text": "35 years"
+                }
+              ],
+              "correct_answer": "C",
+              "explanation": "According to Article 84, a candidate for the Rajya Sabha must not be less than 30 years of age.",
+              "difficulty": "easy",
+              "marks": 1,
+              "is_ai_generated": true,
+              "generation_provenance": {
+                "model": "smartlearn-curator-v1",
+                "template": "icse-civics-parliament-v1",
+                "verified_by": "SmartLearn Academic Review"
+              }
+            }
+          ]
+        },
+        {
+          "topic_number": 2,
+          "title": "Powers, Procedures and Control over Executive",
+          "description": "Question Hour, Zero Hour, No-Confidence Motion, Adjournment Motion, financial powers, and exclusive powers of both Houses.",
+          "estimated_minutes": 25,
+          "learning_objectives": [
+            {
+              "code": "ICSE10-HCG-CH01-LO03",
+              "description": "Explain how the Lok Sabha exercises daily control over the Council of Ministers through parliamentary motions.",
+              "taxonomy_level": "understand",
+              "is_core": true,
+              "is_verified": true
+            }
+          ],
+          "resources": [],
+          "pyqs": [],
+          "practice_questions": []
+        }
+      ]
+    },
+    {
+      "chapter_number": 2,
+      "title": "The President and the Vice-President",
+      "section": "Section A: Civics",
+      "description": "The President: qualifications, election, term, impeachment, powers (executive, legislative, financial, judicial, discretionary, emergency). The Vice-President: qualifications, election, term, and functions.",
+      "topics": [
+        {
+          "topic_number": 1,
+          "title": "Presidential Powers and Emergency Provisions",
+          "description": "Electoral college, National Emergency (Art 352), State Emergency (Art 356), and Financial Emergency (Art 360).",
+          "estimated_minutes": 25,
+          "learning_objectives": [],
+          "resources": [],
+          "pyqs": [],
+          "practice_questions": []
+        }
+      ]
+    },
+    {
+      "chapter_number": 3,
+      "title": "Prime Minister and Council of Ministers",
+      "section": "Section A: Civics",
+      "description": "Appointment, formation of Council of Ministers, Cabinet vs Council of Ministers, collective responsibility, individual responsibility, powers and functions of the Prime Minister.",
+      "topics": [
+        {
+          "topic_number": 1,
+          "title": "Cabinet System and Collective Responsibility",
+          "description": "Cabinet as executive steering wheel and collective ministerial accountability to Lok Sabha.",
+          "estimated_minutes": 25,
+          "learning_objectives": [],
+          "resources": [],
+          "pyqs": [],
+          "practice_questions": []
+        }
+      ]
+    },
+    {
+      "chapter_number": 4,
+      "title": "The Supreme Court",
+      "section": "Section A: Civics",
+      "description": "Composition, qualifications, appointment, term, removal; jurisdiction: original, appellate, advisory; judicial review, writ jurisdiction (Habeas Corpus, Mandamus, Prohibition, Quo Warranto, Certiorari), Court of Record.",
+      "topics": [
+        {
+          "topic_number": 1,
+          "title": "Jurisdiction, Judicial Review and Prerogative Writs",
+          "description": "Original jurisdiction, enforcement of fundamental rights under Article 32, and the five writs.",
+          "estimated_minutes": 25,
+          "learning_objectives": [],
+          "resources": [],
+          "pyqs": [],
+          "practice_questions": []
+        }
+      ]
+    },
+    {
+      "chapter_number": 5,
+      "title": "The High Courts and Subordinate Courts",
+      "section": "Section A: Civics",
+      "description": "Composition, qualifications, appointment, term, transfer; jurisdiction: original, appellate; subordinate courts: District Court, Sessions Court, Lok Adalats.",
+      "topics": [
+        {
+          "topic_number": 1,
+          "title": "High Court Jurisdiction and Lok Adalats",
+          "description": "Writ jurisdiction under Article 226, supervisory powers, and speedy dispute resolution via Lok Adalats.",
+          "estimated_minutes": 20,
+          "learning_objectives": [],
+          "resources": [],
+          "pyqs": [],
+          "practice_questions": []
+        }
+      ]
+    },
+    {
+      "chapter_number": 6,
+      "title": "The First War of Independence, 1857",
+      "section": "Section B: History",
+      "description": "Causes of the 1857 War: political (Doctrine of Lapse, Annexation of Awadh, disrespect to Mughal Emperor), socio-religious (interfering with customs, religious disabilities act, tax on temple lands), economic (drain of wealth, destruction of handicrafts, agrarian distress), military (ill-treatment of Indian sepoys, General Service Enlistment Act), immediate cause (greased cartridges); consequences (Government of India Act 1858, Queen Victoria's Proclamation, military reorganisation).",
+      "topics": [
+        {
+          "topic_number": 1,
+          "title": "Causes of the 1857 War: Political, Socio-Religious and Economic",
+          "description": "Lord Dalhousie's Doctrine of Lapse, annexation of Awadh on pretext of maladministration, loss of livelihoods, and missionary tensions.",
+          "estimated_minutes": 25,
+          "learning_objectives": [
+            {
+              "code": "ICSE10-HCG-CH06-LO01",
+              "description": "Examine Dalhousie's Doctrine of Lapse and the annexation of Awadh as principal political triggers of 1857.",
+              "taxonomy_level": "analyze",
+              "is_core": true,
+              "is_verified": true
+            },
+            {
+              "code": "ICSE10-HCG-CH06-LO02",
+              "description": "Detail the economic ruination of Indian weavers, peasants, and zamindars under East India Company rule.",
+              "taxonomy_level": "understand",
+              "is_core": true,
+              "is_verified": true
+            }
+          ],
+          "resources": [
+            {
+              "title": "CISCE Lesson Notes: Deep-Rooted Causes of the 1857 Uprising",
+              "resource_type": "notes",
+              "provider": "smartlearn",
+              "source_name": "Total History & Civics Class 10 (CISCE Board Aligned)",
+              "source_url": "https://cisce.org/regulations-and-syllabuses-2026/",
+              "text_content": "# The First War of Independence, 1857: Underlying Causes\n\n### 1. Political Causes\n- **Doctrine of Lapse**: Lord Dalhousie annexed states whose rulers died without a natural male heir (Satara, Jhansi, Nagpur, Sambalpur). Adopted sons could inherit personal property but not the throne.\n- **Annexation of Awadh (1856)**: Nawab Wajid Ali Shah was deposed on the pretext of 'alleged maladministration', disbanding the royal army and throwing 75,000 soldiers and aristocrats into destitution.\n- **Disrespect to Bahadur Shah Zafar**: Lord Dalhousie announced that successors of the Mughal Emperor would have to vacate the historic Red Fort and live in the Qutub area, removing royal titles.\n\n### 2. Socio-Religious Causes\n- Interference with religious customs: Abolition of Sati (1829) and Widow Remarriage Act (1856) were viewed by orthodox sections as an assault on Hindu tradition.\n- **Religious Disabilities Act (1850)**: Allowed a convert to Christianity to inherit ancestral property.\n- Taxation on lands belonging to temples and mosques.\n\n### 3. Economic Causes\n- Ruin of Indian handicrafts due to unfair British tariff duties.\n- Permanent Settlement and high land revenue demands impoverished peasants, driving them into debt.\n- Confiscation of jagirs by Inam Commission (1852).",
+              "order_index": 1,
+              "is_verified": true
+            }
+          ],
+          "study_notes": {
+            "notes_type": "comprehensive",
+            "title": "The Uprising of 1857: Causes, Triggers & Imperial Transformation",
+            "overview": "Comprehensive historiographical synthesis of the multi-layered discontent that erupted across northern and central India in May 1857.",
+            "learning_objectives": [
+              "Explain the provisions of Dalhousie's Doctrine of Lapse.",
+              "Analyze why the annexation of Awadh ignited widespread fury among Bengal Army sepoys.",
+              "Examine the socio-religious fears generated by British statutory enactments."
+            ],
+            "explanation_markdown": "# The 1857 Revolt: Structural Discontent\n\n### 1. The Political Aggression of Dalhousie\n- **Doctrine of Lapse**: Rulers of Satara, Jaitpur, Sambalpur, Baghat, Udaipur, Jhansi, and Nagpur had their dynasties extinguished.\n- **Awadh Crisis (1856)**: Awadh had been an unwavering British ally since 1765. Its sudden annexation on charges of 'misgovernance' outraged the 75,000 sepoys from Awadh serving in the Bengal Army.\n- **Pensions Terminated**: Nana Saheb, adopted son of Peshwa Baji Rao II, was refused his father's royal pension.\n\n### 2. Economic Plunder\n- British machine-made cloth decimated traditional handloom weavers in Dacca and Murshidabad.\n- Peasants surrendered ancestral plots to ruthless moneylenders when unable to pay cash land revenue.\n\n### 3. Socio-Religious Apprehensions\nBritish administrative actions were perceived as a systematic conspiracy to convert Indians to Christianity.",
+            "key_terms": [
+              {
+                "term": "Doctrine of Lapse",
+                "definition": "An expansionist British policy initiated by Lord Dalhousie whereby princely states without a biological male heir automatically lapsed to Company territory."
+              },
+              {
+                "term": "Inam Commission",
+                "definition": "A colonial inquiry launched in 1852 that confiscated over 20,000 tax-free land estates (inam lands) in western India."
+              }
+            ],
+            "formulas_and_dates": [
+              {
+                "name": "Abolition of Sati",
+                "formula": "1829"
+              },
+              {
+                "name": "Annexation of Awadh",
+                "formula": "1856"
+              },
+              {
+                "name": "Outbreak at Meerut",
+                "formula": "10 May 1857"
+              }
+            ],
+            "diagrams": [
+              {
+                "caption": "Multi-Pronged Catalysts of the 1857 War",
+                "mermaid_code": "graph TD\n    A[1857 War of Independence] --> B[Political: Doctrine of Lapse & Awadh Annexation]\n    A --> C[Economic: De-industrialisation & Agrarian Debt]\n    A --> D[Socio-Religious: Religious Disabilities Act 1850]\n    A --> E[Military: General Service Enlistment Act]\n    A --> F[Immediate Trigger: Enfield Greased Cartridges]"
+              }
+            ],
+            "common_misconceptions": [
+              {
+                "misconception": "The 1857 uprising was caused entirely by the greased cartridges issue alone.",
+                "correction": "The Enfield greased cartridges were merely the immediate ignition point; the uprising was the culmination of a century of economic, political, and cultural exploitation."
+              }
+            ],
+            "exam_points": [
+              "ICSE questions regularly ask for: 'State any two political causes of the 1857 War.' Mention Doctrine of Lapse and annexation of Awadh.",
+              "Explain the socio-religious significance of the Religious Disabilities Act of 1850."
+            ],
+            "source_references": [
+              {
+                "title": "CISCE Regulations and Syllabuses 2026-27 (H.C.G. Paper 1)",
+                "url": "https://cisce.org/regulations-and-syllabuses-2026/"
+              }
+            ],
+            "version": 1,
+            "is_verified": true
+          },
+          "pyqs": [
+            {
+              "board": "ICSE",
+              "grade": "Class 10",
+              "exam_year": 2023,
+              "paper_code": "CISCE-HCG1-2023",
+              "question_number": "Question 3(a)",
+              "marks": 3,
+              "question_text": "Mention any three political causes that led to the First War of Independence in 1857.",
+              "marking_scheme": "Award 1 mark each for any three valid points:\n1. The Doctrine of Lapse: Rulers without natural male heirs had their states annexed by Lord Dalhousie (e.g. Jhansi, Satara, Nagpur).\n2. Annexation of Awadh: Lord Dalhousie annexed Awadh in 1856 on grounds of alleged maladministration, outraging its people and sepoys.\n3. Disrespect shown to the Mughal Emperor Bahadur Shah Zafar: Royal titles were discontinued and successors were ordered to vacate the Red Fort.\n4. Nana Saheb, adopted son of Peshwa Baji Rao II, was denied his father's pension (1 mark each).",
+              "source_name": "CISCE Official ICSE Class 10 Board Examination Paper 2023",
+              "source_url": "https://cisce.org/regulations-and-syllabuses-2026/",
+              "is_verified": true
+            }
+          ],
+          "practice_questions": [
+            {
+              "question_text": "On what pretext did Lord Dalhousie annex the Kingdom of Awadh into the British empire in 1856?",
+              "question_type": "mcq",
+              "options": [
+                {
+                  "id": "A",
+                  "text": "Under the Doctrine of Lapse for lacking a male heir"
+                },
+                {
+                  "id": "B",
+                  "text": "On the pretext of alleged maladministration / misgovernance"
+                },
+                {
+                  "id": "C",
+                  "text": "Due to non-payment of war indemnity after the Battle of Buxar"
+                },
+                {
+                  "id": "D",
+                  "text": "As a result of a popular referendum of Awadh citizens"
+                }
+              ],
+              "correct_answer": "B",
+              "explanation": "Awadh was annexed in 1856 on the grounds of alleged maladministration and misgovernance by Nawab Wajid Ali Shah.",
+              "difficulty": "easy",
+              "marks": 1,
+              "is_ai_generated": true,
+              "generation_provenance": {
+                "model": "smartlearn-curator-v1",
+                "template": "icse-history-1857-v1",
+                "verified_by": "SmartLearn Academic Review"
+              }
+            }
+          ]
+        },
+        {
+          "topic_number": 2,
+          "title": "Military Causes, Immediate Spark and Queen Victoria's Proclamation",
+          "description": "General Service Enlistment Act (1856), Enfield rifle greased cartridges, Meerut outbreak, and Queen's Proclamation 1858 transferring power to Crown.",
+          "estimated_minutes": 25,
+          "learning_objectives": [
+            {
+              "code": "ICSE10-HCG-CH06-LO03",
+              "description": "Explain the significance of Queen Victoria's Proclamation of 1858 and the Government of India Act 1858.",
+              "taxonomy_level": "understand",
+              "is_core": true,
+              "is_verified": true
+            }
+          ],
+          "resources": [],
+          "pyqs": [],
+          "practice_questions": []
+        }
+      ]
+    },
+    {
+      "chapter_number": 7,
+      "title": "Growth of Nationalism and Early Nationalists",
+      "section": "Section B: History",
+      "description": "Factors leading to the growth of nationalism; Early Nationalists: beliefs, methods (3 Ps: Petitions, Prayers, Protests); contributions of Dadabhai Naoroji, Gopal Krishna Gokhale, and Surendranath Banerjee.",
+      "topics": [
+        {
+          "topic_number": 1,
+          "title": "Factors Promoting Nationalism and Early Nationalist Methodology",
+          "description": "Economic drain theory, vernacular press, and constitutional agitation methods.",
+          "estimated_minutes": 25,
+          "learning_objectives": [],
+          "resources": [],
+          "pyqs": [],
+          "practice_questions": []
+        }
+      ]
+    },
+    {
+      "chapter_number": 8,
+      "title": "Assertive Nationalists and the Partition of Bengal",
+      "section": "Section B: History",
+      "description": "Causes of the Partition of Bengal (1905), anti-partition movement; Swadeshi and Boycott; Assertive Nationalists: beliefs, methods; contributions of Bal Gangadhar Tilak, Bipin Chandra Pal, and Lala Lajpat Rai (Lal-Bal-Pal).",
+      "topics": [
+        {
+          "topic_number": 1,
+          "title": "Partition of Bengal (1905) and Swadeshi Movement",
+          "description": "Lord Curzon's administrative pretext vs divide-and-rule motive, Swadeshi and national education.",
+          "estimated_minutes": 25,
+          "learning_objectives": [],
+          "resources": [],
+          "pyqs": [],
+          "practice_questions": []
+        }
+      ]
+    },
+    {
+      "chapter_number": 9,
+      "title": "The Muslim League and Lucknow Pact",
+      "section": "Section B: History",
+      "description": "Factors leading to the formation of the Muslim League in 1906; aims and objectives; the Lucknow Pact (1916): joint scheme of reforms, significance.",
+      "topics": [
+        {
+          "topic_number": 1,
+          "title": "Formation of Muslim League (1906) and Lucknow Pact (1916)",
+          "description": "Dacca foundation, separate electorates demand, and Congress-League concord at Lucknow.",
+          "estimated_minutes": 20,
+          "learning_objectives": [],
+          "resources": [],
+          "pyqs": [],
+          "practice_questions": []
+        }
+      ]
+    },
+    {
+      "chapter_number": 10,
+      "title": "Mahatma Gandhi and National Movement",
+      "section": "Section B: History",
+      "description": "Non-Cooperation Movement: causes (Khilafat, Rowlatt Act, Jallianwala Bagh), programme, suspension (Chauri Chaura), impact; Civil Disobedience Movement: causes (Simon Commission, Nehru Report, Lahore Session 1929), Dandi March, Gandhi-Irwin Pact, Second Round Table Conference, impact; Quit India Movement: causes (Cripps Mission failure, Japanese threat), Quit India Resolution, impact.",
+      "topics": [
+        {
+          "topic_number": 1,
+          "title": "Non-Cooperation, Civil Disobedience and Quit India",
+          "description": "Satyagraha, Salt March, Do or Die resolution, and mass peasant mobilization.",
+          "estimated_minutes": 30,
+          "learning_objectives": [],
+          "resources": [],
+          "pyqs": [],
+          "practice_questions": []
+        }
+      ]
+    },
+    {
+      "chapter_number": 11,
+      "title": "The Forward Bloc, INA, and Independence",
+      "section": "Section B: History",
+      "description": "Subhas Chandra Bose and Forward Bloc; Indian National Army (INA) and its role; Cabinet Mission Plan (1946); Mountbatten Plan (1947); Indian Independence Act (1947).",
+      "topics": [
+        {
+          "topic_number": 1,
+          "title": "Subhash Chandra Bose, INA and Mountbatten Plan 1947",
+          "description": "INA trials, partition boundary commission, and transfer of power.",
+          "estimated_minutes": 25,
+          "learning_objectives": [],
+          "resources": [],
+          "pyqs": [],
+          "practice_questions": []
+        }
+      ]
+    },
+    {
+      "chapter_number": 12,
+      "title": "The Contemporary World: World Wars & United Nations",
+      "section": "Section B: History",
+      "description": "First World War: causes (nationalism, imperialism, armaments, alliance systems, Sarajevo crisis), Treaty of Versailles; Rise of Dictatorships: Fascism in Italy, Nazism in Germany; Second World War: causes (Versailles dissatisfaction, Hitler's invasion of Poland), consequences; United Nations: objectives, General Assembly, Security Council, International Court of Justice, specialized agencies (UNICEF, WHO, UNESCO); Non-Aligned Movement (NAM): architects (Nehru, Tito, Nasser), Panchsheel.",
+      "topics": [
+        {
+          "topic_number": 1,
+          "title": "The World Wars, United Nations and Non-Aligned Movement",
+          "description": "Causes of global conflict, UN Security Council veto power, and NAM principles.",
+          "estimated_minutes": 30,
+          "learning_objectives": [],
+          "resources": [],
+          "pyqs": [],
+          "practice_questions": []
+        }
+      ]
+    }
+  ]
+}

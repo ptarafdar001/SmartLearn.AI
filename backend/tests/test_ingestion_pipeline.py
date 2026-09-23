@@ -264,3 +264,109 @@ def test_isc_history_remains_intact_after_cbse_ingestion(db_session: Session):
     assert topics_count == 12
     pyqs_count = db_session.query(PreviousYearQuestion).filter(PreviousYearQuestion.subject_id == 43).count()
     assert pyqs_count == 3
+
+
+# ── 5. Batch 4 Content Breadth & Multimodal Ingestion Tests ───────────────────
+
+def test_cbse_social_science_manifest_validation(db_session: Session):
+    """Verify that CBSE Class 10 Social Science manifest parses and satisfies all curricular criteria."""
+    manifest_path = Path("data/curricula/cbse_class10_social_science.json")
+    with open(manifest_path, "r", encoding="utf-8") as f:
+        data = json.load(f)
+
+    manifest = CurriculumManifestSchema.model_validate(data)
+    assert manifest.subject_code == "cbse-class-10-soc"
+    assert manifest.board == "CBSE"
+    assert manifest.grade == "Class 10"
+    assert len(manifest.chapters) == 22, "CBSE Class 10 Social Science must encompass all 22 official chapters."
+    assert manifest.curriculum_status == "content_available"
+
+    # Verify deep topic slice on Chapter 1 (Rise of Nationalism in Europe)
+    ch1 = next(c for c in manifest.chapters if c.chapter_number == 1)
+    assert ch1.title == "The Rise of Nationalism in Europe"
+    assert len(ch1.topics) == 3
+    assert ch1.topics[0].study_notes is not None
+    assert len(ch1.topics[0].pyqs) >= 2
+
+    # Ingest within test session
+    CurriculumIngestionPipeline.run(source=data, dry_run=False, db_session=db_session)
+
+    # Verify database state for cbse-class-10-soc
+    soc_subject = db_session.query(Subject).filter(Subject.code == "cbse-class-10-soc").first()
+    assert soc_subject is not None
+    assert soc_subject.curriculum_status == "content_available"
+    assert db_session.query(Chapter).filter(Chapter.subject_id == soc_subject.id).count() == 22
+
+
+def test_cbse_physics_phet_multimodal_ingestion(db_session: Session):
+    """Verify that CBSE Class 12 Physics contains authentic PhET Interactive Simulation multimodal resources."""
+    manifest_path = Path("data/curricula/cbse_class12_physics.json")
+    with open(manifest_path, "r", encoding="utf-8") as f:
+        data = json.load(f)
+
+    manifest = CurriculumManifestSchema.model_validate(data)
+    assert manifest.subject_code == "cbse-class-12-sci-phy"
+    assert len(manifest.chapters) == 14
+
+    # Check PhET simulation under Chapter 1
+    ch1 = next(c for c in manifest.chapters if c.chapter_number == 1)
+    t3 = next(t for t in ch1.topics if t.topic_number == 3)
+    phet_res1 = next(r for r in t3.resources if r.resource_type == "interactive")
+    assert phet_res1.provider == "phet"
+    assert "charges-and-fields" in (phet_res1.content_url or "")
+    assert phet_res1.is_verified is True
+
+    # Check PhET simulation under Chapter 3
+    ch3 = next(c for c in manifest.chapters if c.chapter_number == 3)
+    t3_ch3 = next(t for t in ch3.topics if t.topic_number == 3)
+    phet_res2 = next(r for r in t3_ch3.resources if r.resource_type == "interactive")
+    assert phet_res2.provider == "phet"
+    assert "circuit-construction-kit-dc" in (phet_res2.content_url or "")
+
+    # Ingest within test session
+    CurriculumIngestionPipeline.run(source=data, dry_run=False, db_session=db_session)
+
+    # Check database state for cbse-class-12-sci-phy
+    phy_subject = db_session.query(Subject).filter(Subject.code == "cbse-class-12-sci-phy").first()
+    assert phy_subject is not None
+    assert phy_subject.curriculum_status == "content_available"
+    interactive_count = (
+        db_session.query(LearningResource)
+        .join(Topic)
+        .join(Chapter)
+        .filter(Chapter.subject_id == phy_subject.id, LearningResource.resource_type == "interactive")
+        .count()
+    )
+    assert interactive_count >= 2, f"Expected at least 2 PhET simulations in DB, found {interactive_count}"
+
+
+def test_icse_history_civics_manifest_validation(db_session: Session):
+    """Verify that ICSE Class 10 History & Civics manifest accurately reflects CISCE HCG Paper 1."""
+    manifest_path = Path("data/curricula/icse_class10_history_civics.json")
+    with open(manifest_path, "r", encoding="utf-8") as f:
+        data = json.load(f)
+
+    manifest = CurriculumManifestSchema.model_validate(data)
+    assert manifest.subject_code == "icse-class-10-hcg"
+    assert manifest.board == "ICSE"
+    assert len(manifest.chapters) == 12
+
+    # Verify Chapter 1 Union Parliament and Chapter 6 1857 Revolt
+    ch1 = next(c for c in manifest.chapters if c.chapter_number == 1)
+    assert "Parliament" in ch1.title
+    assert len(ch1.topics[0].pyqs) >= 2
+    assert ch1.topics[0].pyqs[0].board == "ICSE"
+
+    ch6 = next(c for c in manifest.chapters if c.chapter_number == 6)
+    assert "1857" in ch6.title
+    assert len(ch6.topics[0].pyqs) >= 1
+
+    # Ingest within test session
+    CurriculumIngestionPipeline.run(source=data, dry_run=False, db_session=db_session)
+
+    # Check database state for icse-class-10-hcg
+    icse_subject = db_session.query(Subject).filter(Subject.code == "icse-class-10-hcg").first()
+    assert icse_subject is not None
+    assert icse_subject.curriculum_status == "content_available"
+    assert db_session.query(Chapter).filter(Chapter.subject_id == icse_subject.id).count() == 12
+
