@@ -14,18 +14,13 @@ import { askAITutor } from '../services/tutor';
 import { fetchEnrolledSubjects, fetchSubjectDetail } from '../services/learning';
 import type { TutorChatMessage } from '../types/tutor';
 
-const STARTER_PROMPTS = [
-  'Explain the 1853 Railway Guarantee System in simple terms',
-  'What were Lord Dalhousie’s primary military and economic motives?',
-  'How did railway tariffs contribute to Indian de-industrialisation?',
-  'Generate 3 high-yield practice questions for my upcoming exam',
-];
-
 interface TopicOption {
   id: number;
   title: string;
   chapterTitle: string;
   subjectName: string;
+  board?: string;
+  grade?: string;
 }
 
 export const AITutorPage: React.FC = () => {
@@ -33,18 +28,12 @@ export const AITutorPage: React.FC = () => {
   const initialTopicParam = searchParams.get('topicId');
 
   const [topics, setTopics] = useState<TopicOption[]>([]);
-  const [activeTopicId, setActiveTopicId] = useState<number>(
-    initialTopicParam ? Number(initialTopicParam) : 44
+  const [activeTopicId, setActiveTopicId] = useState<number | null>(
+    initialTopicParam ? Number(initialTopicParam) : null
   );
+  const [catalogLoading, setCatalogLoading] = useState<boolean>(true);
 
-  const [messages, setMessages] = useState<TutorChatMessage[]>([
-    {
-      id: 'welcome',
-      role: 'tutor',
-      content: `Hello! I am your **Curriculum-Aware AI Tutor** for **ISC Class 11 History**.\n\nI am grounded in official CISCE syllabus guidelines and verified learning materials.\n\nYou can:\n- Ask any conceptual doubt or syllabus question.\n- Upload photos of textbook diagrams, maps, or homework exercises.\n- Request high-yield exam takeaways, step-by-step solutions, or revision summaries.`,
-      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-    },
-  ]);
+  const [messages, setMessages] = useState<TutorChatMessage[]>([]);
   const [inputMessage, setInputMessage] = useState<string>('');
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -53,18 +42,21 @@ export const AITutorPage: React.FC = () => {
   useEffect(() => {
     async function loadCurriculumTopics() {
       try {
+        setCatalogLoading(true);
         const subjects = await fetchEnrolledSubjects();
         const availableTopics: TopicOption[] = [];
         for (const s of subjects) {
           try {
             const detail = await fetchSubjectDetail(s.id);
-            for (const ch of detail.chapters) {
-              for (const top of ch.topics) {
+            for (const ch of detail.chapters || []) {
+              for (const top of ch.topics || []) {
                 availableTopics.push({
                   id: top.id,
                   title: top.title,
                   chapterTitle: ch.title,
                   subjectName: s.name,
+                  board: s.board,
+                  grade: s.grade,
                 });
               }
             }
@@ -72,20 +64,61 @@ export const AITutorPage: React.FC = () => {
             // continue
           }
         }
+        setTopics(availableTopics);
         if (availableTopics.length > 0) {
-          setTopics(availableTopics);
           if (!initialTopicParam) {
             setActiveTopicId(availableTopics[0].id);
           }
+        } else {
+          setActiveTopicId(null);
         }
       } catch {
-        // fallback to default
+        // fallback
+      } finally {
+        setCatalogLoading(false);
       }
     }
     loadCurriculumTopics();
   }, [initialTopicParam]);
 
   const activeTopic = topics.find((t) => t.id === activeTopicId);
+
+  // Initialize or update welcome message whenever activeTopic changes
+  useEffect(() => {
+    if (activeTopic) {
+      setMessages([
+        {
+          id: `welcome-${activeTopic.id}`,
+          role: 'tutor',
+          content: `Hello! I am your **Curriculum-Aware AI Tutor** for **${activeTopic.subjectName}** (${activeTopic.board || ''}${activeTopic.grade ? ` Class ${activeTopic.grade}` : ''}).\n\nI am grounded in official syllabus guidelines and learning materials for **${activeTopic.chapterTitle}** • **${activeTopic.title}**.\n\nYou can:\n- Ask conceptual doubts or syllabus questions.\n- Upload photos of diagrams, formulas, or homework exercises.\n- Request high-yield takeaways, step-by-step explanations, or revision summaries.`,
+          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        },
+      ]);
+    } else if (!catalogLoading && topics.length === 0) {
+      setMessages([
+        {
+          id: 'welcome-general',
+          role: 'tutor',
+          content: `Hello! I am your **SmartLearn AI Academic Assistant**.\n\nYour enrolled subjects are currently in preparation. You can ask general academic planning and study methodology questions, but specific syllabus-grounded tutoring requires an active curriculum topic.`,
+          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        },
+      ]);
+    }
+  }, [activeTopicId, topics.length, catalogLoading]);
+
+  const starterPrompts = activeTopic
+    ? [
+        `Explain the core concepts in "${activeTopic.title}" in simple terms`,
+        `What are the most important takeaways from ${activeTopic.chapterTitle}?`,
+        `How should I approach high-yield exam questions on this topic?`,
+        `Summarize key definitions and terms for ${activeTopic.title}`,
+      ]
+    : [
+        'What is an effective daily study routine for board exams?',
+        'How can I structure long-form analytical answers effectively?',
+        'How do I create concise revision sheets for my subjects?',
+        'Give me tips on time management during board examinations',
+      ];
 
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -108,6 +141,11 @@ export const AITutorPage: React.FC = () => {
     const query = (textToSend || inputMessage).trim();
     if (!query && !selectedImage) return;
     if (isLoading) return;
+
+    if (!activeTopicId) {
+      setChatError('Please select a valid curriculum topic to enable grounded AI tutoring.');
+      return;
+    }
 
     setChatError(null);
     const timestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -173,13 +211,15 @@ export const AITutorPage: React.FC = () => {
             <div>
               <div className="tutor-title-row">
                 <h1 className="tutor-page-title">Curriculum AI Tutor</h1>
-                <span className="tutor-badge">Grounded in CISCE Syllabus</span>
+                <span className="tutor-badge">
+                  {activeTopic ? `Grounded in ${activeTopic.board || 'Official'} Curriculum` : 'General Assistance'}
+                </span>
               </div>
               <p className="tutor-page-subtitle">
                 {activeTopic ? (
                   <>Context: {activeTopic.subjectName} • {activeTopic.chapterTitle} • {activeTopic.title}</>
                 ) : (
-                  <>Context: ISC Class 11 History • Transport &amp; Communication</>
+                  <>Context: No curriculum topic selected</>
                 )}
               </p>
             </div>
@@ -189,7 +229,7 @@ export const AITutorPage: React.FC = () => {
             {topics.length > 0 && (
               <select
                 aria-label="Select Syllabus Topic"
-                value={activeTopicId}
+                value={activeTopicId || ''}
                 onChange={(e) => {
                   const newId = Number(e.target.value);
                   setActiveTopicId(newId);
@@ -200,21 +240,23 @@ export const AITutorPage: React.FC = () => {
               >
                 {topics.map((t) => (
                   <option key={t.id} value={t.id}>
-                    {t.chapterTitle}: {t.title}
+                    {t.subjectName} • {t.title}
                   </option>
                 ))}
               </select>
             )}
 
-            <Link
-              to={`/learning/topics/${activeTopicId}`}
-              className="filter-pill"
-              style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: '#eef2ff', color: '#4f46e5', textDecoration: 'none', border: '1px solid #c7d2fe', padding: '6px 12px', fontSize: '13px' }}
-              title="Practice with interactive spoken voice via browser Web Speech API"
-            >
-              <Mic size={14} />
-              <span>Voice Tutor (Browser STT/TTS)</span>
-            </Link>
+            {activeTopicId && (
+              <Link
+                to={`/learning/topics/${activeTopicId}`}
+                className="filter-pill"
+                style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: '#eef2ff', color: '#4f46e5', textDecoration: 'none', border: '1px solid #c7d2fe', padding: '6px 12px', fontSize: '13px' }}
+                title="Practice with interactive spoken voice via browser Web Speech API"
+              >
+                <Mic size={14} />
+                <span>Voice Tutor (Browser STT/TTS)</span>
+              </Link>
+            )}
           </div>
         </div>
 
@@ -276,7 +318,7 @@ export const AITutorPage: React.FC = () => {
                     <span />
                   </div>
                   <span style={{ fontSize: '13px', color: '#64748b', marginLeft: '8px' }}>
-                    Consulting CISCE curriculum resources...
+                    Consulting {activeTopic?.board || 'curriculum'} learning resources...
                   </span>
                 </div>
               </div>
@@ -286,8 +328,8 @@ export const AITutorPage: React.FC = () => {
           {/* Starter Prompts */}
           {messages.length <= 3 && !isLoading && (
             <div className="tutor-starter-chips">
-              <span className="starter-label">Suggested Syllabus Doubts:</span>
-              {STARTER_PROMPTS.map((prompt, idx) => (
+              <span className="starter-label">Suggested Doubts &amp; Takeaways:</span>
+              {starterPrompts.map((prompt, idx) => (
                 <button
                   key={idx}
                   type="button"

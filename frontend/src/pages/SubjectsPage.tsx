@@ -4,6 +4,7 @@ import { BookOpen, ArrowRight } from 'lucide-react';
 import { AppLayout } from '../components/layout/AppLayout';
 import { fetchEnrolledSubjects } from '../services/learning';
 import type { SubjectSummary } from '../types/learning';
+import { CurriculumReadinessBadge } from '../components/learning/CurriculumReadinessBadge';
 
 export const SubjectsPage: React.FC = () => {
   const [subjects, setSubjects] = useState<SubjectSummary[]>([]);
@@ -31,7 +32,7 @@ export const SubjectsPage: React.FC = () => {
         <div>
           <h1 className="page-title-compact">My Enrolled Subjects</h1>
           <p className="page-subtitle-compact">
-            Official syllabus-aligned subjects for ISC Class 11. Select a subject to explore chapters, topics, and verified notes.
+            Official syllabus-aligned curriculum subjects. Select a subject to explore chapters, topics, and verified notes.
           </p>
         </div>
         <span className="page-count-badge">{subjects.length} Subjects Enrolled</span>
@@ -60,13 +61,18 @@ export const SubjectsPage: React.FC = () => {
             return (
               <div key={subj.id} className="subject-card">
                 <div className="subject-card-body">
-                  <div className="subject-card-header">
-                    <h3 className="subject-name">{subj.name}</h3>
-                    <span className="subject-badge">{subj.board} • {subj.grade}</span>
+                  <div className="subject-card-header flex items-start justify-between gap-2 flex-wrap">
+                    <div>
+                      <h3 className="subject-name">{subj.name}</h3>
+                      <span className="subject-badge">{subj.board} • {subj.grade}</span>
+                    </div>
+                    {subj.curriculum_status && (
+                      <CurriculumReadinessBadge status={subj.curriculum_status} size="sm" />
+                    )}
                   </div>
 
                   <p className="subject-desc">
-                    {subj.description || `Official CISCE Class 11 curriculum for ${subj.name}.`}
+                    {subj.description || `Official ${subj.board} ${subj.grade} curriculum for ${subj.name}.`}
                   </p>
 
                   <div className="progress-container">

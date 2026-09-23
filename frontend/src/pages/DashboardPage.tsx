@@ -25,6 +25,7 @@ import type {
   RecommendationItem,
   SubjectSummary,
 } from '../types/learning';
+import { CurriculumReadinessBadge } from '../components/learning/CurriculumReadinessBadge';
 import '../styles/learning.css';
 
 export const DashboardPage: React.FC = () => {
@@ -77,9 +78,9 @@ export const DashboardPage: React.FC = () => {
   }, []);
 
   const studentName = overview?.full_name || user?.full_name || 'Student';
-  const board = overview?.board || 'ISC';
-  const grade = overview?.grade || 'Class 11';
-  const stream = overview?.academic_stream || 'Humanities';
+  const board = overview?.board || '';
+  const grade = overview?.grade || '';
+  const stream = overview?.academic_stream || '';
   const overallProgress = overview?.overall_progress_percentage ?? 0;
 
   return (
@@ -104,23 +105,25 @@ export const DashboardPage: React.FC = () => {
             {/* 1. Compact Greeting & Key Stats Bar */}
             <section className="compact-hero-card" aria-labelledby="hero-greeting">
               <div className="compact-hero-left">
-                <div className="compact-hero-badge">
-                  <span>{board}</span>
-                  <span className="hero-badge-sep">•</span>
-                  <span>{grade}</span>
-                  {stream && (
-                    <>
-                      <span className="hero-badge-sep">•</span>
-                      <span>{stream}</span>
-                    </>
-                  )}
-                </div>
+                {(board || grade || stream) && (
+                  <div className="compact-hero-badge">
+                    {board && <span>{board}</span>}
+                    {board && grade && <span className="hero-badge-sep">•</span>}
+                    {grade && <span>{grade}</span>}
+                    {stream && (
+                      <>
+                        <span className="hero-badge-sep">•</span>
+                        <span>{stream}</span>
+                      </>
+                    )}
+                  </div>
+                )}
 
                 <h1 id="hero-greeting" className="compact-hero-title">
                   Welcome back, {studentName}!
                 </h1>
                 <p className="compact-hero-sub">
-                  Continue your official CISCE syllabus lessons, study verified notes, and resolve doubts with your AI Tutor.
+                  Continue your official{board ? ` ${board}` : ''} syllabus lessons, study verified notes, and resolve doubts with your AI Tutor.
                 </p>
               </div>
 
@@ -250,13 +253,18 @@ export const DashboardPage: React.FC = () => {
                             <div className="compact-subj-top">
                               <div className="compact-subj-title-wrap">
                                 <h3 className="subject-name" style={{ fontSize: 16 }}>{subj.name}</h3>
-                                <span className="subject-badge">{subj.board}</span>
+                                <div className="flex items-center gap-1.5 flex-wrap">
+                                  <span className="subject-badge">{subj.board}</span>
+                                  {subj.curriculum_status && (
+                                    <CurriculumReadinessBadge status={subj.curriculum_status} size="sm" />
+                                  )}
+                                </div>
                               </div>
                               <span className="compact-subj-pct">{pct}%</span>
                             </div>
 
                             <p className="compact-subj-desc">
-                              {subj.description || `Official CISCE Class 11 curriculum for ${subj.name}.`}
+                              {subj.description || `Official ${subj.board || board || ''} ${subj.grade || grade || ''} curriculum for ${subj.name}.`}
                             </p>
 
                             <div className="progress-bar-bg" style={{ height: 5 }}>
@@ -296,10 +304,12 @@ export const DashboardPage: React.FC = () => {
                         <span>Preferred Slot:</span>
                         <span className="capitalize font-semibold">{overview.study_target.preferred_slot}</span>
                       </div>
-                      <div className="compact-goal-row">
-                        <span>Exam Target:</span>
-                        <span className="font-semibold text-emerald-600">ISC 2027 (95%)</span>
-                      </div>
+                      {overview.goals && overview.goals.length > 0 && (
+                        <div className="compact-goal-row">
+                          <span>Academic Goals:</span>
+                          <span className="font-semibold text-emerald-600">{overview.goals.join(', ')}</span>
+                        </div>
+                      )}
                     </div>
                   </div>
                 )}

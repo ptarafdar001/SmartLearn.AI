@@ -11,6 +11,8 @@ import {
 } from 'lucide-react';
 import { fetchSubjectDetail } from '../../services/learning';
 import type { SubjectDetail } from '../../types/learning';
+import { CurriculumReadinessBadge } from '../../components/learning/CurriculumReadinessBadge';
+import { CurriculumStatusCard } from '../../components/learning/CurriculumStatusCard';
 import '../../styles/learning.css';
 import { AppLayout } from '../../components/layout/AppLayout';
 
@@ -87,12 +89,13 @@ export const SubjectDetailPage: React.FC = () => {
             {/* Subject Hero Header */}
             <div className="subject-hero">
               <div className="subject-hero-info">
-                <div className="subject-badges-row">
+                <div className="subject-badges-row flex items-center gap-2 flex-wrap mb-2">
                   <span className="subject-badge">{subject.board}</span>
                   <span className="subject-badge">{subject.grade}</span>
                   {subject.academic_stream && (
                     <span className="subject-badge">{subject.academic_stream}</span>
                   )}
+                  <CurriculumReadinessBadge status={subject.curriculum_status} size="sm" />
                 </div>
 
                 <h1 className="subject-hero-title">{subject.name}</h1>
@@ -102,29 +105,40 @@ export const SubjectDetailPage: React.FC = () => {
               </div>
 
               <div className="subject-hero-progress-box">
-                <div className="progress-header">
-                  <span>Syllabus Completion</span>
-                  <span className="progress-pct-val">{subject.progress_percentage}%</span>
-                </div>
+                {subject.total_topics > 0 ? (
+                  <>
+                    <div className="progress-header">
+                      <span>Syllabus Completion</span>
+                      <span className="progress-pct-val">{subject.progress_percentage}%</span>
+                    </div>
 
-                <div
-                  className="progress-bar-bg"
-                  role="progressbar"
-                  aria-valuenow={subject.progress_percentage}
-                  aria-valuemin={0}
-                  aria-valuemax={100}
-                  aria-label={`Subject completion: ${subject.progress_percentage}%`}
-                >
-                  <div
-                    className="progress-bar-fill"
-                    style={{ width: `${subject.progress_percentage}%` }}
-                  />
-                </div>
+                    <div
+                      className="progress-bar-bg"
+                      role="progressbar"
+                      aria-valuenow={subject.progress_percentage}
+                      aria-valuemin={0}
+                      aria-valuemax={100}
+                      aria-label={`Subject completion: ${subject.progress_percentage}%`}
+                    >
+                      <div
+                        className="progress-bar-fill"
+                        style={{ width: `${subject.progress_percentage}%` }}
+                      />
+                    </div>
 
-                <div className="subject-progress-topics-count">
-                  <CheckCircle2 size={13} className="text-indigo-600" />
-                  <span>{subject.completed_topics} of {subject.total_topics} topics completed</span>
-                </div>
+                    <div className="subject-progress-topics-count">
+                      <CheckCircle2 size={13} className="text-indigo-600" />
+                      <span>{subject.completed_topics} of {subject.total_topics} topics completed</span>
+                    </div>
+                  </>
+                ) : (
+                  <div className="text-center py-2">
+                    <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">
+                      Curriculum Status
+                    </p>
+                    <CurriculumReadinessBadge status={subject.curriculum_status} />
+                  </div>
+                )}
               </div>
             </div>
 
@@ -138,17 +152,19 @@ export const SubjectDetailPage: React.FC = () => {
               </div>
 
               {subject.chapters.length === 0 ? (
-                <div className="learn-empty-state" style={{ padding: '40px 20px', textAlign: 'center', background: '#f8fafc', borderRadius: '12px', border: '1px dashed #cbd5e1' }}>
-                  <BookOpen size={36} className="empty-state-icon" style={{ margin: '0 auto 12px', color: '#6366f1' }} />
-                  <h3 style={{ fontSize: '17px', fontWeight: 600, color: '#1e293b', marginBottom: '8px' }}>
-                    Curriculum In Preparation
-                  </h3>
-                  <p style={{ maxWidth: 520, margin: '0 auto 16px', color: '#64748b', fontSize: '13.5px', lineHeight: 1.6 }}>
-                    Verified syllabus chapters, learning objectives, and authentic previous-year questions for <strong>{subject.name} ({subject.board} {subject.grade})</strong> are currently in editorial curation. Currently, <strong>ISC Class 11 History</strong> is fully seeded with complete verified curriculum intelligence.
-                  </p>
-                  <Link to="/learning/subjects/43" className="continue-action-btn" style={{ display: 'inline-flex', padding: '8px 16px', fontSize: '13px' }}>
-                    <span>Explore Seeded ISC History Syllabus →</span>
-                  </Link>
+                <div className="py-6">
+                  <CurriculumStatusCard
+                    subjectName={subject.name}
+                    board={subject.board}
+                    grade={subject.grade}
+                    curriculumStatus={subject.curriculum_status}
+                    sourceAuthority={subject.source_authority}
+                    syllabusVersion={subject.syllabus_version}
+                    sourceUrl={subject.source_url}
+                    statusMessage={subject.status_message}
+                    backUrl="/subjects"
+                    backLabel="Back to My Subjects"
+                  />
                 </div>
               ) : (
                 <div className="chapter-accordion">

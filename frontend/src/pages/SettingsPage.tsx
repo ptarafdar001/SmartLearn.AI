@@ -1,10 +1,19 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { User, BookOpen } from 'lucide-react';
 import { AppLayout } from '../components/layout/AppLayout';
 import { useAuth } from '../context/AuthContext';
+import { fetchDashboardOverview, fetchEnrolledSubjects } from '../services/learning';
+import type { DashboardOverview, SubjectSummary } from '../types/learning';
 
 export const SettingsPage: React.FC = () => {
   const { user } = useAuth();
+  const [overview, setOverview] = useState<DashboardOverview | null>(null);
+  const [enrolledSubjects, setEnrolledSubjects] = useState<SubjectSummary[]>([]);
+
+  useEffect(() => {
+    fetchDashboardOverview().then(setOverview).catch(() => {});
+    fetchEnrolledSubjects().then(setEnrolledSubjects).catch(() => {});
+  }, []);
 
   return (
     <AppLayout breadcrumbs={[{ label: 'Settings' }]}>
@@ -28,11 +37,11 @@ export const SettingsPage: React.FC = () => {
           <div className="plan-details-list">
             <div className="plan-item-row">
               <span className="plan-item-label">Full Name</span>
-              <span className="plan-item-val">{user?.full_name || 'Demo Student'}</span>
+              <span className="plan-item-val">{overview?.full_name || user?.full_name || 'Student'}</span>
             </div>
             <div className="plan-item-row">
               <span className="plan-item-label">Registered Email</span>
-              <span className="plan-item-val">{user?.email || 'demo.student@smartlearn.ai'}</span>
+              <span className="plan-item-val">{user?.email || 'N/A'}</span>
             </div>
             <div className="plan-item-row">
               <span className="plan-item-label">Role</span>
@@ -55,19 +64,25 @@ export const SettingsPage: React.FC = () => {
           <div className="plan-details-list">
             <div className="plan-item-row">
               <span className="plan-item-label">Examination Board</span>
-              <span className="plan-item-val">CISCE (ISC)</span>
+              <span className="plan-item-val">{overview?.board || 'Not Configured'}</span>
             </div>
             <div className="plan-item-row">
               <span className="plan-item-label">Class / Grade</span>
-              <span className="plan-item-val">Class 11</span>
+              <span className="plan-item-val">{overview?.grade || 'Not Specified'}</span>
             </div>
+            {overview?.academic_stream && (
+              <div className="plan-item-row">
+                <span className="plan-item-label">Academic Stream</span>
+                <span className="plan-item-val">{overview.academic_stream}</span>
+              </div>
+            )}
             <div className="plan-item-row">
-              <span className="plan-item-label">Academic Stream</span>
-              <span className="plan-item-val">Humanities / Arts</span>
-            </div>
-            <div className="plan-item-row">
-              <span className="plan-item-label">Enrolled Subject</span>
-              <span className="plan-item-val">History (Code: isc-11-hist)</span>
+              <span className="plan-item-label">Enrolled Subjects</span>
+              <span className="plan-item-val">
+                {enrolledSubjects.length > 0
+                  ? enrolledSubjects.map((s) => s.name).join(', ')
+                  : 'No subjects enrolled'}
+              </span>
             </div>
           </div>
         </div>
@@ -75,3 +90,4 @@ export const SettingsPage: React.FC = () => {
     </AppLayout>
   );
 };
+

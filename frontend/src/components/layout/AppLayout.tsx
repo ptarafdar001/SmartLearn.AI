@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { NavLink, Link } from 'react-router-dom';
 import {
   LayoutDashboard,
@@ -16,6 +16,8 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { BrandLogo } from '../common/BrandLogo';
+import { fetchDashboardOverview } from '../../services/learning';
+import type { DashboardOverview } from '../../types/learning';
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -36,8 +38,27 @@ const NAV_ITEMS = [
 export const AppLayout: React.FC<AppLayoutProps> = ({ children, breadcrumbs }) => {
   const { user, logout } = useAuth();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [overview, setOverview] = useState<DashboardOverview | null>(null);
 
-  const studentName = user?.full_name || 'Student';
+  useEffect(() => {
+    let isMounted = true;
+    fetchDashboardOverview()
+      .then((data) => {
+        if (isMounted) setOverview(data);
+      })
+      .catch(() => {});
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const studentName = overview?.full_name || user?.full_name || 'Student';
+  const userRoleLabel = overview?.board && overview?.grade
+    ? `${overview.board} • ${overview.grade}`
+    : (user?.role ? user.role.charAt(0).toUpperCase() + user.role.slice(1) : 'Student');
+  const academicPillText = overview?.board
+    ? [overview.board, overview.grade, overview.academic_stream].filter(Boolean).join(' • ')
+    : null;
 
   return (
     <div className="platform-layout">
@@ -108,7 +129,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children, breadcrumbs }) =
             </div>
             <div className="sidebar-user-info">
               <span className="sidebar-user-name">{studentName}</span>
-              <span className="sidebar-user-role">ISC • Class 11</span>
+              <span className="sidebar-user-role">{userRoleLabel}</span>
             </div>
           </div>
 
@@ -154,9 +175,11 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children, breadcrumbs }) =
           </div>
 
           <div className="platform-topbar-actions">
-            <div className="topbar-academic-pill">
-              ISC • Class 11 • Humanities
-            </div>
+            {academicPillText && (
+              <div className="topbar-academic-pill">
+                {academicPillText}
+              </div>
+            )}
           </div>
         </header>
 

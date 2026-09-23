@@ -4,7 +4,6 @@ import {
   CheckCircle,
   ChevronDown,
   ChevronUp,
-  ExternalLink,
   Sparkles,
   ShieldCheck,
   Send,
@@ -20,12 +19,15 @@ import {
   fetchSubjectDetail,
 } from '../services/learning';
 import type { PreviousYearQuestion, PracticeQuestion, PracticeAttemptResponse } from '../types/learning';
+import { CurriculumStatusCard } from '../components/learning/CurriculumStatusCard';
 
 interface TopicOption {
   id: number;
   title: string;
   chapterTitle: string;
   subjectName: string;
+  board?: string;
+  grade?: string;
 }
 
 export const PracticeQuizzesPage: React.FC = () => {
@@ -34,18 +36,19 @@ export const PracticeQuizzesPage: React.FC = () => {
 
   const [activeTab, setActiveTab] = useState<'pyqs' | 'practice'>('pyqs');
   const [topics, setTopics] = useState<TopicOption[]>([]);
-  const [topicId, setTopicId] = useState<number>(
-    initialTopicParam ? Number(initialTopicParam) : 44
+  const [topicId, setTopicId] = useState<number | null>(
+    initialTopicParam ? Number(initialTopicParam) : null
   );
+  const [catalogLoading, setCatalogLoading] = useState<boolean>(true);
 
   // Authentic PYQs State
   const [pyqs, setPyqs] = useState<PreviousYearQuestion[]>([]);
-  const [pyqsLoading, setPyqsLoading] = useState<boolean>(true);
+  const [pyqsLoading, setPyqsLoading] = useState<boolean>(false);
   const [expandedSchemes, setExpandedSchemes] = useState<Record<number, boolean>>({});
 
   // AI Practice State
   const [practiceQuestions, setPracticeQuestions] = useState<PracticeQuestion[]>([]);
-  const [practiceLoading, setPracticeLoading] = useState<boolean>(true);
+  const [practiceLoading, setPracticeLoading] = useState<boolean>(false);
   const [selectedAnswers, setSelectedAnswers] = useState<Record<number, string>>({});
   const [attemptResults, setAttemptResults] = useState<Record<number, PracticeAttemptResponse>>({});
   const [submittingIds, setSubmittingIds] = useState<Record<number, boolean>>({});
@@ -54,18 +57,21 @@ export const PracticeQuizzesPage: React.FC = () => {
   useEffect(() => {
     async function loadCurriculumTopics() {
       try {
+        setCatalogLoading(true);
         const subjects = await fetchEnrolledSubjects();
         const availableTopics: TopicOption[] = [];
         for (const s of subjects) {
           try {
             const detail = await fetchSubjectDetail(s.id);
-            for (const ch of detail.chapters) {
-              for (const top of ch.topics) {
+            for (const ch of detail.chapters || []) {
+              for (const top of ch.topics || []) {
                 availableTopics.push({
                   id: top.id,
                   title: top.title,
                   chapterTitle: ch.title,
                   subjectName: s.name,
+                  board: s.board,
+                  grade: s.grade,
                 });
               }
             }
@@ -73,43 +79,56 @@ export const PracticeQuizzesPage: React.FC = () => {
             // continue
           }
         }
+        setTopics(availableTopics);
         if (availableTopics.length > 0) {
-          setTopics(availableTopics);
           if (!initialTopicParam) {
             setTopicId(availableTopics[0].id);
           }
+        } else {
+          setTopicId(null);
         }
       } catch {
         // fallback
+      } finally {
+        setCatalogLoading(false);
       }
     }
     loadCurriculumTopics();
   }, [initialTopicParam]);
 
   useEffect(() => {
-    loadPYQs();
-    loadPracticeQuestions();
+    if (!topicId) {
+      setPyqs([]);
+      setPracticeQuestions([]);
+      setPyqsLoading(false);
+      setPracticeLoading(false);
+      return;
+    }
+    loadPYQs(topicId);
+    loadPracticeQuestions(topicId);
   }, [topicId]);
 
-  const loadPYQs = async () => {
+  const loadPYQs = async (id: number) => {
     try {
       setPyqsLoading(true);
-      const data = await fetchTopicPYQs(topicId);
+      const data = await fetchTopicPYQs(id);
       setPyqs(data);
     } catch (err) {
       console.error('Failed to load PYQs:', err);
+      setPyqs([]);
     } finally {
       setPyqsLoading(false);
     }
   };
 
-  const loadPracticeQuestions = async () => {
+  const loadPracticeQuestions = async (id: number) => {
     try {
       setPracticeLoading(true);
-      const data = await fetchPracticeQuestions(topicId);
+      const data = await fetchPracticeQuestions(id);
       setPracticeQuestions(data);
     } catch (err) {
       console.error('Failed to load practice questions:', err);
+      setPracticeQuestions([]);
     } finally {
       setPracticeLoading(false);
     }
@@ -140,6 +159,7 @@ export const PracticeQuizzesPage: React.FC = () => {
   };
 
   const handleGenerateFreshQuestions = async () => {
+    if (!topicId) return;
     try {
       setIsGenerating(true);
       const freshQuestions = await generatePracticeQuestions(topicId);
@@ -153,13 +173,15 @@ export const PracticeQuizzesPage: React.FC = () => {
     }
   };
 
+  const selectedTopic = topics.find((t) => t.id === topicId);
+
   return (
     <AppLayout breadcrumbs={[{ label: 'Practice & Quizzes' }]}>
       <div className="page-header-compact">
         <div>
           <h1 className="page-title-compact">Practice &amp; Assessment Hub</h1>
           <p className="page-subtitle-compact">
-            Official CISCE board examination questions and curriculum-grounded AI practice tests for ISC Class 11 History.
+            Curriculum-grounded board examination questions and AI practice tests tailored to your enrolled syllabus.
           </p>
         </div>
 
@@ -167,7 +189,7 @@ export const PracticeQuizzesPage: React.FC = () => {
           {topics.length > 0 && (
             <select
               aria-label="Select Syllabus Topic"
-              value={topicId}
+              value={topicId || ''}
               onChange={(e) => {
                 const newId = Number(e.target.value);
                 setTopicId(newId);
@@ -184,7 +206,7 @@ export const PracticeQuizzesPage: React.FC = () => {
             </select>
           )}
 
-          {activeTab === 'practice' && (
+          {activeTab === 'practice' && topicId && (
             <button
               type="button"
               onClick={handleGenerateFreshQuestions}
@@ -198,76 +220,89 @@ export const PracticeQuizzesPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Navigation Tabs */}
-      <div className="flex border-b border-slate-200 mb-5">
-        <button
-          type="button"
-          onClick={() => setActiveTab('pyqs')}
-          className={`flex items-center gap-2 px-4 py-2.5 text-xs font-semibold border-b-2 transition-colors ${
-            activeTab === 'pyqs'
-              ? 'border-indigo-600 text-indigo-700'
-              : 'border-transparent text-slate-500 hover:text-slate-800'
-          }`}
-        >
-          <ShieldCheck size={15} />
-          <span>Authentic Previous-Year Questions (PYQs)</span>
-          <span className="ml-1 px-1.5 py-0.5 rounded-full bg-indigo-50 text-indigo-700 text-[10px]">
-            {pyqs.length} Official
-          </span>
-        </button>
-
-        <button
-          type="button"
-          onClick={() => setActiveTab('practice')}
-          className={`flex items-center gap-2 px-4 py-2.5 text-xs font-semibold border-b-2 transition-colors ${
-            activeTab === 'practice'
-              ? 'border-indigo-600 text-indigo-700'
-              : 'border-transparent text-slate-500 hover:text-slate-800'
-          }`}
-        >
-          <Sparkles size={15} />
-          <span>AI-Generated Practice Questions</span>
-          <span className="ml-1 px-1.5 py-0.5 rounded-full bg-slate-100 text-slate-700 text-[10px]">
-            {practiceQuestions.length} Available
-          </span>
-        </button>
-      </div>
-
-      {/* ── TAB 1: Authentic Previous-Year Questions ────────────────────── */}
-      {activeTab === 'pyqs' && (
-        <div className="space-y-4">
-          <div className="rounded-xl border border-emerald-100 bg-emerald-50/50 p-3.5 flex items-center justify-between text-xs">
-            <div className="flex items-center gap-2 text-emerald-800 font-medium">
-              <ShieldCheck size={16} className="text-emerald-600 shrink-0" />
-              <span>
-                These questions are authentic past-year board examination questions with official CISCE paper attribution.
-              </span>
-            </div>
-            <a
-              href="https://www.cisce.org/regulations-and-syllabuses-isc/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-1 text-emerald-700 font-semibold hover:underline shrink-0 ml-4"
+      {catalogLoading ? (
+        <div className="learn-loading-container">
+          <div className="learn-spinner" />
+          <p>Loading curriculum topics...</p>
+        </div>
+      ) : topics.length === 0 ? (
+        <div className="py-8">
+          <CurriculumStatusCard
+            subjectName="Enrolled Curricula"
+            curriculumStatus="in_preparation"
+            statusMessage="No interactive topics or quizzes are available yet for your enrolled subjects. Chapters and learning assessments are currently being prepared."
+            backUrl="/subjects"
+            backLabel="Browse All Subjects"
+          />
+        </div>
+      ) : (
+        <>
+          {/* Navigation Tabs */}
+          <div className="flex border-b border-slate-200 mb-5">
+            <button
+              type="button"
+              onClick={() => setActiveTab('pyqs')}
+              className={`flex items-center gap-2 px-4 py-2.5 text-xs font-semibold border-b-2 transition-colors ${
+                activeTab === 'pyqs'
+                  ? 'border-indigo-600 text-indigo-700'
+                  : 'border-transparent text-slate-500 hover:text-slate-800'
+              }`}
             >
-              <span>CISCE Official Regulations</span>
-              <ExternalLink size={12} />
-            </a>
+              <ShieldCheck size={15} />
+              <span>Authentic Previous-Year Questions (PYQs)</span>
+              <span className="ml-1 px-1.5 py-0.5 rounded-full bg-indigo-50 text-indigo-700 text-[10px]">
+                {pyqs.length} Official
+              </span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setActiveTab('practice')}
+              className={`flex items-center gap-2 px-4 py-2.5 text-xs font-semibold border-b-2 transition-colors ${
+                activeTab === 'practice'
+                  ? 'border-indigo-600 text-indigo-700'
+                  : 'border-transparent text-slate-500 hover:text-slate-800'
+              }`}
+            >
+              <Sparkles size={15} />
+              <span>AI-Generated Practice Questions</span>
+              <span className="ml-1 px-1.5 py-0.5 rounded-full bg-slate-100 text-slate-700 text-[10px]">
+                {practiceQuestions.length} Available
+              </span>
+            </button>
           </div>
 
-          {pyqsLoading ? (
-            <div className="p-8 text-center text-slate-500 text-xs flex items-center justify-center gap-2">
-              <Loader2 size={16} className="animate-spin text-indigo-600" />
-              <span>Loading authentic previous-year questions...</span>
-            </div>
-          ) : pyqs.length === 0 ? (
-            <div className="p-8 text-center text-slate-500 text-xs bg-slate-50 rounded-xl border border-slate-200">
-              <ShieldCheck size={28} className="mx-auto mb-2 text-slate-400" />
-              <p className="font-semibold text-slate-800 mb-1 text-sm">No Verified Authentic PYQs For This Topic Yet</p>
-              <p className="max-w-md mx-auto text-slate-600">
-                Official past-year questions for this specific syllabus unit are currently undergoing editorial verification. Switch to the <strong>AI-Generated Practice Questions</strong> tab to practice syllabus-aligned doubts.
-              </p>
-            </div>
-          ) : (
+          {/* ── TAB 1: Authentic Previous-Year Questions ────────────────────── */}
+          {activeTab === 'pyqs' && (
+            <div className="space-y-4">
+              <div className="rounded-xl border border-emerald-100 bg-emerald-50/50 p-3.5 flex items-center justify-between text-xs">
+                <div className="flex items-center gap-2 text-emerald-800 font-medium">
+                  <ShieldCheck size={16} className="text-emerald-600 shrink-0" />
+                  <span>
+                    These questions are authentic past-year examination questions with verified board paper attribution.
+                  </span>
+                </div>
+                {selectedTopic?.board && (
+                  <span className="text-emerald-700 font-semibold text-[11px] shrink-0 ml-4">
+                    {selectedTopic.board} {selectedTopic.grade ? `Class ${selectedTopic.grade}` : ''}
+                  </span>
+                )}
+              </div>
+
+              {pyqsLoading ? (
+                <div className="p-8 text-center text-slate-500 text-xs flex items-center justify-center gap-2">
+                  <Loader2 size={16} className="animate-spin text-indigo-600" />
+                  <span>Loading authentic previous-year questions...</span>
+                </div>
+              ) : pyqs.length === 0 ? (
+                <div className="p-8 text-center text-slate-500 text-xs bg-slate-50 rounded-xl border border-slate-200">
+                  <ShieldCheck size={28} className="mx-auto mb-2 text-slate-400" />
+                  <p className="font-semibold text-slate-800 mb-1 text-sm">No Verified Authentic PYQs For This Topic Yet</p>
+                  <p className="max-w-md mx-auto text-slate-600">
+                    Official past-year questions for this specific syllabus unit are currently undergoing editorial verification. Switch to the <strong>AI-Generated Practice Questions</strong> tab to practice syllabus-aligned doubts.
+                  </p>
+                </div>
+              ) : (
             <div className="grid gap-4">
               {pyqs.map((q) => {
                 const isExpanded = expandedSchemes[q.id];
@@ -455,6 +490,8 @@ export const PracticeQuizzesPage: React.FC = () => {
             </div>
           )}
         </div>
+      )}
+        </>
       )}
     </AppLayout>
   );

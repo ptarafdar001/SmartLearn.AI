@@ -59,6 +59,11 @@ export interface ChapterSummary {
   topics: TopicSummary[];
 }
 
+export type CurriculumReadinessStatus =
+  | 'content_available'
+  | 'curriculum_verified'
+  | 'in_preparation';
+
 export interface SubjectSummary {
   id: number;
   code: string;
@@ -75,6 +80,11 @@ export interface SubjectSummary {
   topic_count?: number | null;
   completed_topics: number;
   progress_percentage?: number | null;
+  curriculum_status?: CurriculumReadinessStatus | string | null;
+  source_authority?: string | null;
+  source_url?: string | null;
+  syllabus_version?: string | null;
+  status_message?: string | null;
 }
 
 export interface SubjectDetail {
@@ -90,6 +100,11 @@ export interface SubjectDetail {
   total_topics: number;
   completed_topics: number;
   progress_percentage: number;
+  curriculum_status?: CurriculumReadinessStatus | string | null;
+  source_authority?: string | null;
+  source_url?: string | null;
+  syllabus_version?: string | null;
+  status_message?: string | null;
   chapters: ChapterSummary[];
 }
 

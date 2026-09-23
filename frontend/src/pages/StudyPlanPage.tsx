@@ -69,13 +69,13 @@ export const StudyPlanPage: React.FC = () => {
           <div className="plan-details-list">
             <div className="plan-item-row">
               <span className="plan-item-label">Academic Board</span>
-              <span className="plan-item-val">{overview?.board || 'CISCE'}</span>
+              <span className="plan-item-val">{overview?.board || 'Not Configured'}</span>
             </div>
 
             <div className="plan-item-row">
               <span className="plan-item-label">Curriculum Level</span>
               <span className="plan-item-val">
-                {overview?.grade || 'Class 11'}{overview?.academic_stream ? ` (${overview.academic_stream})` : ''}
+                {overview?.grade || 'Not Specified'}{overview?.academic_stream ? ` (${overview.academic_stream})` : ''}
               </span>
             </div>
 

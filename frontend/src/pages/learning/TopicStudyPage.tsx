@@ -428,7 +428,7 @@ export const TopicStudyPage: React.FC = () => {
                       <div className="flex items-center justify-between p-3.5 bg-indigo-50/70 rounded-xl border border-indigo-100 mb-5">
                         <div className="flex items-center gap-2 text-indigo-950 font-semibold text-xs">
                           <CheckCircle2 size={16} className="text-emerald-600" />
-                          <span>10-Part Curriculum Study Notes (Verified CISCE Syllabus)</span>
+                          <span>10-Part Curriculum Study Notes (Verified {topic?.subject_name || 'Curriculum'} Syllabus)</span>
                         </div>
                         <span className="text-[11px] text-slate-500 font-mono">v{dynamicNotes.version}.0 Verified</span>
                       </div>
@@ -481,7 +481,7 @@ export const TopicStudyPage: React.FC = () => {
                             {res.is_verified && (
                               <span className="verified-badge">
                                 <Check size={12} />
-                                <span>Official Verified CISCE Curriculum Notes</span>
+                                <span>Official Verified Curriculum Notes</span>
                               </span>
                             )}
                           </div>
@@ -635,7 +635,7 @@ export const TopicStudyPage: React.FC = () => {
                     <div>
                       <h2 className="practice-title">Interactive Knowledge Check</h2>
                       <p className="practice-subtitle">
-                        Test your mastery of official CISCE Class 11 History concepts for this topic.
+                        Test your mastery of official {topic?.subject_name || 'curriculum'} concepts for this topic.
                       </p>
                     </div>
                     <span className="practice-count-badge">{SELF_CHECK_QUIZ.length} Practice Questions</span>

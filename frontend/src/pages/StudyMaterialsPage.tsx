@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { FileText, Video, ArrowRight, Check, BookOpen } from 'lucide-react';
+import { FileText, Video, ArrowRight, Check } from 'lucide-react';
 import { AppLayout } from '../components/layout/AppLayout';
 import { fetchEnrolledSubjects, fetchSubjectDetail } from '../services/learning';
 import type { SubjectDetail, SubjectSummary } from '../types/learning';
+import { CurriculumStatusCard } from '../components/learning/CurriculumStatusCard';
+import { CurriculumReadinessBadge } from '../components/learning/CurriculumReadinessBadge';
 
 export const StudyMaterialsPage: React.FC = () => {
   const [enrolledSubjects, setEnrolledSubjects] = useState<SubjectSummary[]>([]);
@@ -53,9 +55,14 @@ export const StudyMaterialsPage: React.FC = () => {
     <AppLayout breadcrumbs={[{ label: 'Study Materials & Notes' }]}>
       <div className="page-header-compact">
         <div>
-          <h1 className="page-title-compact">Study Materials &amp; Verified Notes</h1>
+          <div className="flex items-center gap-2 mb-1">
+            <h1 className="page-title-compact">Study Materials &amp; Verified Notes</h1>
+            {subject?.curriculum_status && (
+              <CurriculumReadinessBadge status={subject.curriculum_status} size="sm" />
+            )}
+          </div>
           <p className="page-subtitle-compact">
-            Curated revision sheets, textbook extracts, and video lectures aligned with CISCE ISC Class 11 regulations.
+            Curated revision sheets, textbook extracts, and video lectures aligned with {subject?.board || 'official'} {subject?.grade ? `Class ${subject.grade}` : 'curriculum'} standards.
           </p>
         </div>
 
@@ -110,22 +117,19 @@ export const StudyMaterialsPage: React.FC = () => {
           <p>Loading study materials catalog...</p>
         </div>
       ) : chapters.length === 0 ? (
-        <div className="learn-empty-state" style={{ padding: '40px 20px', textAlign: 'center', background: '#f8fafc', borderRadius: '12px', border: '1px dashed #cbd5e1' }}>
-          <BookOpen size={36} className="empty-state-icon" style={{ margin: '0 auto 12px', color: '#6366f1' }} />
-          <h3 style={{ fontSize: '17px', fontWeight: 600, color: '#1e293b', marginBottom: '8px' }}>
-            Curriculum In Preparation
-          </h3>
-          <p style={{ maxWidth: 520, margin: '0 auto 16px', color: '#64748b', fontSize: '13.5px', lineHeight: 1.6 }}>
-            Verified study notes and video lectures for this subject are currently undergoing curriculum alignment and review. Currently, <strong>ISC Class 11 History</strong> has complete verified resources.
-          </p>
-          <button
-            type="button"
-            onClick={() => handleSelectSubject(43)}
-            className="continue-action-btn"
-            style={{ display: 'inline-flex', padding: '8px 16px', fontSize: '13px' }}
-          >
-            <span>View Seeded ISC History Notes →</span>
-          </button>
+        <div className="py-8">
+          <CurriculumStatusCard
+            subjectName={subject?.name || 'Selected Subject'}
+            board={subject?.board}
+            grade={subject?.grade}
+            curriculumStatus={subject?.curriculum_status || 'in_preparation'}
+            sourceAuthority={subject?.source_authority}
+            syllabusVersion={subject?.syllabus_version}
+            sourceUrl={subject?.source_url}
+            statusMessage={subject?.status_message}
+            backUrl="/subjects"
+            backLabel="Browse Other Subjects"
+          />
         </div>
       ) : (
         <div className="materials-grid">
@@ -142,7 +146,7 @@ export const StudyMaterialsPage: React.FC = () => {
                     <div className="materials-topic-info">
                       <div className="materials-badge-verified">
                         <Check size={11} />
-                        <span>Official CISCE Syllabus</span>
+                        <span>Official {subject?.board || 'Curriculum'} Syllabus</span>
                       </div>
                       <h4 className="materials-topic-name">{t.topic_number}. {t.title}</h4>
                       <p className="materials-topic-desc">{t.description}</p>
@@ -164,3 +168,4 @@ export const StudyMaterialsPage: React.FC = () => {
     </AppLayout>
   );
 };
+
