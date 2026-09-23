@@ -101,14 +101,20 @@ export const TutorDrawer: React.FC<TutorDrawerProps> = ({
     voiceEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [voiceTranscripts, interimSpeech]);
 
-  // Cleanup voice session on unmount or drawer close
+  // Cleanup voice session on unmount, drawer close, or window navigation
   useEffect(() => {
     if (!isOpen) {
       if (voiceStateRef.current !== 'idle') {
         stopVoiceSession();
       }
     }
+    const handleBeforeUnload = () => {
+      stopVoiceSession();
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
     return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
       stopVoiceSession();
     };
   }, [isOpen]);
@@ -610,7 +616,12 @@ export const TutorDrawer: React.FC<TutorDrawerProps> = ({
             role="tab"
             aria-selected={activeTab === 'chat'}
             className={`tutor-mode-tab ${activeTab === 'chat' ? 'active' : ''}`}
-            onClick={() => setActiveTab('chat')}
+            onClick={() => {
+              if (voiceStateRef.current !== 'idle') {
+                stopVoiceSession();
+              }
+              setActiveTab('chat');
+            }}
           >
             <MessageSquare size={15} />
             <span>Chat Doubt-Solving</span>
@@ -833,6 +844,12 @@ export const TutorDrawer: React.FC<TutorDrawerProps> = ({
                 {voiceState === 'idle' && 'Tap Start to begin conversational voice tutoring.'}
                 {voiceState === 'error' && 'Voice session encountered an error. Check permissions or retry.'}
               </p>
+
+              <div style={{ textAlign: 'center', marginTop: '6px' }}>
+                <span style={{ fontSize: '11px', color: '#64748b', background: '#f1f5f9', padding: '2px 8px', borderRadius: '4px', border: '1px solid #e2e8f0' }}>
+                  Browser Web Speech Recognition & Synthesis • Not Native S2S
+                </span>
+              </div>
 
               {/* Live Audio Spectrum Canvas */}
               {(voiceState === 'listening' || voiceState === 'speaking') && (

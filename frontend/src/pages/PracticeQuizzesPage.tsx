@@ -13,6 +13,7 @@ import { AppLayout } from '../components/layout/AppLayout';
 import {
   fetchTopicPYQs,
   fetchPracticeQuestions,
+  fetchMyPracticeAttempts,
   generatePracticeQuestions,
   submitPracticeAttempt,
   fetchEnrolledSubjects,
@@ -124,8 +125,31 @@ export const PracticeQuizzesPage: React.FC = () => {
   const loadPracticeQuestions = async (id: number) => {
     try {
       setPracticeLoading(true);
-      const data = await fetchPracticeQuestions(id);
+      const [data, pastAttempts] = await Promise.all([
+        fetchPracticeQuestions(id),
+        fetchMyPracticeAttempts(id).catch(() => []),
+      ]);
       setPracticeQuestions(data);
+      if (Array.isArray(pastAttempts) && pastAttempts.length > 0) {
+        const restoredAnswers: Record<number, string> = {};
+        const restoredResults: Record<number, any> = {};
+        pastAttempts.forEach((att) => {
+          if (att.practice_question_id) {
+            restoredAnswers[att.practice_question_id] = att.user_answer;
+            restoredResults[att.practice_question_id] = {
+              id: att.id,
+              question_id: att.practice_question_id,
+              question_type: att.question_type,
+              user_answer: att.user_answer,
+              is_correct: att.is_correct,
+              marks_obtained: att.marks_obtained,
+              feedback: att.feedback,
+            };
+          }
+        });
+        setSelectedAnswers((prev) => ({ ...prev, ...restoredAnswers }));
+        setAttemptResults((prev) => ({ ...prev, ...restoredResults }));
+      }
     } catch (err) {
       console.error('Failed to load practice questions:', err);
       setPracticeQuestions([]);

@@ -118,6 +118,14 @@ export async function submitPracticeAttempt(questionId: number, userAnswer: stri
   });
 }
 
+export async function fetchMyPracticeAttempts(topicId?: number, limit: number = 100) {
+  const query = topicId ? `?topic_id=${topicId}&limit=${limit}` : `?limit=${limit}`;
+  return apiClient<any[]>(`/learning/practice-questions/my-attempts${query}`, {
+    method: 'GET',
+    requiresAuth: true,
+  });
+}
+
 export async function fetchTopicStudyNotes(topicId: number, notesType: string = 'comprehensive') {
   return apiClient<any>(`/learning/topics/${topicId}/notes?type=${encodeURIComponent(notesType)}`, {
     method: 'GET',

@@ -290,13 +290,20 @@ class LearningRepository:
 
     @staticmethod
     def get_user_question_attempts(
-        db: Session, user_id: int, limit: int = 50
+        db: Session, user_id: int, limit: int = 50, topic_id: Optional[int] = None
     ) -> List[StudentQuestionAttempt]:
-        """Fetch recent attempts for a student."""
+        """Fetch recent attempts for a student, optionally filtered by topic."""
+        query = db.query(StudentQuestionAttempt).filter(StudentQuestionAttempt.user_id == user_id)
+        if topic_id is not None:
+            query = query.outerjoin(
+                PracticeQuestion, StudentQuestionAttempt.practice_question_id == PracticeQuestion.id
+            ).outerjoin(
+                PreviousYearQuestion, StudentQuestionAttempt.pyq_id == PreviousYearQuestion.id
+            ).filter(
+                (PracticeQuestion.topic_id == topic_id) | (PreviousYearQuestion.topic_id == topic_id)
+            )
         return (
-            db.query(StudentQuestionAttempt)
-            .filter(StudentQuestionAttempt.user_id == user_id)
-            .order_by(StudentQuestionAttempt.attempted_at.desc())
+            query.order_by(StudentQuestionAttempt.attempted_at.desc())
             .limit(limit)
             .all()
         )

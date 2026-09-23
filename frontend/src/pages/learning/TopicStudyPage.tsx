@@ -18,6 +18,8 @@ import {
   fetchTopicDetail,
   fetchTopicStudyNotes,
   fetchPracticeQuestions,
+  fetchMyPracticeAttempts,
+  submitPracticeAttempt,
   saveTopicProgress,
 } from '../../services/learning';
 import { TutorDrawer } from '../../components/learning/TutorDrawer';
@@ -151,6 +153,25 @@ export const TopicStudyPage: React.FC = () => {
         } catch {
           // silent fallback
         }
+
+        // Restore persisted student practice attempts for this topic
+        try {
+          const pastAttempts = await fetchMyPracticeAttempts(Number(topicId));
+          if (isMounted && Array.isArray(pastAttempts) && pastAttempts.length > 0) {
+            const restoredSelected: Record<number, string | number> = {};
+            const restoredSubmitted: Record<number, boolean> = {};
+            pastAttempts.forEach((att) => {
+              if (att.practice_question_id) {
+                restoredSelected[att.practice_question_id] = att.user_answer;
+                restoredSubmitted[att.practice_question_id] = true;
+              }
+            });
+            setSelectedAnswers((prev) => ({ ...prev, ...restoredSelected }));
+            setSubmittedAnswers((prev) => ({ ...prev, ...restoredSubmitted }));
+          }
+        } catch {
+          // silent fallback
+        }
       } catch (err: any) {
         if (isMounted) {
           setError(err.message || 'Failed to load topic learning resources.');
@@ -214,8 +235,16 @@ export const TopicStudyPage: React.FC = () => {
     setSelectedAnswers((prev) => ({ ...prev, [questionId]: optionVal }));
   };
 
-  const handleCheckAnswer = (questionId: number) => {
+  const handleCheckAnswer = async (questionId: number) => {
+    const selected = selectedAnswers[questionId];
+    if (selected === undefined) return;
+
     setSubmittedAnswers((prev) => ({ ...prev, [questionId]: true }));
+    try {
+      await submitPracticeAttempt(questionId, String(selected));
+    } catch (err) {
+      console.error('Failed to persist practice attempt:', err);
+    }
   };
 
   // Group resources by type

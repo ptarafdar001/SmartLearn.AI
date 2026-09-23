@@ -329,13 +329,14 @@ def submit_practice_attempt(
 )
 def get_my_attempts(
     limit: int = 50,
+    topic_id: Optional[int] = None,
     current_user: User = Depends(get_current_active_user),
     db: Session = Depends(get_db),
 ):
     """Retrieve history of student attempts with marks and feedback."""
     from app.repositories.learning_repository import LearningRepository
     attempts = LearningRepository.get_user_question_attempts(
-        db, user_id=current_user.id, limit=limit
+        db, user_id=current_user.id, limit=limit, topic_id=topic_id
     )
     return [
         {
@@ -347,7 +348,7 @@ def get_my_attempts(
             "is_correct": a.is_correct,
             "marks_obtained": a.marks_obtained,
             "feedback": a.feedback,
-            "attempted_at": a.attempted_at,
+            "attempted_at": a.attempted_at.isoformat() if a.attempted_at else None,
         }
         for a in attempts
     ]

@@ -244,3 +244,50 @@ def test_out_of_scope_redirection_guard(client: TestClient, db_session: Session)
         data = resp.json()
         assert data["is_out_of_scope"] is True
         assert "outside the isc" in data["reply"].lower() or "outside" in data["reply"].lower()
+
+
+# ── 7. Practice Attempt Persistence, Topic Filter & User Isolation ────────────
+def test_practice_attempt_persistence_topic_filter_and_isolation(client: TestClient, db_session: Session):
+    """Verify student question attempts persist, can be filtered by topic_id, and enforce strict user isolation."""
+    student_a = get_auth_student(client, db_session, "attempt_user_a@example.com")
+    student_b = get_auth_student(client, db_session, "attempt_user_b@example.com")
+
+    pq = db_session.query(PracticeQuestion).first()
+    assert pq is not None, "At least one practice question required for test"
+
+    # 1. Student A submits attempt
+    resp_a = client.post(
+        f"/api/v1/learning/practice-questions/{pq.id}/attempt",
+        json={"user_answer": pq.correct_answer},
+        headers=student_a["headers"],
+    )
+    assert resp_a.status_code == 200
+    assert resp_a.json()["is_correct"] is True
+
+    # 2. Student A retrieves attempts filtered by matching topic_id
+    filtered_resp = client.get(
+        f"/api/v1/learning/practice-questions/my-attempts?topic_id={pq.topic_id}",
+        headers=student_a["headers"],
+    )
+    assert filtered_resp.status_code == 200
+    filtered_attempts = filtered_resp.json()
+    assert len(filtered_attempts) >= 1
+    assert any(a["practice_question_id"] == pq.id for a in filtered_attempts)
+
+    # 3. Student A retrieves attempts filtered by non-matching topic_id (e.g. 999999)
+    mismatch_resp = client.get(
+        "/api/v1/learning/practice-questions/my-attempts?topic_id=999999",
+        headers=student_a["headers"],
+    )
+    assert mismatch_resp.status_code == 200
+    assert len(mismatch_resp.json()) == 0
+
+    # 4. Student B retrieves attempts; must NOT see Student A's attempt
+    b_attempts_resp = client.get(
+        "/api/v1/learning/practice-questions/my-attempts",
+        headers=student_b["headers"],
+    )
+    assert b_attempts_resp.status_code == 200
+    b_attempts = b_attempts_resp.json()
+    assert not any(a["practice_question_id"] == pq.id for a in b_attempts)
+
