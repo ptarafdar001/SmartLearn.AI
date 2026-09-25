@@ -3,8 +3,9 @@ import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 export const ProtectedRoute: React.FC = () => {
-  const { isAuthenticated, isLoading, isOnboarded } = useAuth();
+  const { isAuthenticated, isLoading, isOnboarded, user } = useAuth();
   const location = useLocation();
+
 
   if (isLoading) {
     return (
@@ -18,10 +19,13 @@ export const ProtectedRoute: React.FC = () => {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
+  const isFullyOnboarded = isOnboarded || (user?.is_onboarded ?? false);
+
   // If student onboarding is incomplete, redirect to onboarding wizard Step 1
-  if (!isOnboarded) {
+  if (!isFullyOnboarded) {
     return <Navigate to="/onboarding/step1" replace />;
   }
+
 
   return <Outlet />;
 };
