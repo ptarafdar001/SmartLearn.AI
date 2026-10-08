@@ -48,6 +48,11 @@ class Settings(BaseSettings):
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 1440  # 24 hours
 
+    # ── AI Tutor Configuration ────────────────────────────────────────────────
+    GEMINI_API_KEY: Optional[str] = None
+    AI_TUTOR_MODEL: str = "gemini-3.6-flash"
+    AI_TUTOR_TIMEOUT_SECONDS: int = 30
+
     # ── PostgreSQL Database ───────────────────────────────────────────────────
     POSTGRES_SERVER: str = "localhost"
     POSTGRES_PORT: int = 5432
