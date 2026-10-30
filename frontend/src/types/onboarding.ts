@@ -57,6 +57,9 @@ export interface Step4ScheduleRequest {
   daily_target_hours: number;
   preferred_slot: string;
   available_days: string[];
+  slot_start_time?: string | null;
+  reminder_email?: string | null;
+  email_reminders_enabled?: boolean;
 }
 
 export interface StudyScheduleResponse {
@@ -65,6 +68,9 @@ export interface StudyScheduleResponse {
   daily_target_hours: number;
   preferred_slot: string;
   available_days: string[];
+  slot_start_time?: string | null;
+  reminder_email?: string | null;
+  email_reminders_enabled?: boolean;
   created_at: string;
 }
 
@@ -75,4 +81,23 @@ export interface OnboardingStatusResponse {
   step3_completed: boolean;
   step4_completed: boolean;
   current_step: number;
+}
+
+export interface OnboardingSelectionsResponse {
+  user_id: number;
+  full_name: string;
+  email: string;
+  board?: string | null;
+  grade?: string | null;
+  academic_stream?: string | null;
+  enrolled_subjects: string[];
+  preferred_learning_style?: string | null;
+  study_goals: string[];
+  daily_target_hours?: number | null;
+  preferred_slot?: string | null;
+  slot_start_time?: string | null;
+  available_days: string[];
+  reminder_email?: string | null;
+  email_reminders_enabled: boolean;
+  is_onboarded: boolean;
 }

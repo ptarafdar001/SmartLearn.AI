@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useAuth } from '../../context/AuthContext';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { onboardingService } from '../../services/onboarding';
 import { OnboardingNavbar } from '../../components/onboarding/OnboardingNavbar';
@@ -9,6 +10,7 @@ import '../../styles/onboarding.css';
 
 const BOARDS = ['CBSE', 'ICSE', 'State Board', 'ISC', 'Other'];
 const GRADES = [
+  'Class 5',
   'Class 6',
   'Class 7',
   'Class 8',
@@ -21,24 +23,26 @@ const GRADES = [
 export const Step1Page: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { onboardingSelections, refreshOnboardingSelections } = useAuth();
 
-  // Retrieve existing Step 1 selections if returning via Back navigation or from storage
-  const existingStep1 = (() => {
-    if (location.state && (location.state.board || location.state.grade)) {
-      return location.state;
-    }
-    try {
-      const stored = localStorage.getItem('smartlearn_onboarding_step1');
-      if (stored) return JSON.parse(stored);
-    } catch {
-      // Ignore localStorage errors
-    }
-    return null;
-  })();
+  const [selectedBoard, setSelectedBoard] = useState<string>(
+    location.state?.board || onboardingSelections?.board || ''
+  );
+  const [selectedState, setSelectedState] = useState<string>(
+    location.state?.state || ''
+  );
+  const [selectedGrade, setSelectedGrade] = useState<string>(
+    location.state?.grade || onboardingSelections?.grade || ''
+  );
 
-  const [selectedBoard, setSelectedBoard] = useState<string>(existingStep1?.board || '');
-  const [selectedState, setSelectedState] = useState<string>(existingStep1?.state || '');
-  const [selectedGrade, setSelectedGrade] = useState<string>(existingStep1?.grade || '');
+  useEffect(() => {
+    refreshOnboardingSelections().then((sel) => {
+      if (sel) {
+        if (!selectedBoard && sel.board) setSelectedBoard(sel.board);
+        if (!selectedGrade && sel.grade) setSelectedGrade(sel.grade);
+      }
+    });
+  }, []);
 
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -79,7 +83,7 @@ export const Step1Page: React.FC = () => {
 
       // Preserve previously selected stream and subjects if returning from Step 2 for Classes 11-12
       const isSenior = selectedGrade === 'Class 11' || selectedGrade === 'Class 12';
-      const prevData = (location.state as any) || existingStep1 || {};
+      const prevData = (location.state as any) || onboardingSelections || {};
       const frontendContext = {
         board: selectedBoard,
         grade: selectedGrade,

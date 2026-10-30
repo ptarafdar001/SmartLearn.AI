@@ -1,21 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { NavLink, Link } from 'react-router-dom';
 import {
-  LayoutDashboard,
-  BookOpen,
-  FileText,
-  Bot,
-  HelpCircle,
-  BarChart3,
-  Calendar,
-  Settings,
   LogOut,
   Menu,
   X,
   ChevronRight,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
-import { BrandLogo } from '../common/BrandLogo';
+import { fetchDashboardOverview } from '../../services/learning';
+import type { DashboardOverview } from '../../types/learning';
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -23,21 +16,48 @@ interface AppLayoutProps {
 }
 
 const NAV_ITEMS = [
-  { label: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
-  { label: 'My Subjects', path: '/subjects', icon: BookOpen },
-  { label: 'Study Materials & Notes', path: '/study-materials', icon: FileText },
-  { label: 'AI Tutor', path: '/ai-tutor', icon: Bot },
-  { label: 'Practice & Quizzes', path: '/practice', icon: HelpCircle },
-  { label: 'Progress & Analytics', path: '/analytics', icon: BarChart3 },
-  { label: 'Study Plan', path: '/study-plan', icon: Calendar },
-  { label: 'Settings', path: '/settings', icon: Settings },
+  { label: 'Dashboard', path: '/dashboard' },
+  { label: 'My Subjects', path: '/subjects' },
+  { label: 'Materials & Notes', path: '/study-materials' },
+  { label: 'AI Tutor', path: '/ai-tutor' },
+  { label: 'Practice & Quizzes', path: '/practice' },
+  { label: 'Progress & Analytics', path: '/analytics' },
+  { label: 'Study Plan', path: '/study-plan' },
+  { label: 'Settings', path: '/settings' },
 ];
 
 export const AppLayout: React.FC<AppLayoutProps> = ({ children, breadcrumbs }) => {
   const { user, logout } = useAuth();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [overview, setOverview] = useState<DashboardOverview | null>(null);
 
-  const studentName = user?.full_name || 'Student';
+  useEffect(() => {
+    let isMounted = true;
+    async function loadAcademicDetails() {
+      try {
+        const data = await fetchDashboardOverview();
+        if (isMounted && data) {
+          setOverview(data);
+        }
+      } catch {
+        // Fallback gracefully
+      }
+    }
+    loadAcademicDetails();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const studentName = user?.full_name || overview?.full_name || 'pg';
+  const board = overview?.board || 'ISC';
+  const grade = overview?.grade || 'Class 11';
+  // Stream is strictly only applicable for senior secondary (Class 11 & 12)
+  const isSeniorSecondary = grade === 'Class 11' || grade === 'Class 12';
+  const stream = isSeniorSecondary && overview?.academic_stream
+    ? overview.academic_stream.replace(' / Arts', '')
+    : null;
+  const initialLetter = (studentName.charAt(0) || 'P').toUpperCase();
 
   return (
     <div className="platform-layout">
@@ -52,12 +72,12 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children, breadcrumbs }) =
           {mobileOpen ? <X size={20} /> : <Menu size={20} />}
         </button>
 
-        <Link to="/dashboard" className="mobile-brand">
-          <BrandLogo size="sm" />
+        <Link to="/dashboard" className="sidebar-brand-clean">
+          SmartLearn.AI
         </Link>
 
-        <div className="mobile-user-avatar">
-          {studentName.charAt(0).toUpperCase()}
+        <div className="sidebar-user-avatar-orange" style={{ width: 28, height: 28, fontSize: 13 }}>
+          {initialLetter}
         </div>
       </header>
 
@@ -74,41 +94,41 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children, breadcrumbs }) =
       <aside className={`platform-sidebar ${mobileOpen ? 'open' : ''}`}>
         {/* Sidebar Brand Header */}
         <div className="sidebar-brand-box">
-          <Link to="/dashboard" className="sidebar-brand" onClick={() => setMobileOpen(false)}>
-            <BrandLogo size="sm" />
-            <span className="sidebar-badge">Student</span>
+          <Link to="/dashboard" className="sidebar-brand-clean" onClick={() => setMobileOpen(false)}>
+            SmartLearn.AI
           </Link>
         </div>
 
-        {/* Navigation Items List */}
+        {/* Navigation Items List with Dot Indicator matching Design */}
         <nav className="sidebar-nav" aria-label="Main sidebar navigation">
-          {NAV_ITEMS.map((item) => {
-            const Icon = item.icon;
-            return (
-              <NavLink
-                key={item.path}
-                to={item.path}
-                className={({ isActive }) =>
-                  `sidebar-nav-item ${isActive ? 'active' : ''}`
-                }
-                onClick={() => setMobileOpen(false)}
-              >
-                <Icon size={18} className="sidebar-nav-icon" />
-                <span className="sidebar-nav-label">{item.label}</span>
-              </NavLink>
-            );
-          })}
+          {NAV_ITEMS.map((item) => (
+            <NavLink
+              key={item.path}
+              to={item.path}
+              className={({ isActive }) =>
+                `sidebar-nav-item-modern ${isActive ? 'active' : ''}`
+              }
+              onClick={() => setMobileOpen(false)}
+            >
+              <span className="sidebar-nav-dot" aria-hidden="true" />
+              <span>{item.label}</span>
+            </NavLink>
+          ))}
         </nav>
 
         {/* Sidebar Bottom Profile & Sign Out */}
         <div className="sidebar-footer">
           <div className="sidebar-user-card">
-            <div className="sidebar-user-avatar">
-              {studentName.charAt(0).toUpperCase()}
+            <div className="sidebar-user-avatar-orange">
+              {initialLetter}
             </div>
             <div className="sidebar-user-info">
-              <span className="sidebar-user-name">{studentName}</span>
-              <span className="sidebar-user-role">ISC • Class 11</span>
+              <span className="sidebar-user-name" style={{ fontWeight: 700, color: '#1e293b' }}>
+                {studentName}
+              </span>
+              <span className="sidebar-user-role" style={{ color: '#64748b', fontSize: 12 }}>
+                {board} · {grade}
+              </span>
             </div>
           </div>
 
@@ -118,7 +138,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children, breadcrumbs }) =
             onClick={logout}
             aria-label="Sign out of your account"
           >
-            <LogOut size={15} />
+            <LogOut size={14} />
             <span>Sign Out</span>
           </button>
         </div>
@@ -155,7 +175,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children, breadcrumbs }) =
 
           <div className="platform-topbar-actions">
             <div className="topbar-academic-pill">
-              ISC • Class 11 • Humanities
+              {board} · {grade}{stream ? ` · ${stream}` : ''}
             </div>
           </div>
         </header>

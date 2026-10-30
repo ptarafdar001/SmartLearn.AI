@@ -352,3 +352,31 @@ def get_my_attempts(
         for a in attempts
     ]
 
+
+
+@router.get("/rewards/summary", summary="Get student reward stats")
+def get_student_rewards(
+    current_user: User = Depends(get_current_active_user),
+    db: Session = Depends(get_db),
+):
+    from app.models.onboarding import StudentProfile
+    profile = db.query(StudentProfile).filter(StudentProfile.user_id == current_user.id).first()
+    xp = profile.xp_points if (profile and profile.xp_points) else 0
+    streak = profile.streak_days if (profile and profile.streak_days) else 1
+    badges = ["🌱 New Explorer"]
+    if xp >= 50:
+        badges.append("🌟 Quiz Cadet")
+    if xp >= 100:
+        badges.append("🏆 Knowledge Scholar")
+    if xp >= 250:
+        badges.append("⚡ Master of Curriculum")
+    if streak >= 3:
+        badges.append("🔥 Consistency Champion")
+    return {
+        "xp_points": xp,
+        "streak_days": streak,
+        "badges": badges,
+        "level": (xp // 50) + 1,
+        "next_level_xp": ((xp // 50) + 1) * 50,
+        "level_progress": (xp % 50) * 2,
+    }

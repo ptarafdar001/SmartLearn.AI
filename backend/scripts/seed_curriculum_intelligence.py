@@ -23,14 +23,22 @@ from app.models.learning import (
 def seed_curriculum_intelligence():
     db = SessionLocal()
     try:
-        topic = db.query(Topic).filter(Topic.id == 44).first()
+        topic = (
+            db.query(Topic).filter(Topic.title.ilike("%Development of Transport%")).first()
+            or db.query(Topic).filter(Topic.id == 44).first()
+            or db.query(Topic).first()
+        )
         if not topic:
-            print("Topic 44 not found. Please ensure topic 44 exists.")
+            print("Topic not found. Please ensure topic exists.")
             return
 
-        subject = db.query(Subject).filter(Subject.id == 43).first()
+        subject = (
+            db.query(Subject).filter(Subject.code == "isc-11-hist").first()
+            or db.query(Subject).filter(Subject.id == 43).first()
+            or db.query(Subject).first()
+        )
         if not subject:
-            print("Subject 43 not found.")
+            print("Subject not found.")
             return
 
         now = datetime.now(timezone.utc)
