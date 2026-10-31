@@ -188,3 +188,38 @@ export async function triggerMissedSlotAlert(): Promise<{ status: string; messag
     requiresAuth: true,
   });
 }
+
+
+export interface VideoRecommendationItem {
+  video_id: string;
+  title: string;
+  description: string;
+  channel_title: string;
+  thumbnail_url: string;
+  embed_url: string;
+  duration_minutes: number;
+  relevance_score: number;
+}
+
+export interface TopicVideoRecommendationsResponse {
+  topic_id: number;
+  topic_title: string;
+  chapter_title?: string | null;
+  subject_name?: string | null;
+  board?: string | null;
+  grade?: string | null;
+  videos: VideoRecommendationItem[];
+  total_count: number;
+}
+
+export async function fetchTopicVideoRecommendations(
+  topicId: number
+): Promise<TopicVideoRecommendationsResponse> {
+  return apiClient<TopicVideoRecommendationsResponse>(
+    `/learning/topics/${topicId}/video-recommendations`,
+    {
+      method: 'GET',
+      requiresAuth: true,
+    }
+  );
+}

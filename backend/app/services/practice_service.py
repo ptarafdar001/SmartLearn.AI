@@ -73,7 +73,7 @@ class PracticeService:
             existing = LearningRepository.get_practice_questions(
                 db, topic_id=topic_id, difficulty=difficulty
             )
-            if existing:
+            if existing and len(existing) >= 3:
                 return [PracticeQuestionResponse.model_validate(q) for q in existing]
 
         # Retrieve verified syllabus evidence to guide generation
@@ -90,12 +90,12 @@ class PracticeService:
         evidence_text = RAGRetrievalService.format_evidence_for_prompt(bundle)
 
         prompt = (
-            f"Generate 3 new educational multiple-choice practice questions (MCQs) for:\n"
+            f"Generate strictly 10 comprehensive educational multiple-choice practice questions (MCQs) for:\n"
             f"Subject: {bundle.subject.name} ({bundle.subject.board} {bundle.subject.grade})\n"
             f"Topic: {bundle.topic.title}\n\n"
             f"CURRICULUM GROUNDING EVIDENCE:\n{evidence_text}\n\n"
             f"Requirements:\n"
-            f"1. Generate strictly 3 MCQs in valid JSON format.\n"
+            f"1. Generate strictly 10 distinct, syllabus-aligned MCQs covering foundational theory, definitions, applications, and problem-solving.\n"
             f"2. Each MCQ must have:\n"
             f"   - 'question_text': Clear question scenario.\n"
             f"   - 'options': Array of 4 objects [{{'id': 'A', 'text': '...'}}, {{'id': 'B', 'text': '...'}}, ...]\n"

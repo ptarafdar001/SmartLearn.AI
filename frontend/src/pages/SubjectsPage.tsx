@@ -32,7 +32,7 @@ export const SubjectsPage: React.FC = () => {
   }, []);
 
   const board = overview?.board || 'ISC';
-  const grade = overview?.grade || 'Class 11';
+  const grade = overview?.grade || 'Class 10';
 
   // Helper for pastel card theme and explore button color
   const getSubjectCardDetails = (index: number, name: string) => {
@@ -133,7 +133,7 @@ export const SubjectsPage: React.FC = () => {
                   </div>
 
                   <p className="subject-card-desc">
-                    {subj.description || `Official CISCE syllabus, chapter by chapter.`}
+                    {subj.description || `Official curriculum syllabus, chapter by chapter.`}
                   </p>
 
                   <div>
