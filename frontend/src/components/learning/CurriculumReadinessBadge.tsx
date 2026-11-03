@@ -17,30 +17,59 @@ export const CurriculumReadinessBadge: React.FC<Props> = ({
 
   let label = 'In Preparation';
   let Icon = Clock;
-  let bgClass = 'bg-amber-500/10 text-amber-300 border-amber-500/20';
+  let badgeStyle = {
+    background: 'rgba(245,158,11,0.10)',
+    color: '#f59e0b',
+    borderColor: 'rgba(245,158,11,0.25)',
+  };
 
   if (normalized === 'content_available') {
     label = 'Content Available';
     Icon = BookOpen;
-    bgClass = 'bg-emerald-500/10 text-emerald-300 border-emerald-500/20';
+    badgeStyle = {
+      background: 'rgba(16,185,129,0.10)',
+      color: '#10b981',
+      borderColor: 'rgba(16,185,129,0.25)',
+    };
   } else if (normalized === 'curriculum_verified') {
     label = 'Curriculum Verified';
     Icon = ShieldCheck;
-    bgClass = 'bg-indigo-500/10 text-indigo-300 border-indigo-500/20';
+    badgeStyle = {
+      background: 'rgba(99,102,241,0.10)',
+      color: '#6366f1',
+      borderColor: 'rgba(99,102,241,0.25)',
+    };
   } else if (normalized === 'no_selection') {
     label = 'No Selection';
     Icon = AlertCircle;
-    bgClass = 'bg-slate-500/10 text-slate-300 border-slate-500/20';
+    badgeStyle = {
+      background: 'rgba(100,116,139,0.10)',
+      color: '#64748b',
+      borderColor: 'rgba(100,116,139,0.25)',
+    };
   }
 
-  const sizeClasses = size === 'sm' ? 'px-2 py-0.5 text-xs' : 'px-2.5 py-1 text-xs';
+  const iconSize = size === 'sm' ? 12 : 14;
+  const padding = size === 'sm' ? '2px 8px' : '4px 10px';
 
   return (
     <span
-      className={`inline-flex items-center gap-1.5 font-medium rounded-full border ${bgClass} ${sizeClasses} ${className}`}
+      className={className}
+      style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: '5px',
+        fontWeight: 600,
+        fontSize: '11px',
+        borderRadius: '9999px',
+        border: '1px solid',
+        padding,
+        lineHeight: 1.4,
+        ...badgeStyle,
+      }}
       data-testid="curriculum-readiness-badge"
     >
-      <Icon className={size === 'sm' ? 'w-3 h-3' : 'w-3.5 h-3.5'} />
+      <Icon size={iconSize} style={{ flexShrink: 0 }} />
       <span>{label}</span>
     </span>
   );

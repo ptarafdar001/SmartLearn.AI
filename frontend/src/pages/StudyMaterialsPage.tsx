@@ -97,7 +97,7 @@ export const StudyMaterialsPage: React.FC = () => {
             className={`filter-pill ${filterType === 'notes' ? 'active' : ''}`}
             onClick={() => setFilterType('notes')}
           >
-            <FileText size={13} />
+            <FileText size={13} style={{ flexShrink: 0 }} />
             <span>Revision Notes</span>
           </button>
           <button
@@ -105,7 +105,7 @@ export const StudyMaterialsPage: React.FC = () => {
             className={`filter-pill ${filterType === 'video' ? 'active' : ''}`}
             onClick={() => setFilterType('video')}
           >
-            <Video size={13} />
+            <Video size={13} style={{ flexShrink: 0 }} />
             <span>Video Lectures</span>
           </button>
         </div>

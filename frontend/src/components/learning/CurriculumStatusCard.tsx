@@ -33,90 +33,154 @@ export const CurriculumStatusCard: React.FC<Props> = ({
 
   return (
     <div
-      className="bg-slate-900/60 border border-slate-800 rounded-2xl p-6 sm:p-8 text-center max-w-2xl mx-auto shadow-xl backdrop-blur-sm"
+      style={{
+        background: 'rgba(15,23,42,0.6)',
+        border: '1px solid #1e293b',
+        borderRadius: '16px',
+        padding: '32px 24px',
+        textAlign: 'center',
+        maxWidth: '640px',
+        margin: '0 auto',
+        boxShadow: '0 8px 32px rgba(0,0,0,0.18)',
+        backdropFilter: 'blur(8px)',
+      }}
       data-testid="curriculum-status-card"
     >
-      <div className="flex justify-center mb-4">
+      {/* Icon circle */}
+      <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '16px' }}>
         {isNoSelection ? (
-          <div className="w-14 h-14 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">
-            <AlertTriangle className="w-7 h-7" />
+          <div style={{
+            width: 56, height: 56, borderRadius: 12,
+            background: 'rgba(245,158,11,0.10)', border: '1px solid rgba(245,158,11,0.2)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#f59e0b',
+          }}>
+            <AlertTriangle style={{ width: 28, height: 28 }} />
           </div>
         ) : isVerified ? (
-          <div className="w-14 h-14 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400">
-            <ShieldCheck className="w-7 h-7" />
+          <div style={{
+            width: 56, height: 56, borderRadius: 12,
+            background: 'rgba(99,102,241,0.10)', border: '1px solid rgba(99,102,241,0.2)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#6366f1',
+          }}>
+            <ShieldCheck style={{ width: 28, height: 28 }} />
           </div>
         ) : (
-          <div className="w-14 h-14 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">
-            <Clock className="w-7 h-7" />
+          <div style={{
+            width: 56, height: 56, borderRadius: 12,
+            background: 'rgba(245,158,11,0.10)', border: '1px solid rgba(245,158,11,0.2)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#f59e0b',
+          }}>
+            <Clock style={{ width: 28, height: 28 }} />
           </div>
         )}
       </div>
 
-      <div className="mb-3">
+      {/* Readiness badge */}
+      <div style={{ marginBottom: '12px' }}>
         <CurriculumReadinessBadge status={curriculumStatus} />
       </div>
 
-      <h3 className="text-xl sm:text-2xl font-bold text-white mb-2">
+      <h3 style={{ fontSize: '20px', fontWeight: 700, color: '#f1f5f9', margin: '0 0 8px' }}>
         {isNoSelection
           ? 'No Matching Curriculum Selected'
           : `${subjectName} ${isVerified ? 'Curriculum Verified' : 'In Preparation'}`}
       </h3>
 
-      <p className="text-slate-300 text-sm sm:text-base leading-relaxed mb-6">
+      <p style={{ color: '#cbd5e1', fontSize: '14px', lineHeight: 1.7, margin: '0 0 24px' }}>
         {statusMessage ||
           (isVerified
             ? `The curriculum framework for ${subjectName} is verified against official standards. Interactive chapters, multi-modal notes, and practice quizzes are currently being authored.`
             : `Curriculum and learning materials for ${subjectName}${board ? ` (${board}${grade ? ` Class ${grade}` : ''})` : ''} are currently in preparation. Our subject matter team is onboarding authentic syllabi.`)}
       </p>
 
-      {/* Provenance metadata box - shown only when metadata actually exists */}
+      {/* Provenance metadata box */}
       {(sourceAuthority || syllabusVersion || sourceUrl) && (
-        <div className="bg-slate-950/60 border border-slate-800/80 rounded-xl p-4 mb-6 text-left text-xs sm:text-sm space-y-2">
-          <p className="font-semibold text-slate-300 uppercase tracking-wider text-[11px] mb-2 flex items-center gap-1.5">
-            <Sparkles className="w-3.5 h-3.5 text-indigo-400" />
+        <div style={{
+          background: 'rgba(2,6,23,0.6)',
+          border: '1px solid rgba(30,41,59,0.8)',
+          borderRadius: '10px',
+          padding: '14px 16px',
+          marginBottom: '24px',
+          textAlign: 'left',
+        }}>
+          <p style={{
+            fontWeight: 700,
+            color: '#cbd5e1',
+            textTransform: 'uppercase',
+            letterSpacing: '0.06em',
+            fontSize: '11px',
+            margin: '0 0 10px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px',
+          }}>
+            <Sparkles style={{ width: 13, height: 13, color: '#818cf8', flexShrink: 0 }} />
             Curriculum Grounding Metadata
           </p>
           {sourceAuthority && (
-            <div className="flex justify-between items-center text-slate-400">
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', color: '#94a3b8', fontSize: '13px', marginBottom: '6px' }}>
               <span>Issuing Authority:</span>
-              <span className="font-medium text-slate-200">{sourceAuthority}</span>
+              <span style={{ fontWeight: 600, color: '#e2e8f0' }}>{sourceAuthority}</span>
             </div>
           )}
           {syllabusVersion && (
-            <div className="flex justify-between items-center text-slate-400">
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', color: '#94a3b8', fontSize: '13px', marginBottom: '6px' }}>
               <span>Syllabus Version:</span>
-              <span className="font-medium text-slate-200">{syllabusVersion}</span>
+              <span style={{ fontWeight: 600, color: '#e2e8f0' }}>{syllabusVersion}</span>
             </div>
           )}
           {sourceUrl && (
-            <div className="flex justify-between items-center text-slate-400 pt-1 border-t border-slate-800/60">
+            <div style={{
+              display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+              color: '#94a3b8', fontSize: '13px',
+              paddingTop: '8px', borderTop: '1px solid rgba(30,41,59,0.6)',
+            }}>
               <span>Official Reference:</span>
               <a
                 href={sourceUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-indigo-400 hover:text-indigo-300 inline-flex items-center gap-1 underline"
+                style={{
+                  color: '#818cf8',
+                  textDecoration: 'underline',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '4px',
+                }}
               >
-                View Syllabus <ExternalLink className="w-3 h-3" />
+                View Syllabus <ExternalLink style={{ width: 12, height: 12, flexShrink: 0 }} />
               </a>
             </div>
           )}
         </div>
       )}
 
-      <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+      {/* Action buttons */}
+      <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'center', gap: '10px' }}>
         <Link
           to={backUrl}
-          className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-sm font-medium transition-colors"
+          style={{
+            display: 'inline-flex', alignItems: 'center', gap: '6px',
+            padding: '9px 18px', borderRadius: '10px',
+            background: '#1e293b', color: '#e2e8f0',
+            fontSize: '13px', fontWeight: 600, textDecoration: 'none',
+            transition: 'background 0.15s',
+          }}
         >
-          <ArrowLeft className="w-4 h-4" />
+          <ArrowLeft style={{ width: 15, height: 15, flexShrink: 0 }} />
           {backLabel}
         </Link>
         <Link
           to="/dashboard"
-          className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium transition-colors"
+          style={{
+            display: 'inline-flex', alignItems: 'center', gap: '6px',
+            padding: '9px 18px', borderRadius: '10px',
+            background: '#4f46e5', color: '#ffffff',
+            fontSize: '13px', fontWeight: 600, textDecoration: 'none',
+            transition: 'background 0.15s',
+          }}
         >
-          <BookOpen className="w-4 h-4" />
+          <BookOpen style={{ width: 15, height: 15, flexShrink: 0 }} />
           Student Dashboard
         </Link>
       </div>
