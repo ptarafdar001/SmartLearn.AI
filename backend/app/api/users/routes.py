@@ -6,6 +6,7 @@ from app.core.dependencies import get_current_active_user
 from app.db.session import get_db
 from app.models.users import User
 from app.schemas.onboarding import (
+    OnboardingSelectionsResponse,
     OnboardingStatusResponse,
     Step1BoardClass,
     Step2StreamSubjects,
@@ -99,6 +100,54 @@ def submit_step4(
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
 
+@router.post(
+    "/onboarding/skip",
+    summary="Skip onboarding with default learning profile",
+)
+def skip_onboarding(
+    current_user: User = Depends(get_current_active_user),
+    db: Session = Depends(get_db),
+) -> Dict[str, Any]:
+    """Allow student to skip onboarding questions and immediately enter their personalized dashboard."""
+    try:
+        # Default Step 1: Class 10 CBSE
+        OnboardingService.save_step1_board_class(
+            db=db,
+            user_id=current_user.id,
+            data=Step1BoardClass(board="CBSE", grade="Class 10"),
+        )
+        # Default Step 2: Core Mathematics and Science
+        OnboardingService.save_step2_stream_subjects(
+            db=db,
+            user_id=current_user.id,
+            data=Step2StreamSubjects(
+                subjects=[
+                    {"subject_id": "cbse-10-math", "subject_name": "Mathematics", "category": "core", "is_custom": False},
+                    {"subject_id": "cbse-10-sci", "subject_name": "Science", "category": "core", "is_custom": False},
+                ]
+            ),
+        )
+        # Default Step 3: Visual style and exam prep
+        OnboardingService.save_step3_preferences_goals(
+            db=db,
+            user_id=current_user.id,
+            data=Step3PreferencesGoals(preferred_style="Visual Learner", goals=["Prepare for Board Exams"]),
+        )
+        # Default Step 4: 2 hours evening commitment
+        OnboardingService.save_step4_schedule(
+            db=db,
+            user_id=current_user.id,
+            data=Step4Schedule(
+                daily_target_hours=2.0,
+                preferred_slot="Evening",
+                available_days=["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+            ),
+        )
+        return {"message": "Onboarding skipped successfully.", "is_onboarded": True}
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+
+
 @router.get(
     "/onboarding/status",
     response_model=OnboardingStatusResponse,
@@ -111,6 +160,23 @@ def get_onboarding_status(
     """Retrieve completion status for each onboarding step and current active step."""
     try:
         return OnboardingService.get_onboarding_status(
+            db=db, user_id=current_user.id
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+
+@router.get(
+    "/onboarding/selections",
+    response_model=OnboardingSelectionsResponse,
+    summary="Get unified current student onboarding selections",
+)
+def get_onboarding_selections(
+    current_user: User = Depends(get_current_active_user),
+    db: Session = Depends(get_db),
+) -> OnboardingSelectionsResponse:
+    """Retrieve the single source of truth for the student's active onboarding choices."""
+    try:
+        return OnboardingService.get_current_selections(
             db=db, user_id=current_user.id
         )
     except ValueError as e:

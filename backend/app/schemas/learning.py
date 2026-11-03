@@ -240,6 +240,10 @@ class PracticeQuestionAttemptResponse(BaseModel):
     feedback: str
     explanation: str
     attempted_at: datetime
+    xp_earned: int = 10
+    total_xp: int = 0
+    streak_days: int = 1
+    badge_unlocked: Optional[str] = None
 
     model_config = ConfigDict(from_attributes=True)
 

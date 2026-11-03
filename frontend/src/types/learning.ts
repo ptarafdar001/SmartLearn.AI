@@ -131,10 +131,13 @@ export interface ContinueLearningItem {
   topic_title: string;
   chapter_id: number;
   chapter_title: string;
+  chapter_number?: number;
+  topic_number?: number;
   subject_id: number;
   subject_name: string;
   status: ProgressStatus;
   progress_percentage: number;
+  time_spent_seconds?: number;
   estimated_minutes: number;
   last_accessed_at?: string | null;
 }
@@ -168,6 +171,10 @@ export interface RecommendationItem {
   subject: string;
   learning_style?: string | null;
   recommendation_type: string;
+  topic_id?: number | null;
+  video_id?: string | null;
+  video_url?: string | null;
+  duration_minutes?: number | null;
 }
 
 export interface RecommendationsResponse {
@@ -236,6 +243,10 @@ export interface PracticeAttemptResponse {
   feedback: string;
   explanation: string;
   attempted_at: string;
+  xp_earned?: number;
+  total_xp?: number;
+  streak_days?: number;
+  badge_unlocked?: string | null;
 }
 
 export interface TopicStudyNotes {

@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useAuth } from '../../context/AuthContext';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { onboardingService } from '../../services/onboarding';
 import { OnboardingNavbar } from '../../components/onboarding/OnboardingNavbar';
@@ -46,29 +47,29 @@ export const Step3Page: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Retrieve existing state from navigation or localStorage
-  const existingStep3 = (() => {
-    if (location.state && (location.state.preferred_style || location.state.goals)) {
-      return location.state;
-    }
-    try {
-      const stored = localStorage.getItem('smartlearn_onboarding_step3');
-      if (stored) return JSON.parse(stored);
-    } catch {
-      // Ignore localStorage error
-    }
-    return null;
-  })();
+  const { onboardingSelections, refreshOnboardingSelections } = useAuth();
 
   const [selectedStyle, setSelectedStyle] = useState<string>(
-    existingStep3?.preferred_style || ''
+    location.state?.preferred_style || onboardingSelections?.preferred_learning_style || ''
   );
   const [selectedGoals, setSelectedGoals] = useState<string[]>(() => {
-    if (Array.isArray(existingStep3?.goals)) {
-      return existingStep3.goals;
+    if (Array.isArray(location.state?.goals)) {
+      return location.state.goals;
+    }
+    if (Array.isArray(onboardingSelections?.study_goals) && onboardingSelections.study_goals.length > 0) {
+      return onboardingSelections.study_goals;
     }
     return [];
   });
+
+  useEffect(() => {
+    refreshOnboardingSelections().then((sel) => {
+      if (sel) {
+        if (!selectedStyle && sel.preferred_learning_style) setSelectedStyle(sel.preferred_learning_style);
+        if (selectedGoals.length === 0 && sel.study_goals?.length) setSelectedGoals(sel.study_goals);
+      }
+    });
+  }, []);
 
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);

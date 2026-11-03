@@ -10,6 +10,7 @@ export interface TutorChatMessage {
 export interface TutorChatPayload {
   topic_id: number;
   message: string;
+  model?: string;
   conversation_history: Array<{
     role: 'student' | 'tutor' | 'user' | 'model';
     content: string;
@@ -26,6 +27,8 @@ export interface TutorChatResponse {
   grade: string;
   grounded_resource_titles: string[];
   is_out_of_scope: boolean;
+  scope_redirection_guidance?: string;
+  diagram_source?: string;
 }
 
 export interface VoiceSessionResponse {
@@ -48,4 +51,3 @@ export type VoiceState =
   | 'thinking'
   | 'speaking'
   | 'error';
-

@@ -73,7 +73,7 @@ class PracticeService:
             existing = LearningRepository.get_practice_questions(
                 db, topic_id=topic_id, difficulty=difficulty
             )
-            if existing:
+            if existing and len(existing) >= 3:
                 return [PracticeQuestionResponse.model_validate(q) for q in existing]
 
         # Retrieve verified syllabus evidence to guide generation
@@ -90,12 +90,12 @@ class PracticeService:
         evidence_text = RAGRetrievalService.format_evidence_for_prompt(bundle)
 
         prompt = (
-            f"Generate 3 new educational multiple-choice practice questions (MCQs) for:\n"
+            f"Generate strictly 10 comprehensive educational multiple-choice practice questions (MCQs) for:\n"
             f"Subject: {bundle.subject.name} ({bundle.subject.board} {bundle.subject.grade})\n"
             f"Topic: {bundle.topic.title}\n\n"
             f"CURRICULUM GROUNDING EVIDENCE:\n{evidence_text}\n\n"
             f"Requirements:\n"
-            f"1. Generate strictly 3 MCQs in valid JSON format.\n"
+            f"1. Generate strictly 10 distinct, syllabus-aligned MCQs covering foundational theory, definitions, applications, and problem-solving.\n"
             f"2. Each MCQ must have:\n"
             f"   - 'question_text': Clear question scenario.\n"
             f"   - 'options': Array of 4 objects [{{'id': 'A', 'text': '...'}}, {{'id': 'B', 'text': '...'}}, ...]\n"
@@ -124,7 +124,7 @@ class PracticeService:
 
         reply_json_str = TutorService._call_gemini_api(
             api_key=api_key,
-            model=settings.AI_TUTOR_MODEL,
+            model="gemini-3.5-flash-lite",
             payload=gemini_payload,
             client=client,
         )
@@ -208,6 +208,26 @@ class PracticeService:
             practice_question_id=pq.id,
         )
 
+        # Reward System (XP & Streaks)
+        from app.models.onboarding import StudentProfile
+        profile = db.query(StudentProfile).filter(StudentProfile.user_id == user_id).first()
+        xp_earned = 15 if is_correct else 5
+        total_xp = 0
+        streak = 1
+        badge_unlocked = None
+        if profile:
+            profile.xp_points = (profile.xp_points or 0) + xp_earned
+            total_xp = profile.xp_points
+            streak = profile.streak_days or 1
+            if total_xp >= 50 and (total_xp - xp_earned) < 50:
+                badge_unlocked = 'Quiz Cadet'
+            elif total_xp >= 100 and (total_xp - xp_earned) < 100:
+                badge_unlocked = 'Knowledge Scholar'
+            elif total_xp >= 250 and (total_xp - xp_earned) < 250:
+                badge_unlocked = 'Master of Curriculum'
+            db.commit()
+            db.refresh(profile)
+
         return PracticeQuestionAttemptResponse(
             id=attempt_record.id,
             question_id=pq.id,
@@ -219,4 +239,8 @@ class PracticeService:
             feedback=feedback,
             explanation=pq.explanation,
             attempted_at=attempt_record.attempted_at,
+            xp_earned=xp_earned,
+            total_xp=total_xp,
+            streak_days=streak,
+            badge_unlocked=badge_unlocked,
         )

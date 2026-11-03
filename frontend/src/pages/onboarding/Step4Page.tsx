@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { onboardingService } from '../../services/onboarding';
@@ -50,73 +50,64 @@ const WEEK_DAYS: WeekDayOption[] = [
 export const Step4Page: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { refreshUser } = useAuth();
+  const { refreshUser, onboardingSelections, refreshOnboardingSelections } = useAuth();
 
-  // Retrieve prior onboarding context from location.state or localStorage
-  const prevContext = (() => {
-    let context: any = {};
-    try {
-      const s1 = localStorage.getItem('smartlearn_onboarding_step1');
-      if (s1) context = { ...context, ...JSON.parse(s1) };
-    } catch {
-      // Ignore
-    }
-    try {
-      const s3 = localStorage.getItem('smartlearn_onboarding_step3');
-      if (s3) context = { ...context, ...JSON.parse(s3) };
-    } catch {
-      // Ignore
-    }
-    try {
-      const s4 = localStorage.getItem('smartlearn_onboarding_step4');
-      if (s4) context = { ...context, ...JSON.parse(s4) };
-    } catch {
-      // Ignore
-    }
-    if (location.state) {
-      context = { ...context, ...location.state };
-    }
-    return context;
-  })();
+  const prevContext = location.state || {};
 
   const [selectedTargetHours, setSelectedTargetHours] = useState<number | null>(
     typeof prevContext?.daily_target_hours === 'number'
       ? prevContext.daily_target_hours
-      : null
+      : (onboardingSelections?.daily_target_hours ?? null)
   );
 
   const [selectedSlot, setSelectedSlot] = useState<string>(
-    prevContext?.preferred_slot || ''
+    prevContext?.preferred_slot || onboardingSelections?.preferred_slot || ''
   );
 
   const [selectedDays, setSelectedDays] = useState<string[]>(() => {
-    if (Array.isArray(prevContext?.available_days)) {
+    if (Array.isArray(prevContext?.available_days) && prevContext.available_days.length > 0) {
       return prevContext.available_days;
+    }
+    if (Array.isArray(onboardingSelections?.available_days) && onboardingSelections.available_days.length > 0) {
+      return onboardingSelections.available_days;
     }
     return [];
   });
+
+  useEffect(() => {
+    refreshOnboardingSelections().then((sel) => {
+      if (sel) {
+        if (selectedTargetHours === null && sel.daily_target_hours) setSelectedTargetHours(sel.daily_target_hours);
+        if (!selectedSlot && sel.preferred_slot) setSelectedSlot(sel.preferred_slot);
+        if (selectedDays.length === 0 && sel.available_days?.length) setSelectedDays(sel.available_days);
+      }
+    });
+  }, []);
 
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   // Derived Learning Profile display values
-  const studentBoard = prevContext?.board || 'CBSE';
-  const studentGrade = prevContext?.grade || 'Class 11';
-  const studentStream = prevContext?.academic_stream || null;
+  const studentBoard = prevContext?.board || onboardingSelections?.board || 'CBSE';
+  const studentGrade = prevContext?.grade || onboardingSelections?.grade || 'Class 10';
+  const studentStream = prevContext?.academic_stream || onboardingSelections?.academic_stream || null;
   const isSenior = studentGrade === 'Class 11' || studentGrade === 'Class 12';
 
   const syllabusText = isSenior && studentStream
-    ? `${studentBoard} • ${studentGrade} (${studentStream})`
-    : `${studentBoard} • ${studentGrade}`;
+    ? `${studentBoard} · ${studentGrade} (${studentStream})`
+    : `${studentBoard} · ${studentGrade}`;
 
   const subjectsText = (() => {
     if (Array.isArray(prevContext?.selectedSubjectNames) && prevContext.selectedSubjectNames.length > 0) {
       return prevContext.selectedSubjectNames.join(', ');
     }
+    if (Array.isArray(onboardingSelections?.enrolled_subjects) && onboardingSelections.enrolled_subjects.length > 0) {
+      return onboardingSelections.enrolled_subjects.join(', ');
+    }
     return 'Not specified';
   })();
 
-  const styleText = prevContext?.preferred_style || 'Not specified';
+  const styleText = prevContext?.preferred_style || onboardingSelections?.preferred_learning_style || 'Not specified';
 
   const weeklyCommitmentText = (() => {
     if (selectedTargetHours && selectedDays.length > 0) {

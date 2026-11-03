@@ -49,6 +49,10 @@ class RecommendationItem(BaseModel):
     subject: str
     learning_style: Optional[str] = None
     recommendation_type: str
+    topic_id: Optional[int] = None
+    video_id: Optional[str] = None
+    video_url: Optional[str] = None
+    duration_minutes: Optional[int] = None
 
 
 class RecommendationsResponse(BaseModel):

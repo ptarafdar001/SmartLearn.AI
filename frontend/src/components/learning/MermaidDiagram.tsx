@@ -11,10 +11,11 @@ mermaid.initialize({
   theme: 'neutral',
   securityLevel: 'strict',
   fontFamily: 'Inter, system-ui, sans-serif',
+  suppressErrorRendering: true,
 });
 
 export const MermaidDiagram: React.FC<MermaidDiagramProps> = ({ code }) => {
-  const uniqueId = useId().replace(/:/g, '_');
+  const uniqueId = useId().replace(/[^a-zA-Z0-9]/g, '_');
   const [svgContent, setSvgContent] = useState<string>('');
   const [hasError, setHasError] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -24,14 +25,27 @@ export const MermaidDiagram: React.FC<MermaidDiagramProps> = ({ code }) => {
     const cleanCode = code.trim();
 
     const renderChart = async () => {
+      const renderId = `mermaid_${uniqueId}_${Date.now()}`;
       try {
         setHasError(false);
-        const { svg } = await mermaid.render(`mermaid_${uniqueId}`, cleanCode);
+        // Clean up any stray error elements mermaid may have injected into document.body
+        const errorElements = document.querySelectorAll(`[id^="d${renderId}"], [id^="mermaid_error_"]`);
+        errorElements.forEach((el) => el.remove());
+
+        const { svg } = await mermaid.render(renderId, cleanCode);
         if (isMounted) {
           setSvgContent(svg);
         }
       } catch (err) {
         console.warn('Failed to render Mermaid diagram:', err);
+        // Remove error svgs mermaid automatically appends to the bottom of the body
+        const strayErrorElements = document.querySelectorAll('svg[id*="mermaid"], [id^="dmermaid"]');
+        strayErrorElements.forEach((el) => {
+          if (el.parentElement === document.body) {
+            el.remove();
+          }
+        });
+
         if (isMounted) {
           setHasError(true);
         }
@@ -44,6 +58,12 @@ export const MermaidDiagram: React.FC<MermaidDiagramProps> = ({ code }) => {
 
     return () => {
       isMounted = false;
+      const errorElements = document.querySelectorAll(`[id*="${uniqueId}"]`);
+      errorElements.forEach((el) => {
+        if (el.parentElement === document.body) {
+          el.remove();
+        }
+      });
     };
   }, [code, uniqueId]);
 
