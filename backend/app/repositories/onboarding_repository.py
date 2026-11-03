@@ -163,7 +163,7 @@ class OnboardingRepository:
         user_id: int,
         daily_target_hours: float,
         preferred_slot: str,
-        available_days: List[str], slot_start_time: Optional[str] = None, reminder_email: Optional[str] = None, email_reminders_enabled: bool = True,
+        available_days: List[str],
     ) -> StudySchedule:
         """Create or update student study schedule (Step 4)."""
         sched = (
@@ -175,15 +175,12 @@ class OnboardingRepository:
             sched.daily_target_hours = daily_target_hours
             sched.preferred_slot = preferred_slot
             sched.available_days = available_days
-            if slot_start_time is not None: sched.slot_start_time = slot_start_time
-            if reminder_email is not None: sched.reminder_email = reminder_email
-            sched.email_reminders_enabled = email_reminders_enabled
         else:
             sched = StudySchedule(
                 user_id=user_id,
                 daily_target_hours=daily_target_hours,
                 preferred_slot=preferred_slot,
-                available_days=available_days, slot_start_time=slot_start_time or '18:00', reminder_email=reminder_email, email_reminders_enabled=email_reminders_enabled,
+                available_days=available_days,
             )
             db.add(sched)
         db.commit()

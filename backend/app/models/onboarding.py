@@ -1,7 +1,6 @@
 from datetime import datetime
 from typing import Any, List, Optional
 from sqlalchemy import (
-    Boolean,
     DateTime,
     Float,
     ForeignKey,
@@ -32,8 +31,6 @@ class StudentProfile(Base):
     board: Mapped[str] = mapped_column(String(100), nullable=False)
     grade: Mapped[str] = mapped_column(String(50), nullable=False)
     academic_stream: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
-    xp_points: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
-    streak_days: Mapped[int] = mapped_column(Integer, default=1, nullable=False)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
     )
@@ -141,9 +138,6 @@ class StudySchedule(Base):
     daily_target_hours: Mapped[float] = mapped_column(Float, nullable=False)
     preferred_slot: Mapped[str] = mapped_column(String(100), nullable=False)
     available_days: Mapped[List[str]] = mapped_column(JSON, nullable=False)
-    slot_start_time: Mapped[Optional[str]] = mapped_column(String(20), default='18:00', nullable=True)
-    reminder_email: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
-    email_reminders_enabled: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
     )

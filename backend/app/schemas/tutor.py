@@ -18,7 +18,6 @@ class TutorChatRequest(BaseModel):
     """Request payload for interacting with the AI Tutor."""
     topic_id: int = Field(..., description="ID of the curriculum topic currently being studied")
     message: str = Field(..., min_length=1, max_length=3000, description="Student's doubt or question")
-    model: Optional[str] = Field(default="gemini-1.5-flash", description="Gemini model selected by student")
     conversation_history: List[TutorChatMessage] = Field(
         default=[], max_length=20, description="Recent conversation turns in the current session"
     )
@@ -50,16 +49,18 @@ class TutorChatResponse(BaseModel):
     learning_objectives: List[str] = []
     is_out_of_scope: bool = False
     scope_redirection_guidance: Optional[str] = None
-    diagram_source: Optional[str] = None
+    diagram_code: Optional[str] = None
+
+    model_config = ConfigDict(from_attributes=True)
 
 
 class VoiceSessionRequest(BaseModel):
-    """Request payload to initiate a voice tutor session."""
-    topic_id: int = Field(..., description="Topic ID for voice tutoring session")
+    """Payload to initiate a real-time conversational voice session."""
+    topic_id: int = Field(..., description="Topic ID for curriculum grounding")
 
 
 class VoiceSessionResponse(BaseModel):
-    """Payload returned when initializing a real-time WebSockets tutoring voice stream."""
+    """Ephemeral session token and WebSocket connection details."""
     session_id: str
     session_token: str
     ws_endpoint: str
@@ -69,3 +70,6 @@ class VoiceSessionResponse(BaseModel):
     board: str
     grade: str
     expires_in_seconds: int
+
+    model_config = ConfigDict(from_attributes=True)
+

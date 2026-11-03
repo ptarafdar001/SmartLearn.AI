@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import type { User, LoginRequest, RegisterRequest } from '../types/auth';
-import type { OnboardingStatusResponse, OnboardingSelectionsResponse } from '../types/onboarding';
+import type { OnboardingStatusResponse } from '../types/onboarding';
 import { authService } from '../services/auth';
 import { onboardingService } from '../services/onboarding';
 import { getStoredToken, setStoredToken, removeStoredToken } from '../services/api';
@@ -11,14 +11,12 @@ interface AuthContextType {
   isAuthenticated: boolean;
   isOnboarded: boolean;
   onboardingStatus: OnboardingStatusResponse | null;
-  onboardingSelections: OnboardingSelectionsResponse | null;
   isLoading: boolean;
   login: (credentials: LoginRequest) => Promise<User>;
   register: (data: RegisterRequest) => Promise<User>;
   logout: () => void;
   refreshUser: () => Promise<User | null>;
   checkOnboardingStatus: () => Promise<OnboardingStatusResponse | null>;
-  refreshOnboardingSelections: () => Promise<OnboardingSelectionsResponse | null>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -28,7 +26,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [token, setToken] = useState<string | null>(getStoredToken());
   const [isOnboarded, setIsOnboarded] = useState<boolean>(false);
   const [onboardingStatus, setOnboardingStatus] = useState<OnboardingStatusResponse | null>(null);
-  const [onboardingSelections, setOnboardingSelections] = useState<OnboardingSelectionsResponse | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   const refreshUser = useCallback(async (): Promise<User | null> => {
@@ -47,19 +44,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       let onboarded = userData.is_onboarded;
       try {
-        const [statusData, selectionsData] = await Promise.all([
-          onboardingService.getOnboardingStatus().catch(() => null),
-          onboardingService.getOnboardingSelections().catch(() => null),
-        ]);
-        if (statusData) {
-          setOnboardingStatus(statusData);
-          onboarded = statusData.is_onboarded;
-        }
-        if (selectionsData) {
-          setOnboardingSelections(selectionsData);
-        }
+        const statusData = await onboardingService.getOnboardingStatus();
+        setOnboardingStatus(statusData);
+        onboarded = statusData.is_onboarded;
       } catch {
-        // Graceful fallback
+        // Graceful fallback to user profile is_onboarded if status endpoint fails
       }
       setIsOnboarded(onboarded);
 
@@ -74,27 +63,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, []);
 
-  const refreshOnboardingSelections = useCallback(async (): Promise<OnboardingSelectionsResponse | null> => {
-    try {
-      const selectionsData = await onboardingService.getOnboardingSelections();
-      setOnboardingSelections(selectionsData);
-      return selectionsData;
-    } catch {
-      return null;
-    }
-  }, []);
-
   const checkOnboardingStatus = useCallback(async (): Promise<OnboardingStatusResponse | null> => {
     try {
       const statusData = await onboardingService.getOnboardingStatus();
       setOnboardingStatus(statusData);
       setIsOnboarded(statusData.is_onboarded);
-      await refreshOnboardingSelections();
       return statusData;
     } catch {
       return null;
     }
-  }, [refreshOnboardingSelections]);
+  }, []);
 
   useEffect(() => {
     const initAuth = async () => {
@@ -159,7 +137,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setUser(null);
     setToken(null);
     setOnboardingStatus(null);
-    setOnboardingSelections(null);
     setIsOnboarded(false);
   };
 
@@ -175,10 +152,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         login,
         register,
         logout,
-        onboardingSelections,
         refreshUser,
         checkOnboardingStatus,
-        refreshOnboardingSelections,
       }}
     >
       {children}

@@ -100,9 +100,6 @@ class Step4Schedule(BaseModel):
     daily_target_hours: float = Field(..., gt=0.0, le=24.0)
     preferred_slot: str = Field(..., min_length=2, max_length=100)
     available_days: List[str] = Field(..., min_length=1)
-    slot_start_time: Optional[str] = Field(None, max_length=20)
-    reminder_email: Optional[str] = Field(None, max_length=255)
-    email_reminders_enabled: bool = True
 
     @field_validator("available_days")
     @classmethod
@@ -127,9 +124,6 @@ class StudyScheduleResponse(BaseModel):
     daily_target_hours: float
     preferred_slot: str
     available_days: List[str]
-    slot_start_time: Optional[str] = None
-    reminder_email: Optional[str] = None
-    email_reminders_enabled: bool = True
     created_at: datetime
 
     model_config = ConfigDict(from_attributes=True)
@@ -144,23 +138,3 @@ class OnboardingStatusResponse(BaseModel):
     step3_completed: bool
     step4_completed: bool
     current_step: int
-
-
-class OnboardingSelectionsResponse(BaseModel):
-    """Unified single source of truth for the student's complete onboarding profile."""
-    user_id: int
-    full_name: str
-    email: str
-    board: Optional[str] = None
-    grade: Optional[str] = None
-    academic_stream: Optional[str] = None
-    enrolled_subjects: List[str] = []
-    preferred_learning_style: Optional[str] = None
-    study_goals: List[str] = []
-    daily_target_hours: Optional[float] = None
-    preferred_slot: Optional[str] = None
-    slot_start_time: Optional[str] = None
-    available_days: List[str] = []
-    reminder_email: Optional[str] = None
-    email_reminders_enabled: bool = True
-    is_onboarded: bool = False

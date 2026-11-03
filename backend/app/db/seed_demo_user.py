@@ -26,7 +26,6 @@ def seed_demo_student(db: Session):
             email=email,
             hashed_password=get_password_hash("Password@123"),
             full_name="Demo Student",
-            role="student",
             is_active=True,
             is_onboarded=True
         )
@@ -47,20 +46,24 @@ def seed_demo_student(db: Session):
             user_id=user.id,
             board="ISC",
             grade="Class 11",
-            academic_stream="Humanities / Arts"
+            stream="Humanities / Arts"
         )
         db.add(profile)
     else:
         profile.board = "ISC"
         profile.grade = "Class 11"
-        profile.academic_stream = "Humanities / Arts"
+        profile.stream = "Humanities / Arts"
 
     # Subject Selection
+    hist_subj = db.query(Subject).filter(Subject.code == "isc-11-hist").first()
+    subj_id = hist_subj.id if hist_subj else 1
+    
     existing_subjs = db.query(SubjectSelection).filter(SubjectSelection.user_id == user.id).all()
     if not existing_subjs:
         selection = SubjectSelection(
             user_id=user.id,
-            subject_name="History"
+            subject_id=subj_id,
+            is_primary=True
         )
         db.add(selection)
 
@@ -69,41 +72,32 @@ def seed_demo_student(db: Session):
     if not pref:
         pref = LearningPreference(
             user_id=user.id,
-            preferred_style="visual_and_conceptual"
+            preferred_pace="moderate",
+            learning_style="visual_and_conceptual",
+            explanation_depth="detailed"
         )
         db.add(pref)
-    else:
-        pref.preferred_style = "visual_and_conceptual"
 
     # Goals
     goal = db.query(StudyGoal).filter(StudyGoal.user_id == user.id).first()
     if not goal:
         goal = StudyGoal(
             user_id=user.id,
-            goal_text="Excel in Board Exams",
-            target_score="95%",
-            target_exam="ISC Class 11 Board Exams"
+            primary_goal="Excel in Board Exams",
+            target_percentage=95.0
         )
         db.add(goal)
-    else:
-        goal.goal_text = "Excel in Board Exams"
-        goal.target_score = "95%"
-        goal.target_exam = "ISC Class 11 Board Exams"
 
     # Schedule
     sched = db.query(StudySchedule).filter(StudySchedule.user_id == user.id).first()
     if not sched:
         sched = StudySchedule(
             user_id=user.id,
-            daily_target_hours=2.0,
-            preferred_slot="evening",
-            available_days=["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
+            daily_study_hours=2.0,
+            preferred_time_of_day="evening",
+            days_per_week=6
         )
         db.add(sched)
-    else:
-        sched.daily_target_hours = 2.0
-        sched.preferred_slot = "evening"
-        sched.available_days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
 
     db.commit()
     print("Demo student onboarding data seeded successfully!")

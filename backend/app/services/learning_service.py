@@ -29,406 +29,46 @@ logger = logging.getLogger("smartlearn.learning")
 class LearningService:
     """Orchestrates learning workflows, curriculum traversal, and student progress telemetry."""
 
-    @classmethod
-    def _ensure_canonical_subject_for_selection(
-        cls, db: Session, user_id: int, subject_name: str
-    ) -> Subject:
+    @staticmethod
+    def get_enrolled_subjects(db: Session, user_id: int) -> List[SubjectSummaryResponse]:
         """
-        Dynamically provisions a verified curriculum Subject hierarchy with syllabus chapters,
-        topics, and learning resources if one does not already exist for the student's board/grade.
-        Prevents 'Subject not found or inactive' 404 errors for any chosen onboarding curriculum.
-        """
-        profile = OnboardingRepository.get_student_profile(db, user_id)
-        board = profile.board if profile else "CBSE"
-        grade = profile.grade if profile else "Class 10"
-        stream = profile.academic_stream if profile else None
-
-        # Check if matching subject already exists
-        candidates = LearningRepository.get_subjects_by_board_grade(
-            db, board=board, grade=grade, academic_stream=stream
-        )
-        for s in candidates:
-            if s.name.strip().lower() == subject_name.strip().lower():
-                return s
-
-        # Generate a clean canonical code e.g. "icse-class-7-history-civics-and-geography"
-        clean_name = "".join(c if c.isalnum() else "-" for c in subject_name.lower()).strip("-")
-        clean_board = "".join(c if c.isalnum() else "-" for c in board.lower()).strip("-")
-        clean_grade = "".join(c if c.isalnum() else "-" for c in grade.lower()).strip("-")
-        code = f"{clean_board}-{clean_grade}-{clean_name}"[:50]
-
-        # Check if subject with this code already exists
-        existing_by_code = db.query(Subject).filter(Subject.code == code).first()
-        if existing_by_code:
-            return existing_by_code
-
-        # Create new canonical Subject record
-        new_subject = Subject(
-            code=code,
-            name=subject_name,
-            board=board,
-            grade=grade,
-            academic_stream=stream,
-            category="core",
-            description=f"Official {board} {grade} curriculum syllabus for {subject_name}.",
-            display_order=1,
-            is_active=True,
-        )
-        db.add(new_subject)
-        db.commit()
-        db.refresh(new_subject)
-
-        # Curriculum syllabus chapter & topic generator tailored specifically to student's subject, board, and grade
-        s_lower = subject_name.lower()
-        if any(w in s_lower for w in ["sanskrit", "ruchira", "shemushi"]):
-            curriculum_chapters = [
-                {
-                    "num": 1,
-                    "title": f"Sanskrit Vyakaran & Varnamala (संस्कृत व्याकरणम्)",
-                    "desc": f"Foundations of Sanskrit alphabet, vowels, consonants, and word synthesis according to {board} {grade}.",
-                    "topics": [
-                        {"num": 1, "title": "Varnamala & Uchcharan Sthan (वर्णमाला एवं उच्चारण-स्थानम्)", "desc": "Sanskrit swara, vyanjana, and articulation positions.", "minutes": 20, "video_id": "T6o6WkQ54pE"},
-                        {"num": 2, "title": "Shabd Roop & Karak Parichay (शब्दरूपाणि कारक-परिचयश्च)", "desc": "Vibhakti, declensions, and basic noun declension forms.", "minutes": 24, "video_id": "u5n_2w03q_8"},
-                    ],
-                },
-                {
-                    "num": 2,
-                    "title": f"Dhatu Roop & Simple Sentence Construction (धातुरूपाणि वाक्यरचना च)",
-                    "desc": f"Lakar usage (Lat, Lrit, Lang), verb conjugations, and translation essentials.",
-                    "topics": [
-                        {"num": 1, "title": "Dhatu Roop - Lat & Lrit Lakar (लट् एवं लृट् लकारः)", "desc": "Present and future tense verbal conjugations and practice.", "minutes": 25, "video_id": "4iZ0UvXyFvE"},
-                        {"num": 2, "title": "Anuvad & Pathya Pustak Abhyas (अनुवादः पाठ्याभ्यासश्च)", "desc": "Sentence translations and comprehension exercise analysis.", "minutes": 28, "video_id": "T6o6WkQ54pE"},
-                    ],
-                },
-            ]
-        elif any(w in s_lower for w in ["hindi"]):
-            curriculum_chapters = [
-                {
-                    "num": 1,
-                    "title": f"Hindi Vyakaran: Bhasha aur Vyakaran (भाषा एवं व्याकरण)",
-                    "desc": f"Core grammar rules, varn-vichar, sandhi, and shabd bhed for {board} {grade}.",
-                    "topics": [
-                        {"num": 1, "title": "Varn Vichar & Sandhi Niyam (वर्ण विचार एवं संधि नियम)", "desc": "Phonetics, vowel joins, and consonant transformations.", "minutes": 20, "video_id": "qR812uE16kE"},
-                        {"num": 2, "title": "Sangya, Sarvanam & Karak (संज्ञा, सर्वनाम एवं कारक)", "desc": "Noun categories, pronouns, case markers, and practical syntax.", "minutes": 24, "video_id": "qR812uE16kE"},
-                    ],
-                },
-                {
-                    "num": 2,
-                    "title": f"Hindi Sahitya & Pathan Bodh (साहित्य एवं पठन बोध)",
-                    "desc": f"Prose, poetry comprehension, character insights, and answer writing format.",
-                    "topics": [
-                        {"num": 1, "title": "Gadya Khand & Bhaav Bodh (गद्य खंड एवं भाव बोध)", "desc": "Critical appreciation and central themes of prescribed chapters.", "minutes": 25, "video_id": "qR812uE16kE"},
-                        {"num": 2, "title": "Kavya Soundarya & Vyakhya (काव्य सौंदर्य एवं व्याख्या)", "desc": "Poetic devices, meter, and stanza explanations.", "minutes": 28, "video_id": "qR812uE16kE"},
-                    ],
-                },
-            ]
-        elif any(w in s_lower for w in ["english", "literature"]):
-            curriculum_chapters = [
-                {
-                    "num": 1,
-                    "title": f"English Language, Grammar & Comprehension",
-                    "desc": f"Applied grammar, tense agreements, active-passive voice, and reading skills for {board} {grade}.",
-                    "topics": [
-                        {"num": 1, "title": "Tenses, Subject-Verb Concord & Clauses", "desc": "Grammatical harmony, conditional clauses, and error correction.", "minutes": 20, "video_id": "JULrwhkY6eM"},
-                        {"num": 2, "title": "Reading Comprehension & Contextual Vocabulary", "desc": "Passage skimming, inference deduction, and word power.", "minutes": 24, "video_id": "JULrwhkY6eM"},
-                    ],
-                },
-                {
-                    "num": 2,
-                    "title": f"Prose Analysis & Structured Creative Writing",
-                    "desc": f"Essay writing, letter drafting, character analysis, and literary appreciation.",
-                    "topics": [
-                        {"num": 1, "title": "Formal Writing: Letters, Notices & Analytical Essays", "desc": "Standard templates, formatting, and high-scoring structures.", "minutes": 25, "video_id": "JULrwhkY6eM"},
-                        {"num": 2, "title": "Literature Study: Themes, Motifs & Poetic Devices", "desc": "Understanding narrative arc, character motives, and metaphor analysis.", "minutes": 28, "video_id": "JULrwhkY6eM"},
-                    ],
-                },
-            ]
-        elif any(w in s_lower for w in ["account", "bookkeeping"]):
-            curriculum_chapters = [
-                {
-                    "num": 1,
-                    "title": f"Accounting Principles & Double Entry Framework",
-                    "desc": f"Foundations of accounting records, GAAP principles, and ledger balancing for {board} {grade}.",
-                    "topics": [
-                        {"num": 1, "title": "Double Entry System & Journal Entries", "desc": "Recording financial transactions and debit/credit rules.", "minutes": 22, "video_id": "9bZkp7q19f0"},
-                        {"num": 2, "title": "Ledger Posting & Trial Balance", "desc": "Balancing ledger accounts and verifying arithmetic accuracy.", "minutes": 25, "video_id": "9bZkp7q19f0"},
-                    ],
-                },
-                {
-                    "num": 2,
-                    "title": f"Financial Statements & Final Accounts",
-                    "desc": f"Preparation of Trading, Profit & Loss Account and Balance Sheet with adjustments.",
-                    "topics": [
-                        {"num": 1, "title": "Trading & Profit/Loss Statement", "desc": "Calculating gross profit and operating net revenue.", "minutes": 28, "video_id": "9bZkp7q19f0"},
-                        {"num": 2, "title": "Balance Sheet & Year-End Adjustments", "desc": "Accruals, prepayments, depreciation, and bad debts.", "minutes": 30, "video_id": "9bZkp7q19f0"},
-                    ],
-                },
-            ]
-        elif any(w in s_lower for w in ["second language", "2nd language", "language ii"]):
-            curriculum_chapters = [
-                {
-                    "num": 1,
-                    "title": f"{subject_name}: Vyakaran & Bhasha Bodh (भाषा एवं व्याकरण)",
-                    "desc": f"Grammar rules, sentence syntax, comprehension, and vocabulary prescribed for {board} {grade}.",
-                    "topics": [
-                        {"num": 1, "title": f"Vyakaran Niyam & Shabda Rachna (व्याकरण एवं शब्द रचना)", "desc": "Foundational grammar, morphology, and conjugation principles.", "minutes": 20, "video_id": "qR812uE16kE"},
-                        {"num": 2, "title": f"Vakya Vinyas & Anuvad (वाक्य विन्यास एवं अनुवाद)", "desc": "Sentence formation, idioms, case inflection, and translation.", "minutes": 24, "video_id": "T6o6WkQ54pE"},
-                    ],
-                },
-                {
-                    "num": 2,
-                    "title": f"{subject_name}: Sahitya & Pathan Bodh (साहित्य एवं पठन-बोध)",
-                    "desc": f"Prescribed prose, poetry, textual interpretation, and question answers for {board} {grade}.",
-                    "topics": [
-                        {"num": 1, "title": f"Gadya & Bhaavarth (गद्य एवं भावार्थ)", "desc": "Prose textual comprehension, central theme analysis, and summary.", "minutes": 25, "video_id": "qR812uE16kE"},
-                        {"num": 2, "title": f"Kavya & Vyakhya (काव्य एवं व्याख्या)", "desc": "Poetic appreciation, verse analysis, and critical thinking.", "minutes": 28, "video_id": "T6o6WkQ54pE"},
-                    ],
-                },
-            ]
-        elif any(w in s_lower for w in ["economic", "eco"]) and not any(w in s_lower for w in ["second", "language"]):
-            curriculum_chapters = [
-                {
-                    "num": 1,
-                    "title": f"Microeconomics: Demand, Supply & Market Equilibrium",
-                    "desc": f"Price determination, consumer utility, and elasticity under {board} {grade} standards.",
-                    "topics": [
-                        {"num": 1, "title": "Law of Demand & Elasticity of Demand", "desc": "Price elasticity, determinants of demand, and consumer behavior.", "minutes": 20, "video_id": "nbuM0aJjVgE"},
-                        {"num": 2, "title": "Supply Dynamics & Equilibrium Price", "desc": "Market supply curve, equilibrium determination, and shifts.", "minutes": 24, "video_id": "nbuM0aJjVgE"},
-                    ],
-                },
-                {
-                    "num": 2,
-                    "title": f"National Income & Macroeconomic Aggregates",
-                    "desc": f"GDP, GNP, fiscal policy, and banking mechanism.",
-                    "topics": [
-                        {"num": 1, "title": "Circular Flow of Income & National Aggregates", "desc": "Product, expenditure, and value-added methods of national income.", "minutes": 26, "video_id": "nbuM0aJjVgE"},
-                        {"num": 2, "title": "Central Banking & Monetary Policy Instruments", "desc": "Repo rate, CRR, SLR, and credit control mechanisms.", "minutes": 28, "video_id": "nbuM0aJjVgE"},
-                    ],
-                },
-            ]
-        elif any(w in s_lower for w in ["math", "calculus", "geometry", "algebra"]):
-            curriculum_chapters = [
-                {
-                    "num": 1,
-                    "title": f"Algebra & Functional Systems",
-                    "desc": f"Equations, polynomial functions, and core coordinate techniques for {board} {grade}.",
-                    "topics": [
-                        {"num": 1, "title": "Quadratic Equations & Polynomial Solutions", "desc": "Roots of equations, nature of discriminant, and graph properties.", "minutes": 20, "video_id": "9bZkp7q19f0"},
-                        {"num": 2, "title": "Sequences, Series & Progression Theorems", "desc": "Arithmetic and geometric progressions with summation formulas.", "minutes": 25, "video_id": "9bZkp7q19f0"},
-                    ],
-                },
-                {
-                    "num": 2,
-                    "title": f"Trigonometric Functions & Geometric Applications",
-                    "desc": f"Identities, theorems, and multi-step computational problems.",
-                    "topics": [
-                        {"num": 1, "title": "Trigonometric Ratios & Core Identities", "desc": "Standard angle values and fundamental trigonometric proofs.", "minutes": 25, "video_id": "9bZkp7q19f0"},
-                        {"num": 2, "title": "Coordinate Geometry & Spatial Proofs", "desc": "Distance formula, section ratios, and straight line equations.", "minutes": 30, "video_id": "9bZkp7q19f0"},
-                    ],
-                },
-            ]
-        elif any(w in s_lower for w in ["history", "civic", "geography", "social"]):
-            curriculum_chapters = [
-                {
-                    "num": 1,
-                    "title": f"Historical Frameworks & Constitutional Principles",
-                    "desc": f"Key national developments, governance frameworks, and civic rights under {board} {grade}.",
-                    "topics": [
-                        {"num": 1, "title": "Constitutional Governance & Fundamental Rights", "desc": "Structure of democracy, directive principles, and citizen duties.", "minutes": 20, "video_id": "nbuM0aJjVgE"},
-                        {"num": 2, "title": "Social Reforms & Modern National Movements", "desc": "Key historical transitions and constitutional emergence.", "minutes": 24, "video_id": "nbuM0aJjVgE"},
-                    ],
-                },
-                {
-                    "num": 2,
-                    "title": f"Regional Geography & Environmental Resources",
-                    "desc": f"Geographic features, climate systems, and economic resources.",
-                    "topics": [
-                        {"num": 1, "title": "Physical Divisions, Climate & Drainage Systems", "desc": "Monsoon patterns, river basins, and topography.", "minutes": 25, "video_id": "nbuM0aJjVgE"},
-                        {"num": 2, "title": "Resource Distribution & Sustainable Agriculture", "desc": "Mineral deposits, soil types, and agricultural cropping patterns.", "minutes": 26, "video_id": "nbuM0aJjVgE"},
-                    ],
-                },
-            ]
-        elif any(w in s_lower for w in ["sci", "phys", "chem", "bio"]):
-            curriculum_chapters = [
-                {
-                    "num": 1,
-                    "title": f"Scientific Concepts & Core Mechanisms",
-                    "desc": f"Scientific observations, foundational laws, and laboratory principles for {board} {grade}.",
-                    "topics": [
-                        {"num": 1, "title": "Principles of Motion & Energy Transformations", "desc": "Newtonian laws, work-energy theorem, and conservation principles.", "minutes": 22, "video_id": "yE8rkG9Dw4s"},
-                        {"num": 2, "title": "Atomic Structure & Chemical Bonding", "desc": "Valency, periodic table trends, and compound properties.", "minutes": 25, "video_id": "yE8rkG9Dw4s"},
-                    ],
-                },
-                {
-                    "num": 2,
-                    "title": f"Applied Science & Life Processes",
-                    "desc": f"Cellular functions, metabolic systems, and environmental cycles.",
-                    "topics": [
-                        {"num": 1, "title": "Cell Biology & Vital Metabolic Pathways", "desc": "Nutrition, respiration, and cellular transport mechanisms.", "minutes": 24, "video_id": "yE8rkG9Dw4s"},
-                        {"num": 2, "title": "Ecology & Environmental Balance", "desc": "Food webs, nutrient cycles, and biodiversity conservation.", "minutes": 26, "video_id": "yE8rkG9Dw4s"},
-                    ],
-                },
-            ]
-        else:
-            # General fallback educational video tailored to subject
-            gen_video_id = "T6o6WkQ54pE" if "sanskrit" in s_lower else ("qR812uE16kE" if "hindi" in s_lower else ("9bZkp7q19f0" if "math" in s_lower else ("yE8rkG9Dw4s" if any(w in s_lower for w in ["sci", "bio", "chem", "phys"]) else "JULrwhkY6eM")))
-            curriculum_chapters = [
-                {
-                    "num": 1,
-                    "title": f"Foundations & Key Concepts of {subject_name}",
-                    "desc": f"Core syllabus framework and syllabus terminology according to {board} {grade}.",
-                    "topics": [
-                        {"num": 1, "title": f"Core Essentials of {subject_name}", "desc": f"Foundational rules, syllabus scope, and terminology.", "minutes": 20, "video_id": gen_video_id},
-                        {"num": 2, "title": f"Fundamental Rules & Thematic Structure", "desc": f"In-depth breakdown of standard board-prescribed methodologies.", "minutes": 24, "video_id": gen_video_id},
-                    ],
-                },
-                {
-                    "num": 2,
-                    "title": f"Advanced Themes & Board Exam Preparation",
-                    "desc": f"High-yield curriculum modules, practical applications, and syllabus problem-solving.",
-                    "topics": [
-                        {"num": 1, "title": f"Analytical Concepts & Applied Scenarios", "desc": f"Connecting foundational theories to examination scoring.", "minutes": 25, "video_id": gen_video_id},
-                        {"num": 2, "title": f"Review & Marking Scheme Synthesis", "desc": f"Official evaluation guidelines and step-by-step scoring.", "minutes": 28, "video_id": gen_video_id},
-                    ],
-                },
-            ]
-
-        from app.models.learning import LearningObjective, LearningResource, PracticeQuestion, PreviousYearQuestion
-        for ch_data in curriculum_chapters:
-            ch = Chapter(
-                subject_id=new_subject.id,
-                chapter_number=ch_data["num"],
-                title=ch_data["title"],
-                description=ch_data["desc"],
-            )
-            db.add(ch)
-            db.commit()
-            db.refresh(ch)
-
-            for t_data in ch_data["topics"]:
-                top = Topic(
-                    chapter_id=ch.id,
-                    topic_number=t_data["num"],
-                    title=t_data["title"],
-                    description=t_data["desc"],
-                    estimated_minutes=t_data["minutes"],
-                )
-                db.add(top)
-                db.commit()
-                db.refresh(top)
-
-                # Add learning objectives
-                obj = LearningObjective(
-                    topic_id=top.id,
-                    code=f"{clean_name[:4].upper()}-{ch_data['num']}.{t_data['num']}",
-                    description=f"Master {t_data['title']} according to {board} {grade} examination regulations.",
-                    taxonomy_level="understand",
-                    is_core=True,
-                    is_verified=True,
-                )
-                db.add(obj)
-
-                # Add YouTube Video Learning Resource with active valid embed ID
-                video_res = LearningResource(
-                    topic_id=top.id,
-                    title=f"Video Lesson: {t_data['title']}",
-                    resource_type="video",
-                    provider="YouTube",
-                    source_name=f"{board} Educational Curriculum",
-                    source_url=f"https://www.youtube.com/watch?v={t_data['video_id']}",
-                    external_id=t_data["video_id"],
-                    content_url=f"https://www.youtube-nocookie.com/embed/{t_data['video_id']}",
-                    duration_seconds=t_data["minutes"] * 60,
-                    language="en",
-                    order_index=1,
-                    is_active=True,
-                    is_verified=True,
-                )
-                db.add(video_res)
-
-                # Add Text Reading Resource
-                text_res = LearningResource(
-                    topic_id=top.id,
-                    title=f"Prescribed Syllabus Reading: {t_data['title']}",
-                    resource_type="text",
-                    provider="Official Board",
-                    source_name=f"{board} Official Curriculum Framework",
-                    source_url="https://cbseacademic.nic.in" if "cbse" in board.lower() else "https://www.cisce.org",
-                    text_content=f"Comprehensive textbook chapter reading explaining foundational principles of {t_data['title']} in {subject_name} for {board} {grade}.",
-                    language="en",
-                    order_index=2,
-                    is_active=True,
-                    is_verified=True,
-                )
-                db.add(text_res)
-
-                # Add Authentic Board Question (PYQ)
-                pyq = PreviousYearQuestion(
-                    subject_id=new_subject.id,
-                    topic_id=top.id,
-                    board=board,
-                    grade=grade,
-                    exam_year=2024,
-                    paper_code=f"{clean_name[:3].upper()}-2024",
-                    question_number="1",
-                    question_text=f"Explain the foundational significance of {t_data['title']} in {subject_name} as per {board} guidelines.",
-                    marks=4,
-                    marking_scheme=f"1 mark for core definition; 2 marks for analytical characteristics; 1 mark for curriculum application.",
-                    source_name=f"{board} Official Examination Board Papers",
-                    source_url="https://www.cisce.org" if "icse" in board.lower() else "https://cbseacademic.nic.in",
-                    is_verified=True,
-                )
-                db.add(pyq)
-
-                # Add Curriculum Practice MCQ Question
-                mcq = PracticeQuestion(
-                    topic_id=top.id,
-                    question_text=f"Which of the following is a primary principle of {t_data['title']} in {subject_name}?",
-                    question_type="mcq",
-                    options=[
-                        {"id": "A", "text": f"Foundational systematic framework aligned with {board} {grade}"},
-                        {"id": "B", "text": "Unverified assumption without syllabus evidence"},
-                        {"id": "C", "text": "Purely arbitrary procedural rule"},
-                        {"id": "D", "text": "None of the above"},
-                    ],
-                    correct_answer="A",
-                    explanation=f"According to {board} {grade} curriculum guidelines, {t_data['title']} establishes the foundational framework for {subject_name}.",
-                    difficulty="medium",
-                    marks=1,
-                    is_ai_generated=True,
-                )
-                db.add(mcq)
-
-        db.commit()
-        db.refresh(new_subject)
-        return new_subject
-
-    @classmethod
-    def get_enrolled_subjects(cls, db: Session, user_id: int) -> List[SubjectSummaryResponse]:
-        """
-        Retrieve curriculum subjects dynamically aligned with the student's board, grade,
-        and onboarding selections. If a chosen subject has not yet been seeded, automatically
-        provisions it so the student never experiences 'Subject not found or inactive'.
+        Retrieve curriculum subjects aligned with the student's board, grade, and onboarding selections,
+        including live chapter counts and calculated topic progress.
         """
         profile = OnboardingRepository.get_student_profile(db, user_id)
         selections = OnboardingRepository.get_subject_selections(db, user_id)
+        selected_names = {s.subject_name.strip().lower() for s in selections}
 
-        # For every enrolled selection, ensure a real canonical Subject exists
-        canonical_subjects: List[Subject] = []
-        for sel in selections:
-            canonical = cls._ensure_canonical_subject_for_selection(
-                db, user_id=user_id, subject_name=sel.subject_name
+        if profile:
+            candidate_subjects = LearningRepository.get_subjects_by_board_grade(
+                db,
+                board=profile.board,
+                grade=profile.grade,
+                academic_stream=profile.academic_stream,
             )
-            if canonical and canonical not in canonical_subjects:
-                canonical_subjects.append(canonical)
+        else:
+            candidate_subjects = LearningRepository.get_all_active_subjects(db)
 
-        # If student has selections, ONLY return those exact subjects!
-        # If student has zero selections recorded yet, return an empty list so we never bleed unselected default subjects
-        if not selections:
-            canonical_subjects = []
+        # Filter to subjects the student enrolled in during onboarding (or all matching if no filter)
+        if selected_names:
+            matched_subjects = [
+                s for s in candidate_subjects if s.name.strip().lower() in selected_names
+            ]
+            # Fallback if names differ slightly (e.g. "History" vs "History Elective")
+            if not matched_subjects:
+                matched_subjects = [
+                    s for s in candidate_subjects
+                    if any(sel in s.name.strip().lower() for sel in selected_names)
+                ]
+            subjects = matched_subjects if matched_subjects else candidate_subjects
+        else:
+            subjects = candidate_subjects
 
         results: List[SubjectSummaryResponse] = []
-        for s in canonical_subjects:
+        covered_names = set()
+
+        for s in subjects:
+            covered_names.add(s.name.strip().lower())
             chapters = LearningRepository.get_chapters_by_subject_id(db, s.id)
             all_topics: List[Topic] = []
             for ch in chapters:
@@ -467,25 +107,36 @@ class LearningService:
                 )
             )
 
-        return results
-
-    @classmethod
-    def get_subject_detail(cls, db: Session, user_id: int, subject_id: int) -> SubjectDetailResponse:
-        """
-        Retrieve complete subject details with chapter accordions and student progress status.
-        Gracefully resolves subject_id whether it refers to a Subject.id or a SubjectSelection.id.
-        """
-        subject = LearningRepository.get_subject_by_id(db, subject_id)
-        
-        # If not found directly by Subject.id, check if subject_id matches a SubjectSelection.id
-        if not subject:
-            from app.models.onboarding import SubjectSelection
-            sel = db.query(SubjectSelection).filter(SubjectSelection.id == subject_id).first()
-            if sel:
-                subject = cls._ensure_canonical_subject_for_selection(
-                    db, user_id=user_id, subject_name=sel.subject_name
+        # For any enrolled selection that has not been seeded as a canonical Subject yet,
+        # provide a graceful placeholder summary so existing onboarding workflows & tests work seamlessly
+        for sel in selections:
+            if sel.subject_name.strip().lower() not in covered_names:
+                results.append(
+                    SubjectSummaryResponse(
+                        id=sel.id,
+                        code=f"enrolled-{sel.id}",
+                        name=sel.subject_name,
+                        subject_name=sel.subject_name,
+                        board=profile.board if profile else "CBSE",
+                        grade=profile.grade if profile else "Class 11",
+                        academic_stream=profile.academic_stream if profile else None,
+                        category="core",
+                        description=f"Enrolled subject: {sel.subject_name}",
+                        total_chapters=0,
+                        total_topics=0,
+                        chapter_count=0,
+                        topic_count=0,
+                        completed_topics=0,
+                        progress_percentage=None,
+                    )
                 )
 
+        return results
+
+    @staticmethod
+    def get_subject_detail(db: Session, user_id: int, subject_id: int) -> SubjectDetailResponse:
+        """Retrieve complete subject details with chapter accordions and student progress status."""
+        subject = LearningRepository.get_subject_by_id(db, subject_id)
         if not subject:
             raise ValueError("Subject not found or inactive")
 
@@ -639,62 +290,6 @@ class LearningService:
         subject = LearningRepository.get_subject_by_id(db, chapter.subject_id) if chapter else None
 
         resources = LearningRepository.get_resources_by_topic_id(db, topic.id, only_active=True)
-
-        # Dynamic YouTube Video Recommendation integration
-        # Search specifically for this board, grade, subject, chapter, and topic
-        profile = OnboardingRepository.get_student_profile(db, user_id)
-        pref = OnboardingRepository.get_learning_preference(db, user_id)
-        board_val = (subject.board if subject and subject.board else (profile.board if profile else None))
-        grade_val = (subject.grade if subject and subject.grade else (profile.grade if profile else None))
-        pref_lang = pref.preferred_language if pref and hasattr(pref, "preferred_language") else "English"
-
-        has_verified_video = any(r.resource_type == "video" and r.external_id and len(r.external_id) == 11 for r in resources)
-        if not has_verified_video or any(r.external_id in ["nbuM0aJjVgE", "kYJq1000m9A"] for r in resources if r.resource_type == "video"):
-            try:
-                from app.services.youtube_service import YouTubeService
-                yt_recs = YouTubeService.search_videos(
-                    subject=subject.name if subject else "General Studies",
-                    topic=topic.title,
-                    chapter=chapter.title if chapter else None,
-                    board=board_val,
-                    grade=grade_val,
-                    language=pref_lang,
-                    max_results=3,
-                )
-                if yt_recs:
-                    best_yt = yt_recs[0]
-                    # Update or add video resource in DB
-                    existing_vid = next((r for r in resources if r.resource_type == "video"), None)
-                    if existing_vid:
-                        existing_vid.external_id = best_yt.video_id
-                        existing_vid.content_url = best_yt.embed_url
-                        existing_vid.title = f"Video Lesson: {best_yt.title}"
-                        existing_vid.source_name = best_yt.channel_title
-                        existing_vid.duration_seconds = best_yt.duration_minutes * 60
-                        db.commit()
-                        db.refresh(existing_vid)
-                    else:
-                        from app.models.learning import LearningResource
-                        new_vid = LearningResource(
-                            topic_id=topic.id,
-                            title=f"Video Lesson: {best_yt.title}",
-                            resource_type="video",
-                            provider="YouTube",
-                            source_name=best_yt.channel_title,
-                            external_id=best_yt.video_id,
-                            content_url=best_yt.embed_url,
-                            duration_seconds=best_yt.duration_minutes * 60,
-                            language=pref_lang or "English",
-                            order_index=1,
-                            is_active=True,
-                            is_verified=True,
-                        )
-                        db.add(new_vid)
-                        db.commit()
-                    resources = LearningRepository.get_resources_by_topic_id(db, topic.id, only_active=True)
-            except Exception as e:
-                logger.warning(f"Error fetching dynamic topic video: {e}")
-
         resource_responses = [
             LearningResourceResponse(
                 id=r.id,
@@ -793,41 +388,13 @@ class LearningService:
         if not recent_records:
             return None
 
-        # Verify the topic belongs to the student's current enrolled subjects
-        current_selections = OnboardingRepository.get_subject_selections(db, user_id)
-        current_names = [s.subject_name.strip().lower() for s in current_selections]
-        
-        valid_record = None
-        valid_topic = None
-        valid_chapter = None
-        valid_subject = None
-
-        for rec in recent_records:
-            t = LearningRepository.get_topic_by_id(db, rec.topic_id)
-            if not t:
-                continue
-            ch = LearningRepository.get_chapter_by_id(db, t.chapter_id)
-            if not ch:
-                continue
-            sub = LearningRepository.get_subject_by_id(db, ch.subject_id)
-            if not sub:
-                continue
-            # Must match an active enrolled subject
-            if current_names and sub.name.strip().lower() not in current_names:
-                continue
-            valid_record = rec
-            valid_topic = t
-            valid_chapter = ch
-            valid_subject = sub
-            break
-
-        if not valid_record or not valid_topic:
+        recent = recent_records[0]
+        topic = LearningRepository.get_topic_by_id(db, recent.topic_id)
+        if not topic:
             return None
 
-        recent = valid_record
-        topic = valid_topic
-        chapter = valid_chapter
-        subject = valid_subject
+        chapter = LearningRepository.get_chapter_by_id(db, topic.chapter_id)
+        subject = LearningRepository.get_subject_by_id(db, chapter.subject_id) if chapter else None
 
         return ContinueLearningItem(
             topic_id=topic.id,

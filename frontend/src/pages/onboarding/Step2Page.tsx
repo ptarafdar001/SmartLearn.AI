@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { useAuth } from '../../context/AuthContext';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { onboardingService } from '../../services/onboarding';
 import { OnboardingNavbar } from '../../components/onboarding/OnboardingNavbar';
@@ -39,13 +38,24 @@ export const Step2Page: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const { onboardingSelections } = useAuth();
+  // Retrieve Step 1 selections from navigation state or localStorage
+  const step1Context = (() => {
+    if (location.state && (location.state.board || location.state.grade)) {
+      return location.state;
+    }
+    try {
+      const stored = localStorage.getItem('smartlearn_onboarding_step1');
+      if (stored) return JSON.parse(stored);
+    } catch {
+      // Ignore localStorage errors
+    }
+    return null;
+  })();
 
-  const step1Context = location.state || {};
-  const studentBoard = step1Context.board || onboardingSelections?.board || 'CBSE';
-  const studentGrade = step1Context.grade || onboardingSelections?.grade || 'Class 10';
-  const studentState = step1Context.state || null;
-  const initialStream = step1Context.academic_stream || onboardingSelections?.academic_stream || '';
+  const studentBoard = step1Context?.board || 'CBSE';
+  const studentGrade = step1Context?.grade || 'Class 11';
+  const studentState = step1Context?.state || null;
+  const initialStream = step1Context?.academic_stream || '';
 
   const isSeniorSecondary =
     studentGrade === 'Class 11' || studentGrade === 'Class 12';

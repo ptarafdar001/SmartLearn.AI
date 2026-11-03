@@ -3,7 +3,7 @@ import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 export const OnboardingRoute: React.FC = () => {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading, user, isOnboarded } = useAuth();
   const location = useLocation();
 
   if (isLoading) {
@@ -27,6 +27,13 @@ export const OnboardingRoute: React.FC = () => {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  // Allow student to access onboarding wizard both on first registration and when editing learning preferences
+  const isFullyOnboarded = isOnboarded || (user?.is_onboarded ?? false);
+
+  // If student is already fully onboarded, navigate them to dashboard
+  if (isFullyOnboarded) {
+    return <Navigate to="/dashboard" replace />;
+  }
+
+
   return <Outlet />;
 };

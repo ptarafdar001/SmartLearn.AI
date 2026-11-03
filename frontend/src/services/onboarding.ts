@@ -9,7 +9,6 @@ import type {
   Step3Response,
   StudyScheduleResponse,
   OnboardingStatusResponse,
-  OnboardingSelectionsResponse,
 } from '../types/onboarding';
 
 export const onboardingService = {
@@ -45,21 +44,8 @@ export const onboardingService = {
     });
   },
 
-  async skipOnboarding(): Promise<{ message: string; is_onboarded: boolean }> {
-    return apiClient<{ message: string; is_onboarded: boolean }>('/users/onboarding/skip', {
-      method: 'POST',
-      requiresAuth: true,
-    });
-  },
-
   async getOnboardingStatus(): Promise<OnboardingStatusResponse> {
     return apiClient<OnboardingStatusResponse>('/users/onboarding/status', {
-      method: 'GET',
-      requiresAuth: true,
-    });
-  },
-  async getOnboardingSelections(): Promise<OnboardingSelectionsResponse> {
-    return apiClient<OnboardingSelectionsResponse>('/users/onboarding/selections', {
       method: 'GET',
       requiresAuth: true,
     });

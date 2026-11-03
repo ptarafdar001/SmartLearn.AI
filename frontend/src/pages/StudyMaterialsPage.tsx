@@ -1,17 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { BookOpen } from 'lucide-react';
+import { FileText, Video, ArrowRight, Check, BookOpen } from 'lucide-react';
 import { AppLayout } from '../components/layout/AppLayout';
 import { fetchEnrolledSubjects, fetchSubjectDetail } from '../services/learning';
 import type { SubjectDetail, SubjectSummary } from '../types/learning';
-import '../styles/learning.css';
 
 export const StudyMaterialsPage: React.FC = () => {
   const [enrolledSubjects, setEnrolledSubjects] = useState<SubjectSummary[]>([]);
   const [selectedSubjectId, setSelectedSubjectId] = useState<number | null>(null);
   const [subject, setSubject] = useState<SubjectDetail | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
-  const [filterType, setFilterType] = useState<'all' | 'notes' | 'video' | 'text'>('all');
+  const [filterType, setFilterType] = useState<string>('all');
 
   useEffect(() => {
     async function loadInitial() {
@@ -34,24 +33,11 @@ export const StudyMaterialsPage: React.FC = () => {
     loadInitial();
   }, []);
 
-  const handleSelectSubject = async (subId: number | null) => {
-    setSelectedSubjectId(subId);
-    if (subId === null) {
-      if (enrolledSubjects.length > 0) {
-        try {
-          setLoading(true);
-          const detail = await fetchSubjectDetail(enrolledSubjects[0].id);
-          setSubject(detail);
-        } catch {
-          setSubject(null);
-        } finally {
-          setLoading(false);
-        }
-      }
-      return;
-    }
+  const handleSelectSubject = async (subId: number) => {
+    if (subId === selectedSubjectId) return;
     try {
       setLoading(true);
+      setSelectedSubjectId(subId);
       const detail = await fetchSubjectDetail(subId);
       setSubject(detail);
     } catch {
@@ -64,70 +50,58 @@ export const StudyMaterialsPage: React.FC = () => {
   const chapters = subject?.chapters || [];
 
   return (
-    <AppLayout breadcrumbs={[{ label: 'Materials & Notes' }]}>
-      {/* Top Header Row matching Image 4 */}
-      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 18, flexWrap: 'wrap', gap: 12 }}>
+    <AppLayout breadcrumbs={[{ label: 'Study Materials & Notes' }]}>
+      <div className="page-header-compact">
         <div>
-          <h1 style={{ fontSize: 24, fontWeight: 800, color: '#1e293b', margin: '0 0 4px 0' }}>
-            Materials &amp; Notes
-          </h1>
-          <p style={{ fontSize: 13.5, color: '#64748b', margin: 0 }}>
-            Verified notes, videos and reading for your syllabus.
+          <h1 className="page-title-compact">Study Materials &amp; Verified Notes</h1>
+          <p className="page-subtitle-compact">
+            Curated revision sheets, textbook extracts, and video lectures aligned with CISCE ISC Class 11 regulations.
           </p>
         </div>
 
-        {/* Top-Right Subject Pills matching Image 4 */}
-        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+        {enrolledSubjects.length > 1 && (
+          <div className="filter-pills-row" style={{ marginTop: '12px' }}>
+            <span style={{ fontSize: '13px', fontWeight: 600, color: '#64748b', alignSelf: 'center', marginRight: '6px' }}>
+              Subject:
+            </span>
+            {enrolledSubjects.map((sub) => (
+              <button
+                key={sub.id}
+                type="button"
+                className={`filter-pill ${selectedSubjectId === sub.id ? 'active' : ''}`}
+                onClick={() => handleSelectSubject(sub.id)}
+              >
+                {sub.name}
+              </button>
+            ))}
+          </div>
+        )}
+
+        <div className="filter-pills-row" style={{ marginTop: enrolledSubjects.length > 1 ? '10px' : '0' }}>
           <button
             type="button"
-            className={`filter-btn-pill ${selectedSubjectId === null ? 'active' : ''}`}
-            onClick={() => handleSelectSubject(null)}
+            className={`filter-pill ${filterType === 'all' ? 'active' : ''}`}
+            onClick={() => setFilterType('all')}
           >
-            All subjects
+            All Resources
           </button>
-          {enrolledSubjects.map((sub) => (
-            <button
-              key={sub.id}
-              type="button"
-              className={`filter-btn-pill ${selectedSubjectId === sub.id ? 'active' : ''}`}
-              onClick={() => handleSelectSubject(sub.id)}
-            >
-              {sub.name}
-            </button>
-          ))}
+          <button
+            type="button"
+            className={`filter-pill ${filterType === 'notes' ? 'active' : ''}`}
+            onClick={() => setFilterType('notes')}
+          >
+            <FileText size={13} />
+            <span>Revision Notes</span>
+          </button>
+          <button
+            type="button"
+            className={`filter-pill ${filterType === 'video' ? 'active' : ''}`}
+            onClick={() => setFilterType('video')}
+          >
+            <Video size={13} />
+            <span>Video Lectures</span>
+          </button>
         </div>
-      </div>
-
-      {/* Resource Type Filter Pills matching Image 4 */}
-      <div className="filter-pills-row-modern" style={{ marginBottom: 20 }}>
-        <button
-          type="button"
-          className={`filter-btn-pill ${filterType === 'all' ? 'active' : ''}`}
-          onClick={() => setFilterType('all')}
-        >
-          All
-        </button>
-        <button
-          type="button"
-          className={`filter-btn-pill ${filterType === 'notes' ? 'active' : ''}`}
-          onClick={() => setFilterType('notes')}
-        >
-          Notes
-        </button>
-        <button
-          type="button"
-          className={`filter-btn-pill ${filterType === 'video' ? 'active' : ''}`}
-          onClick={() => setFilterType('video')}
-        >
-          Videos
-        </button>
-        <button
-          type="button"
-          className={`filter-btn-pill ${filterType === 'text' ? 'active' : ''}`}
-          onClick={() => setFilterType('text')}
-        >
-          Reading
-        </button>
       </div>
 
       {loading ? (
@@ -136,56 +110,55 @@ export const StudyMaterialsPage: React.FC = () => {
           <p>Loading study materials catalog...</p>
         </div>
       ) : chapters.length === 0 ? (
-        <div className="learn-empty-state">
-          <BookOpen size={32} />
-          <p>No materials available for the current selection.</p>
+        <div className="learn-empty-state" style={{ padding: '40px 20px', textAlign: 'center', background: '#f8fafc', borderRadius: '12px', border: '1px dashed #cbd5e1' }}>
+          <BookOpen size={36} className="empty-state-icon" style={{ margin: '0 auto 12px', color: '#6366f1' }} />
+          <h3 style={{ fontSize: '17px', fontWeight: 600, color: '#1e293b', marginBottom: '8px' }}>
+            Curriculum In Preparation
+          </h3>
+          <p style={{ maxWidth: 520, margin: '0 auto 16px', color: '#64748b', fontSize: '13.5px', lineHeight: 1.6 }}>
+            Verified study notes and video lectures for this subject are currently undergoing curriculum alignment and review. Currently, <strong>ISC Class 11 History</strong> has complete verified resources.
+          </p>
+          <button
+            type="button"
+            onClick={() => handleSelectSubject(43)}
+            className="continue-action-btn"
+            style={{ display: 'inline-flex', padding: '8px 16px', fontSize: '13px' }}
+          >
+            <span>View Seeded ISC History Notes →</span>
+          </button>
         </div>
       ) : (
-        /* Chapter Blocks matching Image 4 */
-        <div>
-          {chapters.map((ch) => {
-            return (
-              <div key={ch.id} className="materials-ch-block">
-                <h2 className="materials-ch-header-title">
-                  Chapter {ch.chapter_number} · {ch.title}
-                </h2>
-
-                <div>
-                  {ch.topics.map((t, idx) => {
-                    const isEven = idx % 2 === 0;
-                    const durationStr = isEven
-                      ? `Notes · ${t.estimated_minutes || 6} min read`
-                      : `Video · ${t.estimated_minutes ? t.estimated_minutes + 2 : 11} min`;
-                    const btnLabel = isEven ? 'Open' : 'Watch';
-
-                    if (filterType !== 'all') {
-                      if (filterType === 'notes' && !isEven) return null;
-                      if (filterType === 'video' && isEven) return null;
-                    }
-
-                    return (
-                      <div key={t.id} className="material-item-row-clean">
-                        <div>
-                          <div className="material-item-title">{t.title}</div>
-                          <div className="material-item-sub">{durationStr}</div>
-                        </div>
-
-                        <div style={{ display: 'flex', alignItems: 'center' }}>
-                          <span className="badge-verified-green">Verified</span>
-                          <Link
-                            to={`/learning/topics/${t.id}`}
-                            className="btn-open-purple-clean"
-                          >
-                            {btnLabel}
-                          </Link>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
+        <div className="materials-grid">
+          {chapters.map((ch) => (
+            <div key={ch.id} className="materials-chapter-card">
+              <div className="materials-ch-header">
+                <span className="chapter-num-badge">Chapter {ch.chapter_number}</span>
+                <h3 className="materials-ch-title">{ch.title}</h3>
               </div>
-            );
-          })}
+
+              <div className="materials-topics-list">
+                {ch.topics.map((t) => (
+                  <div key={t.id} className="materials-topic-row">
+                    <div className="materials-topic-info">
+                      <div className="materials-badge-verified">
+                        <Check size={11} />
+                        <span>Official CISCE Syllabus</span>
+                      </div>
+                      <h4 className="materials-topic-name">{t.topic_number}. {t.title}</h4>
+                      <p className="materials-topic-desc">{t.description}</p>
+                    </div>
+
+                    <div className="materials-actions">
+                      <Link to={`/learning/topics/${t.id}`} className="materials-view-btn">
+                        <span>Study Notes &amp; Video</span>
+                        <ArrowRight size={13} />
+                      </Link>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
         </div>
       )}
     </AppLayout>

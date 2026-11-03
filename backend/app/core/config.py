@@ -50,11 +50,8 @@ class Settings(BaseSettings):
 
     # ── AI Tutor Configuration ────────────────────────────────────────────────
     GEMINI_API_KEY: Optional[str] = None
-    AI_TUTOR_MODEL: str = "gemini-3.5-flash-lite"
+    AI_TUTOR_MODEL: str = "gemini-3.6-flash"
     AI_TUTOR_TIMEOUT_SECONDS: int = 30
-
-    # ── YouTube Video Recommendations Configuration ───────────────────────────
-    YOUTUBE_API_KEY: Optional[str] = None
 
     # ── PostgreSQL Database ───────────────────────────────────────────────────
     POSTGRES_SERVER: str = "localhost"

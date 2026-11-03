@@ -1,6 +1,16 @@
 import React, { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { AlertCircle, BookOpen, Play, Video } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import {
+  BookOpen,
+  Clock,
+  ArrowRight,
+  Target,
+  Sparkles,
+  Bot,
+  PlayCircle,
+  AlertCircle,
+  TrendingUp,
+} from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { AppLayout } from '../components/layout/AppLayout';
 import {
@@ -19,7 +29,6 @@ import '../styles/learning.css';
 
 export const DashboardPage: React.FC = () => {
   const { user } = useAuth();
-  const navigate = useNavigate();
 
   const [overview, setOverview] = useState<DashboardOverview | null>(null);
   const [subjects, setSubjects] = useState<SubjectSummary[]>([]);
@@ -68,48 +77,10 @@ export const DashboardPage: React.FC = () => {
   }, []);
 
   const studentName = overview?.full_name || user?.full_name || 'Student';
-  const firstName = studentName.split(' ')[0] || studentName;
-  const board = overview?.board || 'Curriculum';
-  const grade = overview?.grade || 'Class 10';
-  const stream = overview?.academic_stream ? overview.academic_stream.replace(' / Arts', '') : null;
-
-  // Time of day calculation
-  const hour = new Date().getHours();
-  const timeOfDay = hour < 12 ? 'morning' : hour < 17 ? 'afternoon' : 'evening';
-
-  // Schedule slot & hours from user data
-  const slot = overview?.study_target?.preferred_slot || 'evening';
-  const targetHours = overview?.study_target?.daily_target_hours || 3;
-  const slotTime =
-    slot === 'morning' ? '9:00 AM' : slot === 'afternoon' ? '2:00 PM' : slot === 'night' ? '8:00 PM' : '6:00 PM';
-
-  // Streak & Studied time
-  const streakDays = overview?.study_streak_days ?? (continueItem ? 1 : 0);
-  const studiedFormatted = continueItem?.time_spent_seconds
-    ? `${Math.floor(continueItem.time_spent_seconds / 3600)}h ${Math.floor((continueItem.time_spent_seconds % 3600) / 60)}m`
-    : '0m';
-
-  // Continue learning item
-  const activeContinue = continueItem;
-  const subjectInitial = activeContinue
-    ? (activeContinue.subject_name.charAt(0) || 'S').toUpperCase()
-    : subjects[0]?.name?.charAt(0).toUpperCase() || 'S';
-
-  // Helper for pastel subject card theme
-  const getSubjectTheme = (index: number, name: string) => {
-    const lower = name.toLowerCase();
-    if (lower.includes('history')) return { cls: 'theme-yellow', color: '#eab308' };
-    if (lower.includes('geography')) return { cls: 'theme-mint', color: '#10b981' };
-    if (lower.includes('english')) return { cls: 'theme-peach', color: '#f97316' };
-    if (lower.includes('pol')) return { cls: 'theme-purple', color: '#8b5cf6' };
-    const themes = [
-      { cls: 'theme-yellow', color: '#eab308' },
-      { cls: 'theme-mint', color: '#10b981' },
-      { cls: 'theme-peach', color: '#f97316' },
-      { cls: 'theme-purple', color: '#8b5cf6' },
-    ];
-    return themes[index % themes.length];
-  };
+  const board = overview?.board || 'ISC';
+  const grade = overview?.grade || 'Class 11';
+  const stream = overview?.academic_stream || 'Humanities';
+  const overallProgress = overview?.overall_progress_percentage ?? 0;
 
   return (
     <AppLayout breadcrumbs={[{ label: 'Dashboard' }]}>
@@ -128,257 +99,243 @@ export const DashboardPage: React.FC = () => {
             <div className="learn-spinner" aria-hidden="true" />
             <p>Loading your personalized learning dashboard...</p>
           </div>
-        ) : subjects.length === 0 ? (
-          <div className="learn-empty-state">
-            <BookOpen size={32} />
-            <p>No enrolled subjects found. Please complete subject onboarding.</p>
-          </div>
         ) : (
           <>
-            {/* 1. Deep Indigo Hero Banner matching Design */}
-            <section className="dashboard-hero-indigo" aria-labelledby="hero-greeting">
-              <div>
-                <div className="hero-pill-translucent">
-                  {board} · {grade}{stream ? ` · ${stream}` : ''}
-                </div>
-                <h1 id="hero-greeting" className="dashboard-hero-title">
-                  Good {timeOfDay}, {firstName}!
-                </h1>
-                <p className="dashboard-hero-sub">
-                  Welcome back, {studentName}! Your {slot} slot starts at {slotTime}. Ready for {targetHours} hours?
-                  {overview?.study_target && (
-                    <span style={{ marginLeft: 8, opacity: 0.9 }}>
-                      ({overview.study_target.daily_target_hours} hrs/day)
-                    </span>
+            {/* 1. Compact Greeting & Key Stats Bar */}
+            <section className="compact-hero-card" aria-labelledby="hero-greeting">
+              <div className="compact-hero-left">
+                <div className="compact-hero-badge">
+                  <span>{board}</span>
+                  <span className="hero-badge-sep">•</span>
+                  <span>{grade}</span>
+                  {stream && (
+                    <>
+                      <span className="hero-badge-sep">•</span>
+                      <span>{stream}</span>
+                    </>
                   )}
+                </div>
+
+                <h1 id="hero-greeting" className="compact-hero-title">
+                  Welcome back, {studentName}!
+                </h1>
+                <p className="compact-hero-sub">
+                  Continue your official CISCE syllabus lessons, study verified notes, and resolve doubts with your AI Tutor.
                 </p>
               </div>
 
-              <div className="hero-stats-row">
-                <div className="hero-stat-card">
-                  <div className="hero-streak-val">{streakDays}</div>
-                  <div className="hero-stat-lbl">DAY STREAK</div>
+              <div className="compact-hero-metrics">
+                <div className="compact-metric-pill">
+                  <div className="stat-icon-wrap stat-icon-primary" style={{ width: 34, height: 34 }}>
+                    <TrendingUp size={16} />
+                  </div>
+                  <div>
+                    <span className="compact-metric-val">
+                      {overallProgress !== null ? `${overallProgress}%` : '0%'}
+                    </span>
+                    <span className="compact-metric-lbl">Overall Progress</span>
+                  </div>
                 </div>
 
-                <div className="hero-stat-card">
-                  <div className="hero-time-val">{studiedFormatted}</div>
-                  <div className="hero-stat-lbl">STUDIED TODAY</div>
+                <div className="compact-metric-pill">
+                  <div className="stat-icon-wrap stat-icon-info" style={{ width: 34, height: 34 }}>
+                    <BookOpen size={16} />
+                  </div>
+                  <div>
+                    <span className="compact-metric-val">{subjects.length}</span>
+                    <span className="compact-metric-lbl">Enrolled Subjects</span>
+                  </div>
                 </div>
+
+                {overview?.study_target && (
+                  <div className="compact-metric-pill">
+                    <div className="stat-icon-wrap stat-icon-success" style={{ width: 34, height: 34 }}>
+                      <Clock size={16} />
+                    </div>
+                    <div>
+                      <span className="compact-metric-val">
+                        {overview.study_target.daily_target_hours} hrs/day
+                      </span>
+                      <span className="compact-metric-lbl">
+                        Study Target ({overview.study_target.preferred_slot})
+                      </span>
+                    </div>
+                  </div>
+                )}
               </div>
             </section>
 
-            {/* 2. Main Two-Column Grid matching Design */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 310px', gap: 24, alignItems: 'flex-start' }}>
-              {/* Left Column: Continue Learning & My Subjects */}
-              <div>
+            {/* 2. Main Dashboard Grid (Fits in One Screen) */}
+            <div className="compact-grid-layout">
+              {/* Left Column: Continue Learning & Enrolled Subjects */}
+              <div className="compact-col-main">
                 {/* Continue Learning Card */}
-                {activeContinue && (
-                  <div className="continue-card-modern">
-                    <div className="continue-square-icon">{subjectInitial}</div>
-
-                    <div className="continue-center-info">
-                      <span className="continue-label-pill">Continue learning</span>
-                      <h3 className="continue-title-modern">
-                        {activeContinue.chapter_number
-                          ? `Chapter ${activeContinue.chapter_number} · ${activeContinue.chapter_title || activeContinue.topic_title}`
-                          : activeContinue.topic_title}
-                      </h3>
-                      <div className="continue-progress-track">
-                        <div
-                          className="continue-progress-fill"
-                          style={{ width: `${activeContinue.progress_percentage}%` }}
-                        />
-                      </div>
+                {continueItem && (
+                  <section className="compact-section" aria-labelledby="continue-learning-title">
+                    <div className="compact-section-hdr">
+                      <h2 id="continue-learning-title" className="compact-section-title">
+                        <PlayCircle size={16} className="text-indigo-600" />
+                        <span>Continue Learning</span>
+                      </h2>
                     </div>
 
-                    <button
-                      type="button"
-                      className="resume-btn-purple"
-                      onClick={() => navigate(`/learning/topics/${activeContinue.topic_id}`)}
-                    >
-                      Resume Topic →
-                    </button>
-                  </div>
-                )}
+                    <div className="compact-continue-card">
+                      <div className="continue-card-info">
+                        <div className="continue-tags-row">
+                          <span className="continue-tag">{continueItem.subject_name}</span>
+                          <span className="continue-chapter-tag">{continueItem.chapter_title}</span>
+                        </div>
 
-                {/* My Subjects Section */}
-                <section aria-labelledby="my-subjects-heading">
-                  <h2 id="my-subjects-heading" className="my-subjects-heading">
-                    My subjects
-                  </h2>
+                        <h3 className="compact-continue-title">{continueItem.topic_title}</h3>
 
-                  <div className="subjects-pastel-grid">
-                    {subjects.map((subj, idx) => {
-                      const theme = getSubjectTheme(idx, subj.name);
-                      const displayName = subj.name;
-                      const chapterCount = subj.total_chapters || subj.chapter_count || 10;
-                      const topicCount = subj.total_topics || subj.topic_count || 24;
-                      const progress = subj.progress_percentage ?? (idx === 0 ? 40 : idx === 1 ? 15 : idx === 2 ? 60 : 0);
+                        <div className="compact-continue-meta">
+                          <span className="continue-meta-item">
+                            <Clock size={12} />
+                            <span>Est. {continueItem.estimated_minutes} mins</span>
+                          </span>
+                          <span className="continue-meta-sep">•</span>
+                          <span className="continue-meta-item">
+                            <span>Progress: {continueItem.progress_percentage}%</span>
+                          </span>
+                        </div>
 
-                      return (
-                        <Link
-                          key={subj.id}
-                          to={`/learning/subjects/${subj.id}`}
-                          className={`subject-pastel-card ${theme.cls}`}
-                        >
-                          <div>
-                            <h3 className="subject-pastel-name">{displayName}</h3>
-                            <div className="subject-pastel-chapters">
-                              {chapterCount} Chapters • {topicCount} Topics
-                            </div>
-                          </div>
+                        <div className="continue-progress-bar">
+                          <div
+                            className="continue-progress-fill"
+                            style={{ width: `${continueItem.progress_percentage}%` }}
+                          />
+                        </div>
+                      </div>
 
-                          <div className="subject-pastel-bar-track">
-                            <div
-                              className="subject-pastel-bar-fill"
-                              style={{ width: `${progress}%` }}
-                            />
-                          </div>
-                        </Link>
-                      );
-                    })}
-                  </div>
-                </section>
-
-                {/* Recommendations with YouTube Video Lessons */}
-                {recommendations.length > 0 && (
-                  <div style={{ marginTop: 24 }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-                      <h3 style={{ fontSize: 16, fontWeight: 700, color: '#1e293b', margin: 0, display: 'flex', alignItems: 'center', gap: 8 }}>
-                        <Video size={18} color="#ef4444" />
-                        Recommended YouTube Video Lessons
-                      </h3>
-                      <Link to="/study-materials" style={{ fontSize: 13, color: '#6366f1', textDecoration: 'none', fontWeight: 600 }}>
-                        View All Materials →
+                      <Link
+                        to={`/learning/topics/${continueItem.topic_id}`}
+                        className="continue-action-btn"
+                        aria-label={`Resume learning: ${continueItem.topic_title}`}
+                      >
+                        <span>Resume Topic →</span>
                       </Link>
                     </div>
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 14 }}>
-                      {recommendations.map((rec) => (
-                        <div
-                          key={rec.id}
-                          style={{
-                            background: '#ffffff',
-                            border: '1px solid #e2e8f0',
-                            borderRadius: 14,
-                            padding: '14px 16px',
-                            display: 'flex',
-                            flexDirection: 'column',
-                            justifyContent: 'space-between',
-                            boxShadow: '0 2px 4px rgba(0,0,0,0.02)',
-                            transition: 'all 0.2s ease',
-                          }}
-                        >
-                          <div>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-                              <span style={{
-                                fontSize: 11,
-                                fontWeight: 700,
-                                textTransform: 'uppercase',
-                                letterSpacing: '0.05em',
-                                background: '#fef2f2',
-                                color: '#dc2626',
-                                padding: '3px 8px',
-                                borderRadius: 6,
-                              }}>
-                                {rec.subject}
-                              </span>
-                              {rec.duration_minutes && (
-                                <span style={{ fontSize: 12, color: '#64748b', fontWeight: 500 }}>
-                                  {rec.duration_minutes} min video
-                                </span>
-                              )}
-                            </div>
-                            <div style={{ fontSize: 14, fontWeight: 700, color: '#1e293b', marginBottom: 6, lineHeight: 1.4 }}>
-                              {rec.title}
-                            </div>
-                            <div style={{ fontSize: 12.5, color: '#64748b', lineHeight: 1.5, marginBottom: 14 }}>
-                              {rec.description}
-                            </div>
-                          </div>
+                  </section>
+                )}
 
-                          <div style={{ display: 'flex', gap: 8, marginTop: 4 }}>
-                            {rec.topic_id ? (
-                              <Link
-                                to={`/learning/topics/${rec.topic_id}`}
-                                style={{
-                                  display: 'inline-flex',
-                                  alignItems: 'center',
-                                  justifyContent: 'center',
-                                  gap: 6,
-                                  background: '#ef4444',
-                                  color: '#ffffff',
-                                  textDecoration: 'none',
-                                  fontSize: 12.5,
-                                  fontWeight: 600,
-                                  padding: '7px 14px',
-                                  borderRadius: 8,
-                                  width: '100%',
-                                }}
-                              >
-                                <Play size={13} fill="#ffffff" /> Watch & Study Topic
-                              </Link>
-                            ) : (
-                              <Link
-                                to="/study-materials"
-                                style={{
-                                  display: 'inline-flex',
-                                  alignItems: 'center',
-                                  justifyContent: 'center',
-                                  gap: 6,
-                                  background: '#4f46e5',
-                                  color: '#ffffff',
-                                  textDecoration: 'none',
-                                  fontSize: 12.5,
-                                  fontWeight: 600,
-                                  padding: '7px 14px',
-                                  borderRadius: 8,
-                                  width: '100%',
-                                }}
-                              >
-                                Open Syllabus Materials
-                              </Link>
-                            )}
-                          </div>
-                        </div>
-                      ))}
+                {/* Enrolled Subjects */}
+                <section className="compact-section" aria-labelledby="enrolled-subjects-title">
+                  <div className="compact-section-hdr">
+                    <h2 id="enrolled-subjects-title" className="compact-section-title">
+                      <BookOpen size={16} className="text-indigo-600" />
+                      <span>Your Enrolled Subjects</span>
+                    </h2>
+                    <Link to="/subjects" className="compact-view-all-link">
+                      <span>View All</span>
+                      <ArrowRight size={12} />
+                    </Link>
+                  </div>
+
+                  {subjects.length === 0 ? (
+                    <div className="learn-empty-state" style={{ padding: '28px 16px' }}>
+                      <BookOpen size={24} className="empty-state-icon" />
+                      <p>No enrolled subjects found. Please complete subject selection.</p>
+                    </div>
+                  ) : (
+                    <div className="compact-subjects-grid">
+                      {subjects.map((subj) => {
+                        const pct = subj.progress_percentage ?? 0;
+                        return (
+                          <Link
+                            key={subj.id}
+                            to={`/learning/subjects/${subj.id}`}
+                            className="compact-subject-card"
+                            aria-label={`Subject: ${subj.name}, ${pct}% completed, click to view syllabus`}
+                          >
+                            <div className="compact-subj-top">
+                              <div className="compact-subj-title-wrap">
+                                <h3 className="subject-name" style={{ fontSize: 16 }}>{subj.name}</h3>
+                                <span className="subject-badge">{subj.board}</span>
+                              </div>
+                              <span className="compact-subj-pct">{pct}%</span>
+                            </div>
+
+                            <p className="compact-subj-desc">
+                              {subj.description || `Official CISCE Class 11 curriculum for ${subj.name}.`}
+                            </p>
+
+                            <div className="progress-bar-bg" style={{ height: 5 }}>
+                              <div className="progress-bar-fill" style={{ width: `${pct}%` }} />
+                            </div>
+
+                            <div className="compact-subj-footer">
+                              <span>
+                                {subj.total_chapters || subj.chapter_count || 0} Chapters •{' '}
+                                {subj.total_topics || subj.topic_count || 0} Topics
+                              </span>
+                              <span className="subject-explore-link">Explore →</span>
+                            </div>
+                          </Link>
+                        );
+                      })}
+                    </div>
+                  )}
+                </section>
+              </div>
+
+              {/* Right Column: Goal & Recommendations */}
+              <div className="compact-col-side">
+                {/* Today's Study Goal Card */}
+                {overview?.study_target && (
+                  <div className="compact-goal-card">
+                    <div className="compact-card-hdr">
+                      <Target size={15} className="text-indigo-600" />
+                      <h3 className="compact-card-title">Today's Study Goal</h3>
+                    </div>
+                    <div className="compact-goal-details">
+                      <div className="compact-goal-row">
+                        <span>Daily Target:</span>
+                        <span className="font-semibold">{overview.study_target.daily_target_hours} Hours</span>
+                      </div>
+                      <div className="compact-goal-row">
+                        <span>Preferred Slot:</span>
+                        <span className="capitalize font-semibold">{overview.study_target.preferred_slot}</span>
+                      </div>
+                      <div className="compact-goal-row">
+                        <span>Exam Target:</span>
+                        <span className="font-semibold text-emerald-600">ISC 2027 (95%)</span>
+                      </div>
                     </div>
                   </div>
                 )}
-              </div>
 
-              {/* Right Column: Today's Plan & Stuck on something */}
-              <div>
-                {/* Today's Plan */}
-                <div className="todays-plan-box">
-                  <h3 className="todays-plan-title">Today's plan</h3>
-                  <div className="plan-items-list">
-                    <div className="plan-item-pill plan-mint">
-                      {slot === 'morning' ? '9:00 AM' : slot === 'afternoon' ? '2:00 PM' : '6:00 PM'} ·{' '}
-                      {subjects[0]?.name || 'Core Subject'} Study Notes
+                {/* AI Tutor Callout */}
+                <div className="compact-tutor-banner">
+                  <div className="compact-tutor-left">
+                    <div className="tutor-spotlight-icon" style={{ width: 32, height: 32 }}>
+                      <Bot size={18} />
                     </div>
-                    <div className="plan-item-pill plan-purple">
-                      {slot === 'morning' ? '10:00 AM' : slot === 'afternoon' ? '3:00 PM' : '7:00 PM'} ·{' '}
-                      {subjects[1]?.name || subjects[0]?.name || 'Syllabus'} Practice Quiz
-                    </div>
-                    <div className="plan-item-pill plan-yellow">
-                      {slot === 'morning' ? '11:00 AM' : slot === 'afternoon' ? '4:00 PM' : '8:00 PM'} · Revise with
-                      AI Tutor
+                    <div>
+                      <h3 className="compact-tutor-title">Curriculum AI Tutor</h3>
+                      <span className="compact-tutor-sub">Ready for text &amp; voice doubts</span>
                     </div>
                   </div>
+                  <Link to="/ai-tutor" className="compact-tutor-btn">
+                    <span>Ask Tutor</span>
+                    <ArrowRight size={13} />
+                  </Link>
                 </div>
 
-                {/* Stuck on something? */}
-                <div className="stuck-container">
-                  <h3 className="stuck-title">Stuck on something?</h3>
-                  <p className="stuck-sub">Ask your tutor, by typing or talking.</p>
-                  <button
-                    type="button"
-                    className="stuck-btn-purple"
-                    onClick={() => navigate('/ai-tutor')}
-                  >
-                    Ask AI Tutor
-                  </button>
-                </div>
+                {/* Recommended Next Step */}
+                {recommendations.length > 0 && (
+                  <div className="compact-recs-box">
+                    <div className="compact-card-hdr">
+                      <Sparkles size={15} className="text-indigo-600" />
+                      <h3 className="compact-card-title">Recommended Next Step</h3>
+                    </div>
+
+                    <div className="compact-rec-item">
+                      <span className="rec-type-badge">{recommendations[0].recommendation_type.replace('_', ' ')}</span>
+                      <h4 className="compact-rec-title">{recommendations[0].title}</h4>
+                      <p className="compact-rec-desc">{recommendations[0].description}</p>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </>
